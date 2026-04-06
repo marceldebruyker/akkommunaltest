@@ -1,6 +1,7 @@
 ---
 const title = "Login - AK Kommunal Plattform";
 import BrandLogo from '../components/BrandLogo.astro';
+import '../styles/global.css';
 
 const error = Astro.url.searchParams.get('error');
 const redirectUrl = Astro.url.searchParams.get('redirect') || '';
@@ -17,8 +18,6 @@ const redirectUrl = Astro.url.searchParams.get('redirect') || '';
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
-    <!-- Load Global CSS -->
-    <link rel="stylesheet" href="/src/styles/global.css" />
     <title>{title}</title>
 </head>
 <body class="bg-[#fafafa] font-body text-gray-800 h-screen w-full overflow-hidden flex flex-col md:flex-row">
