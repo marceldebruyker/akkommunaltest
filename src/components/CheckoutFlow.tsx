@@ -172,6 +172,7 @@ export default function CheckoutFlow({ user = null }: { user?: any }) {
                 <div>
                   <div className="text-xs font-bold text-primary tracking-widest uppercase mb-0.5">Angemeldet als</div>
                   <div className="font-semibold text-on-surface text-base">{user.email}</div>
+                  <a href="/api/auth/signout" className="text-[10px] text-red-500 hover:text-red-700 font-bold uppercase mt-1 inline-block transition-colors">Anderes Konto / Abmelden</a>
                 </div>
               </div>
             </div>
