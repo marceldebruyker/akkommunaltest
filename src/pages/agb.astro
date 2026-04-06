@@ -1,0 +1,35 @@
+---
+import Layout from '../layouts/Layout.astro';
+import TopNavBar from '../components/TopNavBar.astro';
+import FooterSection from '../components/FooterSection.astro';
+---
+
+<Layout title="AGB - AK Kommunal">
+  <TopNavBar />
+  <main class="w-full bg-surface pt-32 pb-24 min-h-[60vh]">
+    <div class="max-w-4xl mx-auto px-8 text-on-surface">
+      <h1 class="text-4xl font-headline font-extrabold text-primary mb-8">Allgemeine Geschäftsbedingungen</h1>
+      <div class="prose prose-lg prose-blue max-w-none text-on-surface-variant font-light leading-relaxed">
+        <h3>§ 1 Geltungsbereich</h3>
+        <p>
+          Diese Allgemeinen Geschäftsbedingungen gelten für alle Verträge über die Teilnahme an Veranstaltungen, Seminaren und dem Online-Videoportal des "Arbeitskreis Kommunal" der BW PARTNER.
+        </p>
+        
+        <h3>§ 2 Anmeldung und Vertragsschluss</h3>
+        <p>
+          Die Anmeldung zu unseren Schulungsmodulen erfolgt elektronisch über diese Website. Ein verbindlicher Vertrag kommt durch unsere schriftliche Anmeldebestätigung zustande.
+        </p>
+        
+        <h3>§ 3 Leistungen und Inhalte</h3>
+        <p>
+          Der genaue Leistungsumfang ergibt sich aus der jeweiligen Modulbeschreibung. Modulzugänge (digital) und Video-on-Demand Abrufe sind personalisiert und dürfen nicht an Dritte weitergegeben werden.
+        </p>
+
+        <p class="mt-12 text-sm italic">
+          *Dies ist ein Platzhaltertext für die AGB im Entwicklungsstand. Bitte vor Livegang mit der juristischen Fachabteilung abstimmen und ergänzen.*
+        </p>
+      </div>
+    </div>
+  </main>
+  <FooterSection />
+</Layout>

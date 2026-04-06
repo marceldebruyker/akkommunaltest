@@ -1,0 +1,114 @@
+---
+import AppLayout from '../../layouts/AppLayout.astro';
+
+import { getSupabaseServer } from '../../lib/supabase';
+import { sanityClient } from '../../lib/sanity';
+
+const supabase = getSupabaseServer(Astro.request, Astro.cookies);
+const { data: authData } = await supabase.auth.getUser();
+
+if (!authData?.user) {
+  return Astro.redirect('/login');
+}
+
+const { data: purchases } = await supabase
+  .from('purchases')
+  .select('video_slug')
+  .eq('user_id', authData.user.id);
+
+const purchasedSlugs = purchases ? purchases.map(p => p.video_slug) : [];
+
+// Fetch ALL seminars from Sanity
+const sanitySeminars = await sanityClient.fetch(`*[_type == "seminar"] | order(eventDate asc) {
+  "slug": slug.current,
+  title, status, eventDate, teamsLink, vimeoId, moduleName, duration, price,
+  "imageUrl": image.asset->url
+}`);
+
+// Determine which seminars the user has access to
+const videos = sanitySeminars.map((video: any) => ({
+  ...video,
+  image: video.imageUrl || "https://images.unsplash.com/photo-1544531586-fde5298cdd40?auto=format&fit=crop&q=80&w=800", // Sanity Image or Fallback
+  hasAccess: purchasedSlugs.includes(video.slug)
+}));
+
+---
+
+<AppLayout title="Meine Lernwelt - AK Kommunal App" currentPath="/app/lernwelt">
+  <div class="p-8 max-w-6xl mx-auto">
+    
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+      <div>
+        <h1 class="text-3xl font-extrabold font-headline text-[#05183a] tracking-tight mb-2">Meine Lernwelt</h1>
+        <p class="text-gray-500">Ihre freigeschalteten Fachvideos und der Gesamtkatalog.</p>
+      </div>
+      
+      <!-- Filter -->
+      <div class="flex gap-2">
+         <select class="bg-white border border-gray-200 text-sm rounded-lg px-4 py-2 outline-none focus:border-blue-500 text-gray-700 font-medium shadow-sm cursor-pointer">
+           <option>Alle Videos</option>
+           <option>Nur freigeschaltete</option>
+           <option>Grundlagen Modul</option>
+           <option>Praktiker Modul</option>
+         </select>
+      </div>
+    </div>
+
+    <!-- Video Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      {videos.map((video: any) => (
+        video.hasAccess ? (
+          /* ACTIVE STATE */
+          <a href={video.status === 'live' ? (video.teamsLink || '#') : `/app/player/${video.slug}`} target={video.status === 'live' ? "_blank" : "_self"} class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col sm:flex-row group hover:shadow-lg hover:border-blue-200 transition-all cursor-pointer h-full">
+            <div class="w-full sm:w-2/5 relative h-48 sm:h-auto border-b sm:border-b-0 sm:border-r border-gray-100">
+               <img src={video.image} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
+               <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors"></div>
+               <div class="absolute bottom-3 right-3 bg-black/70 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded">
+                 {video.duration || '90 Min.'}
+               </div>
+               <div class="absolute top-3 left-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-[#05183a] shadow-sm transform group-hover:scale-110 transition-transform">
+                 <span class="material-symbols-outlined text-[18px] ml-0.5">{video.status === 'live' ? 'groups' : 'play_arrow'}</span>
+               </div>
+            </div>
+            <div class="p-6 flex-1 flex flex-col justify-center">
+              <span class={`text-[9px] uppercase font-bold tracking-widest px-2 py-1 rounded w-fit mb-3 border ${video.status === 'live' ? 'text-blue-600 bg-blue-50 border-blue-100' : 'text-emerald-600 bg-emerald-50 border-emerald-100'}`}>
+                 {video.status === 'live' ? 'Live Session' : 'Freigeschaltet'}
+              </span>
+              <h3 class="text-lg font-bold text-[#05183a] mb-2 leading-tight group-hover:text-blue-600 transition-colors">{video.title}</h3>
+              <div class="text-xs text-gray-500 font-medium flex items-center gap-1.5 mt-auto pt-4">
+                 <span class="material-symbols-outlined text-[14px]">videocam</span> Online-Seminar • {video.moduleName || 'Seminar'}
+              </div>
+            </div>
+          </a>
+        ) : (
+          /* LOCKED STATE */
+          <div class="bg-gray-50 rounded-2xl border border-dashed border-gray-300 overflow-hidden flex flex-col sm:flex-row group relative h-full">
+            <div class="w-full sm:w-2/5 relative h-48 sm:h-auto border-b sm:border-b-0 sm:border-r border-gray-200 grayscale opacity-60">
+               <img src={video.image} class="w-full h-full object-cover" />
+            </div>
+            
+            <div class="p-6 flex-1 flex flex-col justify-center opacity-60">
+              <span class="text-[9px] uppercase font-bold tracking-widest text-gray-500 bg-gray-200 px-2 py-1 rounded w-fit mb-3">
+                 Nicht gebucht
+              </span>
+              <h3 class="text-lg font-bold text-gray-700 mb-2 leading-tight line-clamp-2">{video.title}</h3>
+              <div class="text-xs text-gray-500 font-medium flex items-center gap-1.5 mt-auto pt-4">
+                 <span class="material-symbols-outlined text-[14px]">videocam</span> Online-Seminar • {video.moduleName}
+              </div>
+            </div>
+
+            <!-- Lock Overlay Hover Effect -->
+            <div class="absolute inset-0 bg-white/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-center p-6 border border-red-200 rounded-2xl cursor-pointer">
+              <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mb-3 shadow-sm">
+                <span class="material-symbols-outlined text-[24px]">lock</span>
+              </div>
+              <p class="font-bold text-[#05183a] text-sm mb-1">Video gesperrt</p>
+              <p class="text-xs text-gray-600">Dieses Video benötigt das <strong>{video.moduleName}</strong>.<br/>Klicken Sie hier für ein Upgrade.</p>
+            </div>
+          </div>
+        )
+      ))}
+    </div>
+
+  </div>
+</AppLayout>

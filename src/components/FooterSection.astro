@@ -1,0 +1,128 @@
+---
+import BrandLogo from './BrandLogo.astro';
+---
+<!-- Newsletter / Contact -->
+<section class="py-24 border-t border-outline-variant/15 relative overflow-hidden">
+  <div class="absolute inset-0 bg-gradient-to-br from-surface to-surface-container-low -z-10"></div>
+  
+  <div class="max-w-6xl mx-auto px-8 relative z-10">
+    <div class="bg-surface-container-lowest rounded-3xl p-8 md:p-12 grid grid-cols-1 lg:grid-cols-5 items-center gap-12 lg:gap-16 shadow-[0_20px_40px_-15px_rgba(5,24,58,0.05)] border border-outline-variant/20 relative overflow-hidden">
+      <!-- Decorative circle in newsletter box -->
+      <div class="absolute -right-20 -bottom-20 w-64 h-64 bg-primary-fixed-dim/20 rounded-full blur-[80px]"></div>
+      
+      <div class="lg:col-span-2 relative z-10">
+        <div class="inline-flex items-center gap-2 mb-4 text-primary font-bold text-xs tracking-widest uppercase">
+          <span class="material-symbols-outlined text-[16px]">mail</span>
+          AK Kommunal Update
+        </div>
+        <h2 class="text-2xl md:text-3xl font-extrabold font-headline text-primary mb-4">Bleiben Sie informiert.</h2>
+        <p class="text-on-surface-variant leading-relaxed text-base">Abonnieren Sie unseren Newsletter für aktuelle Termine, neue Kurse und exklusive Einblicke in kommunale Fachthemen von unseren Experten.</p>
+      </div>
+      
+      <form class="lg:col-span-3 w-full flex flex-col gap-4 relative z-10">
+        <div class="flex flex-col sm:flex-row gap-4 relative w-full">
+          <div class="relative flex-grow">
+            <input 
+              class="w-full bg-surface-container-low border border-outline-variant/40 focus:border-primary focus:ring-1 focus:ring-primary py-4 px-6 rounded-xl transition-all outline-none font-body text-on-surface placeholder:text-outline" 
+              placeholder="Ihre dienstliche E-Mail-Adresse" 
+              type="email"
+              required
+            />
+          </div>
+          <button class="bg-primary text-on-primary px-8 py-4 rounded-xl font-bold hover:bg-primary/90 hover:-translate-y-0.5 active:scale-95 transition-all shadow-lg whitespace-nowrap" type="submit">
+            Anmelden
+          </button>
+        </div>
+        <!-- DSGVO Checkbox -->
+        <label class="flex items-start gap-3 cursor-pointer group mt-1">
+          <div class="relative flex items-center justify-center mt-0.5">
+            <input type="checkbox" required class="peer appearance-none w-5 h-5 border-2 border-outline-variant/50 rounded-md checked:bg-primary checked:border-primary transition-all cursor-pointer" />
+            <span class="material-symbols-outlined absolute text-white text-[14px] opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity">check</span>
+          </div>
+          <span class="text-[12px] text-on-surface-variant/80 font-body leading-relaxed">
+            Ich willige ein, dass meine E-Mail-Adresse für den Newsletterversand verarbeitet wird. Weitere Informationen finde ich in der <a href="/datenschutz" class="underline hover:text-primary transition-colors">Datenschutzerklärung</a>.
+          </span>
+        </label>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="w-full border-t border-outline-variant/15 bg-surface-container-low dark:bg-primary pt-20 pb-8">
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 px-8 max-w-6xl mx-auto mb-16">
+    
+    <div class="lg:col-span-4">
+      <div class="mb-6">
+        <BrandLogo />
+      </div>
+      <p class="text-on-surface-variant dark:text-on-primary/60 max-w-sm mb-4 font-body leading-relaxed mt-4">
+        Standort Stuttgart<br/>
+        Hauptstraße 41<br/>
+        70563 Stuttgart (Vaihingen)
+      </p>
+      <div class="text-sm text-on-surface-variant mb-6">
+        Ansprechpartnerin: Freya Schempp<br/>
+        Tel: <a href="tel:07111640165" class="hover:text-primary">0711 1640 165</a><br/>
+        E-Mail: <a href="mailto:info@ak-kommunal.de" class="hover:text-primary">info@ak-kommunal.de</a>
+      </div>
+      <div class="flex gap-4">
+        <a aria-label="E-Mail" class="w-10 h-10 rounded-full border border-outline-variant/30 flex items-center justify-center text-on-surface-variant dark:text-on-primary/60 hover:text-primary dark:hover:text-white hover:border-primary dark:hover:border-white transition-all hover:-translate-y-1" href="mailto:info@ak-kommunal.de">
+          <span class="material-symbols-outlined text-[20px]">mail</span>
+        </a>
+      </div>
+    </div>
+    
+    <div class="lg:col-span-8 grid grid-cols-2 md:grid-cols-4 gap-8">
+      <div>
+        <h5 class="font-bold text-primary dark:text-[#ffffff] mb-6 text-sm uppercase tracking-wider font-headline">Plattform</h5>
+        <ul class="space-y-4 font-body text-sm">
+          <li><a class="text-on-surface-variant dark:text-on-primary/60 hover:text-primary dark:hover:text-[#ffffff] transition-colors" href="/mediathek">Mediathek</a></li>
+          <li><a class="text-on-surface-variant dark:text-on-primary/60 hover:text-primary dark:hover:text-[#ffffff] transition-colors" href="/aktuelles">Aktuelles / News</a></li>
+          <li><a class="text-on-surface-variant dark:text-on-primary/60 hover:text-primary dark:hover:text-[#ffffff] transition-colors" href="/termine">Termine & Webinare</a></li>
+          <li><a class="text-on-surface-variant dark:text-on-primary/60 hover:text-primary dark:hover:text-[#ffffff] transition-colors" href="/mitglied-werden">Mitgliedschaften</a></li>
+          <li><a class="text-on-surface-variant dark:text-on-primary/60 hover:text-primary dark:hover:text-[#ffffff] transition-colors" href="/team">Das Team</a></li>
+        </ul>
+      </div>
+      
+      <div>
+        <h5 class="font-bold text-primary dark:text-[#ffffff] mb-6 text-sm uppercase tracking-wider font-headline">Account</h5>
+        <ul class="space-y-4 font-body text-sm">
+          <li><a class="text-on-surface-variant dark:text-on-primary/60 hover:text-primary dark:hover:text-[#ffffff] transition-colors" href="/login">Anmelden</a></li>
+          <li><a class="text-on-surface-variant dark:text-on-primary/60 hover:text-primary dark:hover:text-[#ffffff] transition-colors" href="/login">Mitgliederbereich</a></li>
+          <li><a class="text-on-surface-variant dark:text-on-primary/60 hover:text-primary dark:hover:text-[#ffffff] transition-colors" href="/zertifikate">Meine Zertifikate</a></li>
+        </ul>
+      </div>
+
+       <div>
+        <h5 class="font-bold text-primary dark:text-[#ffffff] mb-6 text-sm uppercase tracking-wider font-headline">Unternehmen</h5>
+        <ul class="space-y-4 font-body text-sm">
+          <li><a class="text-on-surface-variant dark:text-on-primary/60 hover:text-primary dark:hover:text-[#ffffff] transition-colors" href="/ueber-uns">Über uns</a></li>
+          <li><a class="text-on-surface-variant dark:text-on-primary/60 hover:text-primary dark:hover:text-[#ffffff] transition-colors" href="/dozenten">Dozenten</a></li>
+          <li><a class="text-on-surface-variant dark:text-on-primary/60 hover:text-primary dark:hover:text-[#ffffff] transition-colors" href="https://www.bw-partner.com/" target="_blank" rel="noopener noreferrer">BW PARTNER</a></li>
+          <li><a class="text-on-surface-variant dark:text-on-primary/60 hover:text-primary dark:hover:text-[#ffffff] transition-colors" href="/kontakt">Kontakt</a></li>
+        </ul>
+      </div>
+      
+      <div>
+        <h5 class="font-bold text-primary dark:text-[#ffffff] mb-6 text-sm uppercase tracking-wider font-headline">Rechtliches</h5>
+        <ul class="space-y-4 font-body text-sm">
+          <li><a class="text-on-surface-variant dark:text-on-primary/60 hover:text-primary dark:hover:text-[#ffffff] transition-colors" href="/impressum">Impressum</a></li>
+          <li><a class="text-on-surface-variant dark:text-on-primary/60 hover:text-primary dark:hover:text-[#ffffff] transition-colors" href="/datenschutz">Datenschutz</a></li>
+          <li><a class="text-on-surface-variant dark:text-on-primary/60 hover:text-primary dark:hover:text-[#ffffff] transition-colors" href="/agb">AGB</a></li>
+          <li><a class="text-on-surface-variant dark:text-on-primary/60 hover:text-primary dark:hover:text-[#ffffff] transition-colors" href="/widerruf">Widerruf</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  
+  <div class="max-w-6xl mx-auto px-8 py-8 border-t border-outline-variant/20 dark:border-white/10 text-center md:text-left flex flex-col md:flex-row justify-between items-center gap-4">
+    <p class="text-on-surface-variant/70 dark:text-on-primary/40 text-[10px] md:text-xs font-body font-medium">
+      © {new Date().getFullYear()} AK Kommunal - Eine Marke der BW PARTNER. Alle Rechte vorbehalten.
+    </p>
+    <div class="text-on-surface-variant/70 dark:text-on-primary/40 text-xs flex items-center gap-2">
+      <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+      System Status: Online
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,117 @@
+---
+import Layout from '../layouts/Layout.astro';
+import TopNavBar from '../components/TopNavBar.astro';
+import FooterSection from '../components/FooterSection.astro';
+---
+
+<Layout title="Kontakt - AK Kommunal">
+  <TopNavBar />
+
+  <main class="w-full bg-surface pt-32 pb-24 min-h-screen relative overflow-hidden">
+    <!-- Background styling -->
+    <div class="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+
+    <div class="max-w-6xl mx-auto px-6 lg:px-10 relative z-10 mb-12 animate-[fadeInUp_1s_ease-out]">
+      <div class="flex items-center gap-4 mb-4">
+        <div class="h-[2px] w-12 bg-primary"></div>
+        <h2 class="text-[10px] md:text-xs font-bold text-primary tracking-widest uppercase">
+          Direkter Draht
+        </h2>
+      </div>
+      <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold font-headline text-primary tracking-tight leading-[1.1] pb-2 mb-6">
+        Treten Sie mit uns <br/>
+        <span class="text-primary-fixed-dim">in Kontakt.</span>
+      </h1>
+      <p class="text-lg font-body leading-relaxed font-light text-on-surface-variant max-w-2xl">
+        Haben Sie Fragen zu den einzelnen Modulen, suchen eine individuelle Inhouse-Lösung oder interessieren Sie sich für das Arbeitsportal? Wir sind gerne persönlich für Sie da.
+      </p>
+    </div>
+
+    <div class="max-w-6xl mx-auto px-6 lg:px-10 relative z-10 animate-[fadeInUp_1s_ease-out_0.2s_both]">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
+        
+        <!-- Contact Form -->
+        <div class="lg:col-span-7 bg-white p-8 md:p-12 rounded-3xl shadow-[0_20px_40px_-15px_rgba(5,24,58,0.08)] border border-outline-variant/20">
+          <form class="space-y-6" onsubmit="event.preventDefault(); alert('Vielen Dank für Ihre Nachricht. (Demo Formular)');">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="space-y-2">
+                <label class="text-sm font-bold text-primary">Vorname</label>
+                <input type="text" required class="w-full bg-surface px-4 py-3 rounded-xl border border-outline-variant/40 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-on-surface-variant/40" placeholder="Max" />
+              </div>
+              <div class="space-y-2">
+                <label class="text-sm font-bold text-primary">Nachname</label>
+                <input type="text" required class="w-full bg-surface px-4 py-3 rounded-xl border border-outline-variant/40 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-on-surface-variant/40" placeholder="Mustermann" />
+              </div>
+            </div>
+            
+            <div class="space-y-2">
+              <label class="text-sm font-bold text-primary">Organisation / Kommune</label>
+              <input type="text" class="w-full bg-surface px-4 py-3 rounded-xl border border-outline-variant/40 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-on-surface-variant/40" placeholder="Stadtmusterhausen" />
+            </div>
+
+            <div class="space-y-2">
+              <label class="text-sm font-bold text-primary">E-Mail</label>
+              <input type="email" required class="w-full bg-surface px-4 py-3 rounded-xl border border-outline-variant/40 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-on-surface-variant/40" placeholder="m.mustermann@stadt.de" />
+            </div>
+
+            <div class="space-y-2">
+              <label class="text-sm font-bold text-primary">Ihre Nachricht</label>
+              <textarea required rows="4" class="w-full bg-surface px-4 py-3 rounded-xl border border-outline-variant/40 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-on-surface-variant/40 resize-none" placeholder="Wie können wir Ihnen helfen?"></textarea>
+            </div>
+
+            <button type="submit" class="w-full bg-primary text-white font-bold text-lg py-4 rounded-xl hover:bg-primary-fixed-dim transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 mt-4">
+              Nachricht senden
+            </button>
+          </form>
+        </div>
+
+        <!-- Contact Info (Freya Marx Box from Team) -->
+        <div class="lg:col-span-5 h-full">
+          <div class="bg-surface-container-lowest h-full rounded-3xl overflow-hidden shadow-[0_20px_40px_-15px_rgba(5,24,58,0.08)] border border-outline-variant/30 flex flex-col group">
+            <div class="w-full h-64 md:h-72 relative overflow-hidden bg-surface-variant/20">
+              <img src="/team/IMG_3724-Bearbeitet-600x400.jpg" alt="Freya Marx" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-out" />
+            </div>
+            
+            <div class="flex-1 p-8 md:p-10 relative flex flex-col">
+              <h3 class="text-[10px] md:text-xs font-bold text-primary tracking-[0.2em] uppercase mb-4">Ihre Ansprechpartnerin</h3>
+              <h2 class="text-3xl font-extrabold font-headline text-primary mb-1">Freya Marx</h2>
+              <p class="text-primary/70 text-sm font-medium mb-8">Organisationsleitung AK Kommunal</p>
+              
+              <div class="space-y-6 text-sm text-on-surface-variant font-body">
+                <div>
+                  <strong class="text-primary tracking-wide text-xs uppercase mb-1 block">Standort</strong>
+                  <span class="font-bold text-on-surface">BW PARTNER</span><br/>
+                  Hauptstr. 41<br/>
+                  70563 Stuttgart (Vaihingen)
+                </div>
+                
+                <div class="flex flex-col gap-4 justify-start">
+                  <strong class="text-primary tracking-wide text-xs uppercase mb-[-10px] block">Direktkontakt</strong>
+                  <div class="flex items-center gap-3 group/link">
+                    <span class="w-10 h-10 rounded-full flex-shrink-0 border border-primary/20 flex items-center justify-center text-primary group-hover/link:bg-primary group-hover/link:text-white transition-all duration-300">
+                      <span class="material-symbols-outlined text-[18px]">phone</span>
+                    </span>
+                    <a href="tel:+49071116401650" class="hover:text-primary transition-colors font-medium">
+                      +49 0711 1640 1650
+                    </a>
+                  </div>
+                  <div class="flex items-center gap-3 group/link">
+                    <span class="w-10 h-10 rounded-full flex-shrink-0 border border-primary/20 flex items-center justify-center text-primary group-hover/link:bg-primary group-hover/link:text-white transition-all duration-300">
+                      <span class="material-symbols-outlined text-[18px]">mail</span>
+                    </span>
+                    <a href="mailto:f.schempp@bw-partner.com" class="hover:text-primary transition-colors font-medium break-words">
+                      f.schempp@bw-partner.com
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <FooterSection />
+</Layout>

@@ -1,0 +1,51 @@
+<section class="relative min-h-[50vh] md:min-h-[600px] flex items-center overflow-hidden py-24 pt-32">
+  <div class="absolute inset-0 z-0">
+    <img 
+      class="w-full h-full object-cover animate-[subtleZoom_20s_ease-in-out_infinite_alternate]" 
+      alt="Hero Background" 
+      src="/team/IMG_8181_web.jpg"
+    />
+    <div class="absolute inset-0 bg-primary/70 mix-blend-multiply"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/40 to-transparent"></div>
+  </div>
+  
+  <div class="relative z-10 max-w-6xl mx-auto px-8 w-full">
+    <div class="max-w-3xl">
+      <span class="inline-block text-xs text-primary-fixed-dim tracking-[0.2em] uppercase font-label mb-4 font-semibold animate-[fadeInUp_1s_ease-out]">
+        Arbeitskreis Kommunal
+      </span>
+      <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-on-primary font-headline leading-[1.1] tracking-tight mb-6 animate-[fadeInUp_1s_ease-out_0.2s_both]">
+        Praxisnahes Kommunalwissen auf Abruf.
+      </h1>
+      <p class="text-lg md:text-xl text-on-primary/80 leading-relaxed mb-10 max-w-xl font-light animate-[fadeInUp_1s_ease-out_0.4s_both]">
+        Live-Webinare, Mediathek und Experten-Community – alles, was Ihre Kommune steuerlich sicher aufstellt.
+      </p>
+      <div class="flex flex-wrap gap-4 animate-[fadeInUp_1s_ease-out_0.6s_both]">
+        <a href="/mitglied-werden" class="bg-primary-fixed-dim text-primary px-8 py-4 rounded-lg font-bold text-lg hover:bg-white hover:-translate-y-1 transition-all duration-300 shadow-xl hover:shadow-2xl">
+          Mitglied werden
+        </a>
+        <a href="/mediathek" class="border flex items-center gap-2 border-white/30 text-white backdrop-blur-md px-8 py-4 rounded-lg font-bold text-lg hover:bg-white/10 hover:border-white/50 hover:-translate-y-1 transition-all duration-300">
+          Zur Mediathek
+          <span class="material-symbols-outlined text-[20px]">play_circle</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  @keyframes subtlyZoom {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.05); }
+  }
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>

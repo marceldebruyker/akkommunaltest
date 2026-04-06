@@ -1,0 +1,216 @@
+import React, { useState } from 'react';
+import { useStore } from '@nanostores/react';
+import { cartItems, clearCart } from '../store/cartStore';
+
+interface Module {
+  id: string;
+  title: string;
+  price: number;
+  description: string;
+  benefits: string[];
+}
+
+const MODULES: Module[] = [
+  {
+    id: 'grundlagen',
+    title: 'Grundlagen Modul',
+    price: 500,
+    description: 'Fokussiert auf Umsatz- und Ertragsteuern für Quereinsteiger & neue Mitarbeiter.',
+    benefits: ['Materieller Zugang zum Portal', 'Arbeitshilfen Download']
+  },
+  {
+    id: 'spezial',
+    title: 'Spezialthemen Modul',
+    price: 700,
+    description: 'Experten-Zirkel für komplexe Themenbereiche und Aktuelles aus der Rechtsprechung.',
+    benefits: ['Materieller Zugang zum Portal', 'Arbeitshilfen Download']
+  },
+  {
+    id: 'praktiker',
+    title: 'Praktiker Modul',
+    price: 1200,
+    description: 'Fokussierter Fach-Austausch und Erarbeitung von Best-Practice Ansätzen.',
+    benefits: ['Materieller Zugang zum Portal', 'Arbeitshilfen Download']
+  }
+];
+
+const GESAMTPAKET: Module = {
+  id: 'gesamt',
+  title: 'Gesamtpaket',
+  price: 1600,
+  description: 'Teilnahme an allen angebotenen Modulen und volldigitaler Zugang.',
+  benefits: ['Alle Module inklusive', 'Portalzugang & Download Center', 'Gesetzes-Newsletter']
+};
+
+export default function MembershipConfigurator() {
+  const [selectedModules, setSelectedModules] = useState<string[]>([]);
+  const [isGesamtpaket, setIsGesamtpaket] = useState(false);
+  const cart = useStore(cartItems);
+
+  const toggleModule = (id: string) => {
+    if (isGesamtpaket) {
+      setIsGesamtpaket(false);
+      setSelectedModules([id]);
+      return;
+    }
+    
+    if (selectedModules.includes(id)) {
+      setSelectedModules(selectedModules.filter(m => m !== id));
+    } else {
+      setSelectedModules([...selectedModules, id]);
+    }
+  };
+
+  const selectGesamtpaket = () => {
+    if (isGesamtpaket) {
+      setIsGesamtpaket(false);
+    } else {
+      setIsGesamtpaket(true);
+      setSelectedModules([]);
+    }
+  };
+
+  // Calculate totals
+  const totalPrice = isGesamtpaket 
+    ? GESAMTPAKET.price 
+    : selectedModules.reduce((acc, id) => {
+        const mod = MODULES.find(m => m.id === id);
+        return acc + (mod ? mod.price : 0);
+      }, 0);
+
+  const selectedTitles = isGesamtpaket 
+    ? [GESAMTPAKET.title] 
+    : selectedModules.map(id => MODULES.find(m => m.id === id)?.title).filter(Boolean);
+
+  const hasSelection = isGesamtpaket || selectedModules.length > 0;
+
+  const handleSubscribe = () => {
+    if (cart.length > 0) {
+      const confirmClear = window.confirm(
+        "Hinweis: Sie haben Einzelvideos im Warenkorb. Wenn Sie Module abonnieren, wird dieser geleert, da Einmalkäufe und Abos nicht auf derselben Rechnung gemischt werden können.\n\nMöchten Sie fortfahren?"
+      );
+      if (!confirmClear) return;
+      clearCart();
+    }
+
+    const planQuery = isGesamtpaket ? 'gesamt' : selectedModules.join(',');
+    window.location.href = `/kasse?abo=${planQuery}`;
+  };
+
+  return (
+    <div className="relative pb-32">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+        
+        {/* Individual Modules */}
+        {MODULES.map((mod) => {
+          const isSelected = selectedModules.includes(mod.id);
+          const isDisabled = isGesamtpaket; // Although it deselects, visually it might just be dim? Let's just let "Gesamtpaket" visually uncheck them.
+
+          return (
+            <div 
+              key={mod.id}
+              onClick={() => toggleModule(mod.id)}
+              className={`p-8 rounded-2xl border transition-all duration-300 flex flex-col cursor-pointer relative ${
+                isSelected 
+                  ? 'bg-primary/5 border-primary shadow-md ring-1 ring-primary' 
+                  : 'bg-surface-container-lowest border-outline-variant/20 hover:border-primary/50 hover:shadow-xl'
+              }`}
+            >
+              {isSelected && (
+                <div className="absolute top-4 right-4 text-primary">
+                  <span className="material-symbols-outlined fill-current uppercase">check_circle</span>
+                </div>
+              )}
+              <h4 className="text-lg font-bold font-headline mb-2 text-on-surface pr-6">{mod.title}</h4>
+              <div className="text-3xl font-extrabold text-primary mb-2">
+                {mod.price.toLocaleString('de-DE')} € <span className="text-xs font-normal text-on-surface-variant">/ Jahr</span>
+              </div>
+              <p className="text-xs text-on-surface-variant mb-6 font-medium">{mod.description}</p>
+              
+              <ul className="text-xs space-y-4 mb-8 flex-1">
+                {mod.benefits.map((ben, i) => (
+                  <li key={i} className="flex items-start gap-2">
+                    <span className="material-symbols-outlined text-xs text-primary bg-primary/10 rounded-full p-0.5">check</span> 
+                    <span>{ben}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          );
+        })}
+
+        {/* Gesamtpaket */}
+        <div 
+          onClick={selectGesamtpaket}
+          className={`p-8 rounded-2xl border transition-all duration-300 flex flex-col cursor-pointer transform lg:scale-105 relative z-20 ${
+            isGesamtpaket 
+              ? 'bg-primary text-white border-primary shadow-2xl ring-2 ring-primary-fixed-dim' 
+              : 'bg-primary-container text-white border-primary-fixed-dim/30 hover:bg-primary transition-colors hover:shadow-xl'
+          }`}
+        >
+          <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary-fixed-dim to-primary-fixed text-primary text-[10px] font-extrabold px-4 py-1 rounded-full uppercase tracking-widest shadow-md">
+            Empfehlung
+          </div>
+          
+          {isGesamtpaket && (
+             <div className="absolute top-4 right-4 text-primary-fixed-dim">
+               <span className="material-symbols-outlined fill-current uppercase">check_circle</span>
+             </div>
+          )}
+
+          <h4 className="text-lg font-bold font-headline mb-2 text-on-primary pr-6">{GESAMTPAKET.title}</h4>
+          <div className="text-3xl font-extrabold text-white mb-2">
+            {GESAMTPAKET.price.toLocaleString('de-DE')} € <span className="text-xs font-normal text-white/70">/ Jahr</span>
+          </div>
+          <p className="text-xs text-white/80 mb-6 font-medium">{GESAMTPAKET.description}</p>
+          
+          <ul className="text-xs space-y-4 mb-8 flex-1">
+            {GESAMTPAKET.benefits.map((ben, i) => (
+              <li key={i} className="flex items-start gap-2">
+                <span className="material-symbols-outlined text-xs text-primary-fixed-dim bg-primary-fixed-dim/20 rounded-full p-0.5">check</span> 
+                <span>{ben}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+
+      {/* Sticky Bar */}
+      {hasSelection && (
+        <div className="fixed bottom-0 left-0 w-full bg-white dark:bg-[#05183a] border-t border-gray-200 dark:border-white/10 shadow-[0_-10px_40px_rgba(0,0,0,0.05)] z-50 animate-[slideUp_0.4s_ease-out]">
+          <div className="max-w-6xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="flex flex-col">
+              <span className="text-sm font-semibold text-on-surface-variant uppercase tracking-wider">Ihre Auswahl:</span>
+              <span className="text-base font-bold text-primary font-headline">
+                {selectedTitles.join(' + ')}
+              </span>
+            </div>
+            
+            <div className="flex items-center gap-6">
+              <div className="text-right">
+                <div className="text-xs text-on-surface-variant uppercase tracking-widest font-bold">Gesamt</div>
+                <div className="text-2xl font-extrabold text-primary font-headline leading-none">
+                  {totalPrice.toLocaleString('de-DE')} € <span className="text-sm font-normal">/ Jahr</span>
+                </div>
+              </div>
+              <button 
+                onClick={handleSubscribe}
+                className="bg-primary hover:bg-primary-fixed text-white hover:text-primary font-bold py-3 px-6 rounded-xl transition-all shadow-md active:scale-95 whitespace-nowrap"
+              >
+                Zahlungspflichtig abonnieren
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Tailwind Animation keys for the sticky bar */}
+      <style>{`
+        @keyframes slideUp {
+          from { transform: translateY(100%); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+        }
+      `}</style>
+    </div>
+  );
+}

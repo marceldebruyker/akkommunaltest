@@ -1,0 +1,82 @@
+---
+import '../styles/global.css';
+import BrandLogo from '../components/BrandLogo.astro';
+const { title, currentPath } = Astro.props;
+---
+
+<!doctype html>
+<html lang="de" class="antialiased">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="description" content="AK Kommunal WebApp" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="preconnect" href="https://fonts.googleapis.com">
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+		<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+		<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+		<title>{title}</title>
+	</head>
+	<body class="bg-[#f0f2f5] text-on-background font-body h-screen overflow-hidden flex">
+    
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white border-r border-[#e5e7eb] flex flex-col h-full flex-shrink-0 z-20">
+      <div class="h-16 flex items-center px-4 border-b border-[#e5e7eb] pt-2">
+        <BrandLogo />
+      </div>
+      
+      <div class="flex-1 overflow-y-auto py-6 px-4 flex flex-col gap-1">
+        <a href="/app/dashboard" class={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${currentPath === '/app/dashboard' ? 'bg-[#05183a]/5 text-[#05183a]' : 'text-gray-500 hover:bg-gray-50 hover:text-[#05183a]'}`}>
+          <span class="material-symbols-outlined text-[20px]">grid_view</span> Dashboard
+        </a>
+        <a href="/app/lernwelt" class={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${currentPath === '/app/lernwelt' ? 'bg-[#05183a]/5 text-[#05183a]' : 'text-gray-500 hover:bg-gray-50 hover:text-[#05183a]'}`}>
+          <span class="material-symbols-outlined text-[20px]">video_library</span> Meine Lernwelt
+        </a>
+        <a href="/app/forum" class={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${currentPath === '/app/forum' ? 'bg-[#05183a]/5 text-[#05183a]' : 'text-gray-500 hover:bg-gray-50 hover:text-[#05183a]'}`}>
+          <span class="material-symbols-outlined text-[20px]">forum</span> Community
+        </a>
+        <a href="/app/profil" class={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${currentPath === '/app/profil' ? 'bg-[#05183a]/5 text-[#05183a]' : 'text-gray-500 hover:bg-gray-50 hover:text-[#05183a]'}`}>
+          <span class="material-symbols-outlined text-[20px]">person</span> Profil & Rechnungen
+        </a>
+      </div>
+
+      <div class="p-4 border-t border-[#e5e7eb]">
+        <a href="/" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-500 hover:bg-red-50 hover:text-red-600 transition-colors">
+          <span class="material-symbols-outlined text-[20px]">logout</span> Abmelden
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col h-full overflow-hidden relative">
+      <!-- Topbar App -->
+      <header class="h-16 bg-white border-b border-[#e5e7eb] flex items-center justify-between px-8 flex-shrink-0 z-10 w-full shadow-sm">
+        <div class="flex items-center gap-4 text-gray-400">
+           <span class="material-symbols-outlined cursor-pointer hover:text-[#05183a] transition-colors">menu</span>
+           <span class="text-sm font-medium text-gray-800">Welcome back, Jan Müller</span>
+        </div>
+        <div class="flex items-center gap-4">
+          <button class="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors relative">
+            <span class="material-symbols-outlined text-[20px]">notifications</span>
+            <span class="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
+          </button>
+          <div class="w-10 h-10 rounded-full bg-[#05183a] text-white flex items-center justify-center font-bold text-sm shadow-md">
+            JM
+          </div>
+        </div>
+      </header>
+      
+      <!-- Scrollable Content -->
+      <main class="flex-1 overflow-y-auto">
+        <slot />
+      </main>
+    </div>
+
+	</body>
+</html>
+<style is:global>
+  ::selection {
+    background-color: rgba(5,24,58,0.2);
+    color: #05183a;
+  }
+</style>

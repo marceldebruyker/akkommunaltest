@@ -1,0 +1,35 @@
+{
+  "name": "ak-kommunal-plattform",
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "astro": "astro"
+  },
+  "dependencies": {
+    "@astrojs/node": "^10.0.4",
+    "@astrojs/react": "^5.0.1",
+    "@nanostores/react": "^1.1.0",
+    "@portabletext/react": "^6.0.3",
+    "@sanity/astro": "^3.3.1",
+    "@sanity/client": "^7.20.0",
+    "@supabase/ssr": "^0.9.0",
+    "@supabase/supabase-js": "^2.100.1",
+    "@tailwindcss/vite": "^4.2.2",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "astro": "^6.0.8",
+    "nanostores": "^1.2.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "sanity": "^5.19.0",
+    "stripe": "^21.0.0",
+    "styled-components": "^6.3.12",
+    "tailwindcss": "^4.2.2"
+  }
+}

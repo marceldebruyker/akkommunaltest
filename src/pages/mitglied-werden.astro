@@ -1,0 +1,174 @@
+---
+import Layout from '../layouts/Layout.astro';
+import TopNavBar from '../components/TopNavBar.astro';
+import FooterSection from '../components/FooterSection.astro';
+import MembershipSection from '../components/MembershipSection.astro';
+---
+
+<Layout title="Mitglied Werden | AK Kommunal">
+  <TopNavBar />
+  
+  <main class="w-full bg-surface pt-32 pb-24 min-h-screen relative overflow-hidden">
+    <!-- Blob Background for consistency -->
+    <div class="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+
+    <!-- Header Section -->
+    <div class="max-w-6xl mx-auto px-6 lg:px-10 relative z-10 mb-12 animate-[fadeInUp_1s_ease-out]">
+      <div class="flex items-center gap-4 mb-4">
+        <div class="h-[2px] w-12 bg-primary"></div>
+        <h2 class="text-[10px] md:text-xs font-bold text-primary tracking-widest uppercase">
+          AK Kommunal Jahresprogramm
+        </h2>
+      </div>
+      <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold font-headline text-primary tracking-tight leading-tight pb-2 mb-6 max-w-3xl">
+        Werden Sie jetzt <br/>
+        <span class="text-primary-fixed-dim">Teil des Netzwerks.</span>
+      </h1>
+      <p class="text-on-surface-variant text-lg font-body leading-relaxed font-light max-w-2xl">
+        Wählen Sie das für Sie passende Modul oder sichern Sie sich mit dem Gesamtpaket den vollen Zugriff auf das geballte Fachwissen, die Community und alle Downloads.
+      </p>
+    </div>
+
+    <!-- Interactive Membership Pricing (Reusing the Component) -->
+    <div class="animate-[fadeInUp_1s_ease-out_0.2s_both] relative z-10 -mt-16">
+      <MembershipSection />
+    </div>
+
+    <!-- Dedicated Application Form -->
+    <div class="max-w-3xl mx-auto px-6 lg:px-10 relative z-10 mt-12 animate-[fadeInUp_1s_ease-out_0.4s_both]">
+      
+      <div class="bg-surface-container-lowest p-8 md:p-12 rounded-3xl shadow-sm border border-outline-variant/30">
+        <h3 class="text-2xl font-bold font-headline text-primary mb-2">Verbindliche Anmeldung</h3>
+        <p class="text-on-surface-variant text-sm mb-8 font-light">
+          Füllen Sie das Formular aus, um sich für die AK Kommunal Plattform im Jahr 2026 zu registrieren. 
+          Wir setzen uns zeitnah mit Ihnen in Verbindung und stellen Ihre Rechnung aus.
+        </p>
+
+        <form class="space-y-6" id="signup-form">
+          <!-- Selection -->
+          <div>
+            <label class="block text-xs font-bold text-on-surface tracking-widest mb-3 uppercase">Gewünschtes Paket *</label>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <label class="flex items-center gap-3 p-4 border border-outline-variant/40 rounded-xl cursor-pointer hover:bg-surface transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                <input type="radio" name="package" value="grundlagen" class="text-primary w-4 h-4 focus:ring-primary" required>
+                <div>
+                  <div class="font-bold text-sm text-primary">Grundlagen Modul</div>
+                  <div class="text-xs text-on-surface-variant">500 € / Jahr</div>
+                </div>
+              </label>
+              
+              <label class="flex items-center gap-3 p-4 border border-outline-variant/40 rounded-xl cursor-pointer hover:bg-surface transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                <input type="radio" name="package" value="spezialthemen" class="text-primary w-4 h-4 focus:ring-primary">
+                <div>
+                  <div class="font-bold text-sm text-primary">Spezialthemen Modul</div>
+                  <div class="text-xs text-on-surface-variant">700 € / Jahr</div>
+                </div>
+              </label>
+
+              <label class="flex items-center gap-3 p-4 border border-outline-variant/40 rounded-xl cursor-pointer hover:bg-surface transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                <input type="radio" name="package" value="praktiker" class="text-primary w-4 h-4 focus:ring-primary">
+                <div>
+                  <div class="font-bold text-sm text-primary">Praktiker Modul</div>
+                  <div class="text-xs text-on-surface-variant">1.200 € / Jahr</div>
+                </div>
+              </label>
+
+              <label class="flex items-center gap-3 p-4 border border-primary-fixed-dim/50 rounded-xl cursor-pointer hover:bg-surface transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5 relative overflow-hidden group">
+                <div class="absolute inset-0 bg-gradient-to-br from-primary-fixed-dim/10 to-transparent pointer-events-none group-has-[:checked]:opacity-100 opacity-0 transition-opacity"></div>
+                <input type="radio" name="package" value="gesamt" class="text-primary w-4 h-4 focus:ring-primary" checked>
+                <div class="relative z-10">
+                  <div class="font-bold text-sm text-primary">Gesamtpaket <span class="text-[9px] uppercase tracking-widest bg-primary-fixed-dim text-primary px-1.5 py-0.5 rounded ml-1">Empfehlung</span></div>
+                  <div class="text-xs text-on-surface-variant">1.600 € / Jahr</div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-[11px] font-bold text-on-surface tracking-wide mb-2 uppercase" for="vorname">Vorname *</label>
+              <input type="text" id="vorname" required class="w-full bg-surface border border-outline-variant/30 rounded-lg px-4 py-3 text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+            </div>
+            <div>
+              <label class="block text-[11px] font-bold text-on-surface tracking-wide mb-2 uppercase" for="nachname">Nachname *</label>
+              <input type="text" id="nachname" required class="w-full bg-surface border border-outline-variant/30 rounded-lg px-4 py-3 text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+            </div>
+          </div>
+
+          <div>
+             <label class="block text-[11px] font-bold text-on-surface tracking-wide mb-2 uppercase" for="unternehmen">Institution / Kommune / Unternehmen *</label>
+             <input type="text" id="unternehmen" required class="w-full bg-surface border border-outline-variant/30 rounded-lg px-4 py-3 text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+          </div>
+
+          <div>
+             <label class="block text-[11px] font-bold text-on-surface tracking-wide mb-2 uppercase" for="email">E-Mail Adresse *</label>
+             <input type="email" id="email" required class="w-full bg-surface border border-outline-variant/30 rounded-lg px-4 py-3 text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
+          </div>
+
+          <!-- DSGVO Checkbox (Explicitly implemented based on previous feedback) -->
+          <div class="flex items-start gap-3 mt-4 p-4 rounded-xl bg-surface border border-outline-variant/20">
+            <div class="flex items-center h-5 mt-0.5">
+              <input id="dsgvo" type="checkbox" required class="w-4 h-4 text-primary bg-surface border-outline-variant/40 rounded focus:ring-primary focus:ring-2 accent-primary cursor-pointer">
+            </div>
+            <label for="dsgvo" class="text-xs text-on-surface-variant font-medium leading-relaxed cursor-pointer">
+              Ich stimme zu, dass meine Angaben aus dem Kontaktformular zur Beantwortung meiner Anfrage erhoben und verarbeitet werden. Die Daten werden nach abgeschlossener Bearbeitung gelöscht. Hinweis: Sie können Ihre Einwilligung jederzeit für die Zukunft per E-Mail widerrufen. Detaillierte Informationen zum Umgang mit Nutzerdaten finden Sie in unserer <a href="/datenschutz" class="text-primary hover:underline">Datenschutzerklärung</a>. *
+            </label>
+          </div>
+
+          <div class="pt-4 border-t border-outline-variant/20">
+             <button type="submit" class="w-full bg-primary hover:bg-primary-fixed-dim text-white text-sm font-bold uppercase tracking-widest px-8 py-4 rounded-xl transition-all shadow-md group flex items-center justify-center gap-2">
+                Jetzt kostenpflichtig buchen
+                <span class="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">arrow_forward</span>
+             </button>
+             <p class="text-center text-[10px] text-on-surface-variant mt-3 font-medium">B2B Angebot: Alle Preise zzgl. USt. Es gelten unsere AGB.</p>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </main>
+
+  <FooterSection />
+</Layout>
+
+<script>
+  // Add smooth scroll behavior to MembershipSection buttons so they link down to the form
+  document.addEventListener('DOMContentLoaded', () => {
+    const membershipButtons = document.querySelectorAll('section button');
+    
+    membershipButtons.forEach((btn, index) => {
+      // We know there are 4 buttons in MembershipSection (Grundlagen, Spezial, Praktiker, Gesamt)
+      // Let's bind them to also select the right radio button
+      const packages = ['grundlagen', 'spezialthemen', 'praktiker', 'gesamt'];
+      
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        // Select corresponding radio
+        if(packages[index]) {
+          const radioBtn = document.querySelector(`input[value="${packages[index]}"]`) as HTMLInputElement;
+          if (radioBtn) radioBtn.checked = true;
+        }
+
+        // Scroll to form
+        const form = document.getElementById('signup-form');
+        if (form) {
+          form.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      });
+    });
+  });
+</script>
+
+<style>
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>

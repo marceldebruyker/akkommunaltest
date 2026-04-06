@@ -1,0 +1,166 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import TopNavBar from '../../components/TopNavBar.astro';
+import FooterSection from '../../components/FooterSection.astro';
+import BuyVideoButton from '../../components/BuyVideoButton.tsx';
+import videos from '../../data/videos.json';
+
+import { getSupabaseServer } from '../../lib/supabase';
+
+const { slug } = Astro.params;
+const video = videos.find(v => v.slug === slug);
+
+if (!video) {
+  return Astro.redirect('/404');
+}
+
+// 1. Fetch authenticated user
+const { data: authData } = await getSupabaseServer(Astro.request, Astro.cookies).auth.getUser();
+const user = authData?.user || null;
+
+let hasAccess = false;
+
+if (user) {
+  // 2. Check if the user has purchased this specific video
+  const supabase = getSupabaseServer(Astro.request, Astro.cookies);
+  const { data: purchaseData } = await supabase
+    .from('purchases')
+    .select('id')
+    .eq('user_id', user.id)
+    .eq('video_slug', video.slug)
+    .single();
+
+  if (purchaseData) {
+    hasAccess = true;
+  }
+}
+
+---
+<Layout title={`${video.title} - Mediathek`}>
+  <TopNavBar />
+
+  <main class="w-full bg-surface pt-32 pb-24 min-h-screen relative overflow-hidden">
+    
+    <!-- Abstract Background styling for Hero -->
+    <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-primary-fixed-dim/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+
+    <!-- Hero Header Textual Design -->
+    <div class="max-w-6xl mx-auto px-6 lg:px-10 mb-16 mt-8 relative z-10 animate-[fadeInUp_1s_ease-out]">
+        <a href="/mediathek" class="text-on-surface-variant hover:text-primary mb-8 inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest transition-colors">
+          <span class="material-symbols-outlined text-[18px]">arrow_back</span>
+          Zurück zur Mediathek
+        </a>
+
+        <div class="flex flex-wrap items-center gap-3 mb-6">
+          <span class="bg-primary/5 text-primary text-[10px] font-extrabold uppercase tracking-widest px-4 py-1.5 rounded-full border border-primary/10">{video.moduleName}</span>
+          <span class="bg-surface-variant/20 text-on-surface-variant text-[10px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-full border border-outline-variant/30 flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">timer</span> {video.duration}
+          </span>
+          <span class="bg-surface-variant/20 text-on-surface-variant text-[10px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-full border border-outline-variant/30 flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">play_circle</span> Online-Aufzeichnung
+          </span>
+        </div>
+        
+        <h1 class="text-4xl md:text-5xl lg:text-6xl max-w-4xl font-extrabold font-headline text-primary leading-[1.1] mb-6 tracking-tight">
+          {video.title}
+        </h1>
+
+        <p class="text-xl md:text-2xl font-light text-on-surface-variant max-w-3xl leading-relaxed">
+          {video.description}
+        </p>
+    </div>
+
+    <!-- Video Details Content Grid -->
+    <div class="max-w-6xl mx-auto px-6 lg:px-10 grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 animate-[fadeInUp_1s_ease-out_0.2s_both]">
+      
+      <!-- Main Info & Course Materials -->
+      <div class="lg:col-span-8 flex flex-col gap-10">
+        <!-- Feature Image Mock -->
+        <div class="w-full aspect-[21/9] rounded-3xl overflow-hidden shadow-sm relative">
+          <img src={video.image} alt={video.title} class="w-full h-full object-cover" />
+          <div class="absolute inset-0 bg-gradient-to-t from-[#05183a]/80 to-transparent flex items-end p-8">
+            <p class="text-white font-medium text-lg">Ein exklusiver Fachvortrag der AK Kommunal.</p>
+          </div>
+        </div>
+
+        <div class="prose prose-lg prose-blue max-w-none text-on-surface-variant font-light leading-relaxed">
+          <h2 class="text-2xl font-bold font-headline text-primary mt-0 mb-4 tracking-tight">Darum geht es im Seminar</h2>
+          <p>Dieses Video ist Teil des <strong>{video.moduleName}s</strong> der Akademie der AK Kommunal. Die Aufzeichnung steht Ihnen samt aller Unterlagen nach dem Kauf in Ihrem persönlichen Kunden-Log-in-Bereich zur Verfügung.</p>
+          
+          <p class="mt-6">Das Seminar richtet sich primär an Kämmerer, Fachbereichsleiter Finanzen und Spezialisten aus der Verwaltung, die bereits Grundlagenwissen mitbringen und sich gezielt auf neue Gesetzeslagen oder Fachvorgaben vorbereiten müssen.</p>
+        </div>
+
+        <!-- Seminar Materials Callout -->
+        <div class="bg-primary/5 border border-primary/10 rounded-3xl p-8 flex flex-col md:flex-row gap-8 items-start">
+           <div class="w-16 h-16 bg-white rounded-2xl shadow-sm border border-outline-variant/20 flex flex-shrink-0 items-center justify-center">
+             <span class="material-symbols-outlined text-primary text-[32px]">folder_copy</span>
+           </div>
+           <div>
+             <h3 class="text-xl font-bold font-headline text-primary mb-2">Inklusive Kursunterlagen (PDF)</h3>
+             <p class="text-sm leading-relaxed text-on-surface-variant">Neben der Video-Aufzeichnung erhalten Sie vollen Zugriff auf die begleitenden Skripte, Präsentationsfolien und Praxishilfen als PDF-Downloads in Ihrem persönlichen Dashboard-Bereich.</p>
+           </div>
+        </div>
+      </div>
+
+      <!-- Sidebar / Buy Box -->
+      <div class="lg:col-span-4 relative">
+        <!-- Sticky Container -->
+        <div class="sticky top-32 bg-white p-8 rounded-3xl border border-outline-variant/30 shadow-[0_20px_40px_-15px_rgba(5,24,58,0.08)] flex flex-col">
+          <h3 class="text-xl font-extrabold font-headline text-primary mb-2">Seminar-Zugang</h3>
+          <p class="text-sm text-on-surface-variant mb-6">Nach dem Erwerb erscheint das Video automatisch in Ihrer persönlichen Lernwelt.</p>
+          
+          <div class="space-y-4 mb-8 bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/20">
+            <div class="flex items-start gap-3">
+              <span class="material-symbols-outlined text-primary text-[20px] mt-0.5">smart_display</span>
+              <div>
+                <strong class="text-sm text-primary block">Video auf Abruf</strong>
+                <span class="text-xs text-on-surface-variant block">Im Kundenbereich streambar</span>
+              </div>
+            </div>
+            <div class="flex items-start gap-3">
+              <span class="material-symbols-outlined text-primary text-[20px] mt-0.5">download</span>
+              <div>
+                <strong class="text-sm text-primary block">Download-Materialien</strong>
+                <span class="text-xs text-on-surface-variant block">Präsentationen & PDFs inklusive</span>
+              </div>
+            </div>
+          </div>
+          
+          {hasAccess ? (
+            <div class="bg-emerald-50 rounded-xl p-6 mb-6 border border-emerald-100 flex flex-col items-center justify-center text-center gap-3">
+              <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center">
+                 <span class="material-symbols-outlined text-[24px]">check_circle</span>
+              </div>
+              <div class="mb-2">
+                <span class="block text-[10px] uppercase font-bold tracking-widest text-emerald-600 mb-1">Bereits Freigeschaltet</span>
+                <span class="text-sm font-medium text-emerald-800">Sie haben vollen Zugriff auf dieses Seminar!</span>
+              </div>
+              <a href={`/app/player/${video.slug}`} class="w-full bg-emerald-600 hover:bg-emerald-700 text-white text-[15px] font-bold py-4 px-4 rounded-xl transition-all shadow-sm flex items-center justify-center gap-2">
+                Jetzt ansehen <span class="material-symbols-outlined text-[20px]">play_arrow</span>
+              </a>
+            </div>
+          ) : (
+            <div class="flex flex-col">
+              <div class="bg-surface-variant/20 rounded-xl p-4 mb-6 border border-outline-variant/20 flex justify-between items-center">
+                <span class="block text-[10px] uppercase font-bold tracking-widest text-on-surface-variant">Einmaliger Kauf</span>
+                <div class="flex items-end gap-1.5 mt-1">
+                  <span class="text-3xl font-extrabold text-primary leading-none">{video.price} €</span>
+                </div>
+              </div>
+
+              <!-- Connecting to SideCart -->
+              <BuyVideoButton client:load video={video} />
+
+              <p class="text-center text-[10px] text-on-surface-variant/80 uppercase mt-4 font-bold tracking-widest">
+                Oder <a href={`/login?redirect=/mediathek/${video.slug}`} class="text-primary hover:underline">Einloggen</a>
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <FooterSection />
+</Layout>

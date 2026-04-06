@@ -1,0 +1,18 @@
+---
+import MembershipConfigurator from './MembershipConfigurator';
+---
+
+<section class="py-24 md:py-32 bg-surface relative overflow-hidden">
+  <!-- Subtle decorative blobs -->
+  <div class="absolute top-0 right-1/4 w-96 h-96 bg-primary-fixed-dim/20 rounded-full blur-[120px] pointer-events-none"></div>
+  <div class="absolute bottom-0 left-1/4 w-96 h-96 bg-secondary-fixed/30 rounded-full blur-[120px] pointer-events-none"></div>
+
+  <div class="max-w-6xl mx-auto px-8 text-center mb-16 relative z-10">
+    <h2 class="text-3xl md:text-4xl font-extrabold font-headline text-primary tracking-tight">Konditionen &amp; Anmeldung</h2>
+    <p class="text-on-surface-variant mt-6 text-base max-w-2xl mx-auto">Alle Preise verstehen sich zzgl. gesetzlicher USt. pro Teilnehmer und Jahr. Inklusive aller Unterlagen, die nach der Veranstaltung zur Verfügung stehen.</p>
+  </div>
+  
+  <div class="max-w-6xl mx-auto px-4 sm:px-8 relative z-10">
+    <MembershipConfigurator client:load />
+  </div>
+</section>

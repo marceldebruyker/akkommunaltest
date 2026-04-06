@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+@theme {
+  --color-secondary: #466270;
+  --color-outline-variant: #c5c6cf;
+  --color-on-primary-fixed-variant: #37466a;
+  --color-on-tertiary: #ffffff;
+  --color-on-secondary-container: #4a6774;
+  --color-surface-container-high: #e6e8ea;
+  --color-tertiary-container: #640007;
+  --color-on-tertiary-fixed: #410003;
+  --color-surface-container: #eceef0;
+  --color-secondary-container: #c6e4f4;
+  --color-surface-container-low: #f2f4f6;
+  --color-on-error-container: #93000a;
+  --color-on-secondary: #ffffff;
+  --color-error-container: #ffdad6;
+  --color-inverse-surface: #2d3133;
+  --color-tertiary-fixed-dim: #ffb3ac;
+  --color-surface: #f8f9fb;
+  --color-primary-fixed-dim: #b6c6f1;
+  --color-on-tertiary-container: #ff5f58;
+  --color-surface-container-lowest: #ffffff;
+  --color-on-surface: #191c1e;
+  --color-on-secondary-fixed: #001f2a;
+  --color-surface-dim: #d8dadc;
+  --color-on-surface-variant: #45464e;
+  --color-primary-container: #1d2d50;
+  --color-inverse-primary: #b6c6f1;
+  --color-error: #ba1a1a;
+  --color-outline: #75777f;
+  --color-background: #f8f9fb;
+  --color-surface-tint: #4e5e84;
+  --color-primary: #05183a;
+  --color-on-primary-container: #8595be;
+  --color-secondary-fixed-dim: #adcbda;
+  --color-on-tertiary-fixed-variant: #930010;
+  --color-on-primary: #ffffff;
+  --color-on-error: #ffffff;
+  --color-on-background: #191c1e;
+  --color-tertiary: #3d0003;
+  --color-on-secondary-fixed-variant: #2e4b57;
+  --color-inverse-on-surface: #eff1f3;
+  --color-surface-container-highest: #e0e3e5;
+  --color-surface-variant: #e0e3e5;
+  --color-primary-fixed: #d9e2ff;
+  --color-surface-bright: #f8f9fb;
+  --color-secondary-fixed: #c9e7f7;
+  --color-tertiary-fixed: #ffdad6;
+  --color-on-primary-fixed: #081a3d;
+
+  --font-headline: "Manrope", sans-serif;
+  --font-body: "Inter", sans-serif;
+  --font-label: "Inter", sans-serif;
+
+  --radius-DEFAULT: 0.125rem;
+  --radius-lg: 0.25rem;
+  --radius-xl: 0.5rem;
+  --radius-full: 0.75rem;
+}
+
+@layer base {
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+}
+
+@layer utilities {
+  .glass-card {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+}

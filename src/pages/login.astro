@@ -1,0 +1,169 @@
+---
+const title = "Login - AK Kommunal Plattform";
+import BrandLogo from '../components/BrandLogo.astro';
+
+const error = Astro.url.searchParams.get('error');
+const redirectUrl = Astro.url.searchParams.get('redirect') || '';
+---
+
+<!doctype html>
+<html lang="de" class="antialiased">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <!-- Google Fonts Matches -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <!-- Load Global CSS -->
+    <link rel="stylesheet" href="/src/styles/global.css" />
+    <title>{title}</title>
+</head>
+<body class="bg-[#fafafa] font-body text-gray-800 h-screen w-full overflow-hidden flex flex-col md:flex-row">
+    
+    <!-- Left Panel: Graphic & Brand (Hidden on Mobile) -->
+    <div class="hidden md:flex w-1/2 h-full bg-[#0a152e] relative flex-col justify-center p-16 lg:p-24 xl:p-32 overflow-hidden">
+        
+        <!-- Architectural Background Image -->
+        <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1400&auto=format&fit=crop" alt="Architecture Background" class="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-50 grayscale" />
+        
+        <!-- Dark Blue Gradient Overlay -->
+        <div class="absolute inset-0 bg-gradient-to-br from-[#0a152e]/90 to-[#071026]/95"></div>
+
+        <!-- Content -->
+        <div class="relative z-10 w-full max-w-lg">
+            
+            <div class="mb-14">
+                <BrandLogo variant="light" />
+            </div>
+
+            <h1 class="text-5xl lg:text-6xl font-extrabold font-headline text-white leading-[1.05] tracking-tight pb-2 mb-8 mt-4">
+                AK Kommunal<br/>Fachportal
+            </h1>
+
+            <p class="text-[17px] text-white/70 font-light leading-relaxed max-w-md mb-16">
+                Das digitale Fachportal für kommunales Finanz- und Steuerrecht. Melden Sie sich hier an, um auf Ihre persönliche Lernwelt zuzugreifen.
+            </p>
+            
+        </div>
+    </div>
+
+    <!-- Right Panel: Login Form -->
+    <div class="w-full md:w-1/2 h-full bg-[#fafafa] flex flex-col justify-center items-center relative p-6">
+        
+        <!-- Scrollable/Centered wrapper -->
+        <div class="w-full max-w-[400px] flex flex-col">
+            
+            <!-- Header Texts -->
+            <div class="mb-10 w-full">
+                <h2 class="text-[32px] font-extrabold font-headline text-[#0a152e] tracking-tight mb-3">Willkommen zurück</h2>
+                <p class="text-[15px] font-light text-gray-600 leading-relaxed pr-8">
+                    Bitte geben Sie Ihre Zugangsdaten ein, um das Portal zu betreten.
+                </p>
+            </div>
+
+            <!-- Login Form Card -->
+            <div class="bg-white p-8 lg:p-10 rounded-[20px] shadow-[0_8px_30px_rgb(0,0,0,0.03)] border border-gray-100 mb-8 w-full">
+                
+                {error && (
+                    <div class="bg-red-50 text-red-600 border border-red-200 p-4 rounded-lg text-[13px] font-medium mb-6 w-full text-center flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">error</span>
+                        {error}
+                    </div>
+                )}
+
+                <form action="/api/auth/signin" method="POST" class="flex flex-col gap-6">
+                    <input type="hidden" name="redirect" value={redirectUrl} />
+                    
+                    <!-- Email -->
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-600 uppercase tracking-[0.1em] mb-2.5">
+                            E-MAIL-ADRESSE
+                        </label>
+                        <input 
+                            type="email" 
+                            name="email"
+                            placeholder="name@kommune.de" 
+                            class="w-full bg-[#f4f4f5] border-none px-4 py-3.5 rounded-lg text-sm text-[#0a152e] font-medium outline-none focus:ring-2 focus:ring-[#0a152e]/10 transition-shadow placeholder:text-gray-400 placeholder:font-light"
+                            required
+                        />
+                    </div>
+
+                    <!-- Password -->
+                    <div>
+                        <div class="flex items-center justify-between mb-2.5">
+                            <label class="text-[10px] font-bold text-gray-600 uppercase tracking-[0.1em]">
+                                PASSWORT
+                            </label>
+                            <a href="#" class="text-[10px] font-bold text-[#0a152e] uppercase tracking-[0.1em] hover:text-blue-600 transition-colors">
+                                VERGESSEN?
+                            </a>
+                        </div>
+                        <input 
+                            type="password" 
+                            name="password"
+                            placeholder="••••••••" 
+                            class="w-full bg-[#f4f4f5] border-none px-4 py-3.5 rounded-lg text-sm text-[#0a152e] font-medium outline-none focus:ring-2 focus:ring-[#0a152e]/10 transition-shadow placeholder:text-gray-400"
+                            required
+                        />
+                    </div>
+
+                    <!-- Remember Me -->
+                    <label class="flex items-center gap-3 mt-2 cursor-pointer group w-fit">
+                        <div class="w-4 h-4 rounded border border-gray-300 flex items-center justify-center bg-white group-hover:border-gray-400 transition-colors">
+                            <input type="checkbox" class="opacity-0 absolute w-0 h-0" />
+                            <!-- Custom checkmark fake -->
+                        </div>
+                        <span class="text-[13px] text-gray-500 font-medium group-hover:text-gray-700 transition-colors">
+                            Für 30 Tage angemeldet bleiben
+                        </span>
+                    </label>
+
+                    <!-- Submit Button -->
+                    <button type="submit" class="w-full mt-2 bg-[#0a152e] hover:bg-[#112147] text-white py-4 px-6 rounded-lg text-[11px] font-bold uppercase tracking-[0.15em] transition-colors flex items-center justify-center gap-3 group">
+                        ZUM PORTAL ANMELDEN
+                        <span class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                    </button>
+
+                </form>
+            </div>
+
+            <!-- External Customer Box -->
+            <a href="/shop" class="w-full bg-[#f4f4f5] border border-gray-200/50 hover:bg-[#efeff0] transition-colors rounded-2xl p-4 flex items-center gap-5 cursor-pointer group mb-10">
+                <div class="w-12 h-12 bg-[#dbeafe] rounded-xl flex items-center justify-center flex-shrink-0 text-blue-800 group-hover:scale-105 transition-transform">
+                    <span class="material-symbols-outlined text-[24px]">group_add</span>
+                </div>
+                <div class="flex-1">
+                    <div class="text-[13px] font-extrabold text-[#0a152e] mb-0.5">Externe Kunden</div>
+                    <div class="text-[11px] text-gray-500 leading-tight">Zugang zu unserem öffentlichen Shop und freien Ressourcen</div>
+                </div>
+                <span class="material-symbols-outlined text-gray-400 group-hover:text-[#0a152e] group-hover:translate-x-1 transition-all">chevron_right</span>
+            </a>
+
+            <!-- Create Account Link -->
+            <div class="text-center text-[13px] text-gray-500 mb-8 md:mb-0">
+                Neu bei AK Kommunal? <a href="/mitglied-werden" class="text-[#0a152e] font-extrabold border-b border-[#0a152e] pb-[1px] hover:text-blue-600 hover:border-blue-600 transition-colors ml-1">Konto erstellen</a>
+            </div>
+
+        </div>
+
+        <!-- Absolute Footer on Right Side (Visible on large screens, nested correctly) -->
+        <div class="w-full mt-auto md:absolute md:bottom-12 md:left-0 md:right-0 md:mt-0 px-6">
+            <div class="max-w-[400px] mx-auto border-t border-gray-200 pt-8 flex flex-col items-center">
+                <div class="flex flex-wrap justify-center gap-x-6 gap-y-3 mb-4">
+                    <a href="/impressum" class="text-[9px] font-bold text-gray-400 uppercase tracking-[0.15em] hover:text-[#0a152e] transition-colors">IMPRESSUM</a>
+                    <a href="/datenschutz" class="text-[9px] font-bold text-gray-400 uppercase tracking-[0.15em] hover:text-[#0a152e] transition-colors">DATENSCHUTZ</a>
+                    <a href="/agb" class="text-[9px] font-bold text-gray-400 uppercase tracking-[0.15em] hover:text-[#0a152e] transition-colors">AGB</a>
+                </div>
+                <div class="text-[8px] font-bold text-gray-300 uppercase tracking-[0.2em] text-center">
+                    © 2026 AK KOMMUNAL. BW PARTNER GRUPPE.
+                </div>
+            </div>
+        </div>
+
+    </div>
+    
+</body>
+</html>

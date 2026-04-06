@@ -1,0 +1,99 @@
+---
+import AppLayout from '../../layouts/AppLayout.astro';
+---
+
+<AppLayout title="Profil & Einstellungen - AK Kommunal App" currentPath="/app/profil">
+  <div class="p-8 max-w-4xl mx-auto">
+    
+    <div class="mb-10">
+      <h1 class="text-3xl font-extrabold font-headline text-[#05183a] tracking-tight mb-2">Profil & Rechnungen</h1>
+      <p class="text-gray-500">Verwalten Sie Ihre persönlichen Daten und laden Sie Buchungsbelege herunter.</p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-10">
+      
+      <!-- Account Settings -->
+      <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-8">
+        <h2 class="text-lg font-bold text-[#05183a] mb-6 flex items-center gap-2 border-b border-gray-100 pb-4">
+          <span class="material-symbols-outlined text-gray-400">tune</span> Kontoeinstellungen
+        </h2>
+        
+        <form class="space-y-6" onsubmit="event.preventDefault(); alert('Änderungen gespeichert!');">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-2">
+              <label class="text-xs font-bold text-gray-600 uppercase tracking-widest">Vorname</label>
+              <input type="text" value="Jan" class="w-full bg-gray-50 border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 px-4 py-2.5 rounded-lg outline-none text-sm font-medium text-[#05183a]" />
+            </div>
+            <div class="space-y-2">
+              <label class="text-xs font-bold text-gray-600 uppercase tracking-widest">Nachname</label>
+              <input type="text" value="Müller" class="w-full bg-gray-50 border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 px-4 py-2.5 rounded-lg outline-none text-sm font-medium text-[#05183a]" />
+            </div>
+          </div>
+          
+          <div class="space-y-2">
+            <label class="text-xs font-bold text-gray-600 uppercase tracking-widest">E-Mail Adresse (Login)</label>
+            <input type="email" value="jan.mueller@kommune-musterstadt.de" class="w-full bg-gray-50 border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 px-4 py-2.5 rounded-lg outline-none text-sm font-medium text-[#05183a]" />
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-xs font-bold text-gray-600 uppercase tracking-widest">Neues Passwort setzen</label>
+            <input type="password" placeholder="••••••••" class="w-full bg-gray-50 border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 px-4 py-2.5 rounded-lg outline-none text-sm font-medium text-[#05183a]" />
+          </div>
+
+          <div class="pt-4 flex justify-end">
+             <button type="submit" class="bg-[#05183a] text-white px-6 py-2.5 rounded-lg text-sm font-bold shadow-md hover:bg-blue-900 transition-colors">
+               Speichern
+             </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Invoices -->
+      <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+        <h2 class="text-lg font-bold text-[#05183a] m-8 mb-4 border-b border-gray-100 pb-4 flex items-center gap-2">
+          <span class="material-symbols-outlined text-gray-400">receipt_long</span> Meine Rechnungen
+        </h2>
+        
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-gray-50 text-xs font-bold text-gray-500 uppercase tracking-wider">
+              <th class="p-4 border-b border-gray-200 pl-8">Datum</th>
+              <th class="p-4 border-b border-gray-200">Beschreibung</th>
+              <th class="p-4 border-b border-gray-200">Betrag</th>
+              <th class="p-4 border-b border-gray-200 text-right pr-8">Download</th>
+            </tr>
+          </thead>
+          <tbody class="text-sm font-medium text-gray-700">
+            <tr class="hover:bg-gray-50 transition-colors group">
+              <td class="p-4 border-b border-gray-100 pl-8">01.03.2026</td>
+              <td class="p-4 border-b border-gray-100">
+                 Spezialthemen Modul (Jahreslizenz)<br/>
+                 <span class="text-xs text-gray-400 font-normal">Rechnungs-Nr: RE-260301-442</span>
+              </td>
+              <td class="p-4 border-b border-gray-100 font-bold text-[#05183a]">700,00 €</td>
+              <td class="p-4 border-b border-gray-100 text-right pr-8">
+                <button class="w-8 h-8 rounded-lg border border-gray-200 group-hover:bg-[#05183a] group-hover:text-white group-hover:border-[#05183a] flex items-center justify-center ml-auto transition-colors text-gray-400" title="PDF PDF Herunterladen">
+                  <span class="material-symbols-outlined text-[18px]">download</span>
+                </button>
+              </td>
+            </tr>
+            <tr class="hover:bg-gray-50 transition-colors group">
+              <td class="p-4 border-b border-gray-100 pl-8">15.01.2025</td>
+              <td class="p-4 border-b border-gray-100">
+                 Grundlagen Modul (Jahreslizenz)<br/>
+                 <span class="text-xs text-gray-400 font-normal">Rechnungs-Nr: RE-250115-112</span>
+              </td>
+              <td class="p-4 border-b border-gray-100 font-bold text-[#05183a]">500,00 €</td>
+              <td class="p-4 border-b border-gray-100 text-right pr-8">
+                <button class="w-8 h-8 rounded-lg border border-gray-200 group-hover:bg-[#05183a] group-hover:text-white group-hover:border-[#05183a] flex items-center justify-center ml-auto transition-colors text-gray-400" title="PDF PDF Herunterladen">
+                  <span class="material-symbols-outlined text-[18px]">download</span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</AppLayout>

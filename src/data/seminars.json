@@ -1,0 +1,249 @@
+[
+  {
+    "moduleId": "grundlagen",
+    "moduleName": "Grundlagen-Modul",
+    "seminars": [
+      {
+        "title": "Ertragsteuern (Teil 1 & 2)",
+        "duration": "ca. 60-90 Min.",
+        "events": [
+          {
+            "label": "1. Halbjahr",
+            "date": "12.02. - 13.02.2026",
+            "dateIso": "2026-02-12"
+          },
+          {
+            "label": "2. Halbjahr",
+            "date": "24.09. - 25.09.2026",
+            "dateIso": "2026-09-24"
+          }
+        ]
+      },
+      {
+        "title": "Umsatzsteuer (Teil 1 & 2)",
+        "duration": "ca. 60-90 Min.",
+        "events": [
+          {
+            "label": "1. Halbjahr",
+            "date": "05.03. - 06.03.2026",
+            "dateIso": "2026-03-05"
+          },
+          {
+            "label": "2. Halbjahr",
+            "date": "17.09. - 18.09.2026",
+            "dateIso": "2026-09-17"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "moduleId": "praktiker",
+    "moduleName": "Praktiker-Modul",
+    "seminars": [
+      {
+        "title": "Tax CMS – Reihe",
+        "description": "Konzeption eines TAX-Compliance-Management-Systems",
+        "duration": "ca. 120 Min.",
+        "events": [
+          {
+            "label": "Teil 1: Theoretische Grundlagen",
+            "date": "27.02.2026",
+            "dateIso": "2026-02-27"
+          },
+          {
+            "label": "Teil 2: Aufbau IKS",
+            "date": "20.03.2026",
+            "dateIso": "2026-03-20"
+          },
+          {
+            "label": "Teil 3: Risikomanagement",
+            "date": "12.06.2026",
+            "dateIso": "2026-06-12"
+          },
+          {
+            "label": "Teil 4: Fallstricke bei der Umsetzung",
+            "date": "10.07.2026",
+            "dateIso": "2026-07-10"
+          }
+        ]
+      },
+      {
+        "title": "Aktuelles aus dem Steuerrecht",
+        "description": "Update zu aktuellen Entwicklungen im Ertrag- und Umsatzsteuerrecht",
+        "duration": "30-45 Min.",
+        "events": [
+          {
+            "label": "Quartal 1",
+            "date": "26.03.2026",
+            "dateIso": "2026-03-26"
+          },
+          {
+            "label": "Quartal 2",
+            "date": "25.06.2026",
+            "dateIso": "2026-06-25"
+          },
+          {
+            "label": "Quartal 3",
+            "date": "01.10.2026",
+            "dateIso": "2026-10-01"
+          },
+          {
+            "label": "Quartal 4 (Jahresrückblick)",
+            "date": "10.12.2026",
+            "dateIso": "2026-12-10"
+          }
+        ]
+      },
+      {
+        "title": "Jahresabschluss von Eigenbetrieben (HGB, Doppik)",
+        "description": "Erläuterung von ausgewählten Themen (bspw. Anhang, Rückstellungen, Liquiditätsrechnung etc.)",
+        "duration": "ca. 90-120 Min.",
+        "events": [
+          {
+            "label": "Webinar",
+            "date": "21.05.2026",
+            "dateIso": "2026-05-21"
+          }
+        ]
+      },
+      {
+        "title": "Neuigkeiten und Auffrischung § 2b UStG",
+        "description": "Aktuelle Entwicklungen zur Einführung des § 2b UStG zum 1. Januar 2027",
+        "duration": "ca. 90-120 Min.",
+        "events": [
+          {
+            "label": "Best of § 2b UStG I",
+            "date": "02.07.2026",
+            "dateIso": "2026-07-02"
+          },
+          {
+            "label": "Best of § 2b UStG II",
+            "date": "05.11.2026",
+            "dateIso": "2026-11-05"
+          }
+        ]
+      },
+      {
+        "title": "Praxisfälle Tax CMS",
+        "description": "Ausgewählte Fallbeispiele zur praktischen Umsetzung",
+        "duration": "ca. 90-120 Min.",
+        "events": [
+          {
+            "label": "Webinar",
+            "date": "16.07.2026",
+            "dateIso": "2026-07-16"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "moduleId": "spezialthemen",
+    "moduleName": "Spezialthemen-Modul",
+    "seminars": [
+      {
+        "title": "Einführung in § 2b UStG",
+        "duration": "ca. 90-120 Min.",
+        "events": [
+          {
+            "label": "Webinar",
+            "date": "12.03.2026",
+            "dateIso": "2026-03-12"
+          }
+        ]
+      },
+      {
+        "title": "Einführung eines Tax CMS",
+        "duration": "ca. 90-120 Min.",
+        "events": [
+          {
+            "label": "Webinar",
+            "date": "19.03.2026",
+            "dateIso": "2026-03-19"
+          }
+        ]
+      },
+      {
+        "title": "PV-Anlagen und BHKW im Ertrag- und Umsatzsteuerrecht",
+        "duration": "ca. 90-120 Min.",
+        "events": [
+          {
+            "label": "Webinar",
+            "date": "16.04.2026",
+            "dateIso": "2026-04-16"
+          }
+        ]
+      },
+      {
+        "title": "Cyber-Security und Datensicherheit",
+        "description": "Für Kommunen und kommunale Gesellschaften",
+        "duration": "ca. 90-120 Min.",
+        "events": [
+          {
+            "label": "Webinar",
+            "date": "23.04.2026",
+            "dateIso": "2026-04-23"
+          }
+        ]
+      },
+      {
+        "title": "E-Rechnung: Umsetzung, Pflicht und Praxis",
+        "duration": "ca. 90-120 Min.",
+        "events": [
+          {
+            "label": "Webinar",
+            "date": "30.04.2026",
+            "dateIso": "2026-04-30"
+          }
+        ]
+      },
+      {
+        "title": "Datenschutz und Datensicherheit (insb. p.D.)",
+        "description": "Bei Kommunen und kommunalen Gesellschaften",
+        "duration": "ca. 90-120 Min.",
+        "events": [
+          {
+            "label": "Webinar",
+            "date": "08.10.2026",
+            "dateIso": "2026-10-08"
+          }
+        ]
+      },
+      {
+        "title": "Benefits Lohnsteuer und Umsatzsteuer",
+        "duration": "ca. 90-120 Min.",
+        "events": [
+          {
+            "label": "Webinar",
+            "date": "15.10.2026",
+            "dateIso": "2026-10-15"
+          }
+        ]
+      },
+      {
+        "title": "PV-Anlagen, BHKW & Co",
+        "description": "Aktueller energierechtlicher Überblick",
+        "duration": "ca. 90-120 Min.",
+        "events": [
+          {
+            "label": "Webinar",
+            "date": "22.10.2026",
+            "dateIso": "2026-10-22"
+          }
+        ]
+      },
+      {
+        "title": "Einnahmenüberschussrechnung und steuerliches Einlagekonto",
+        "duration": "ca. 90-120 Min.",
+        "events": [
+          {
+            "label": "Webinar",
+            "date": "26.11.2026",
+            "dateIso": "2026-11-26"
+          }
+        ]
+      }
+    ]
+  }
+]

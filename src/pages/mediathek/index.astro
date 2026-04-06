@@ -1,0 +1,141 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import TopNavBar from '../../components/TopNavBar.astro';
+import FooterSection from '../../components/FooterSection.astro';
+import AcademyFocusSection from '../../components/AcademyFocusSection.astro';
+
+import videos from '../../data/videos.json';
+---
+
+<Layout title="Videothek - AK Kommunal">
+  <TopNavBar />
+  
+  <main class="w-full bg-surface pt-32 pb-24 min-h-screen relative overflow-hidden">
+    <!-- Abstract Background styling -->
+    <div class="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+    
+    <!-- Header -->
+    <div class="max-w-6xl mx-auto px-6 lg:px-10 mb-12 relative z-10 animate-[fadeInUp_1s_ease-out]">
+      <div class="flex items-center gap-4 mb-4">
+        <div class="h-[2px] w-12 bg-primary"></div>
+        <h2 class="text-[10px] md:text-xs font-bold text-primary tracking-widest uppercase">
+          AK Kommunal Akademie
+        </h2>
+      </div>
+      <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold font-headline text-primary tracking-tight leading-[1.1] pb-2 mb-6 max-w-3xl">
+        Unsere Videothek für<br/> <span class="text-primary-fixed-dim">kommunale Fachexpertise.</span>
+      </h1>
+      <p class="text-lg font-body leading-relaxed font-light text-on-surface-variant max-w-2xl">
+        Fortbildung auf höchstem Niveau. Entdecken Sie praxisnahe Online-Kurse und Experten-Aufzeichnungen speziell für die Anforderungen der öffentlichen Verwaltung.
+      </p>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="max-w-6xl mx-auto px-6 lg:px-10 pb-32">
+      <div class="flex flex-col lg:flex-row gap-12 lg:gap-16">
+        
+        <!-- Sidebar Filters -->
+        <aside class="w-full lg:w-48 flex-shrink-0">
+          <!-- Kategorie -->
+          <div class="mb-10">
+            <h3 class="text-[9px] font-bold text-on-surface-variant uppercase tracking-[0.2em] mb-5">Kategorie</h3>
+            <div class="space-y-4">
+              <label class="flex items-center gap-3 cursor-pointer group">
+                <input type="checkbox" class="w-3.5 h-3.5 rounded-sm border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
+                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">Finanzwesen</span>
+              </label>
+              <label class="flex items-center gap-3 cursor-pointer group">
+                <input type="checkbox" class="w-3.5 h-3.5 rounded-sm border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
+                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">Steuerrecht</span>
+              </label>
+              <label class="flex items-center gap-3 cursor-pointer group">
+                <input type="checkbox" class="w-3.5 h-3.5 rounded-sm border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
+                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">Verwaltungsrecht</span>
+              </label>
+              <label class="flex items-center gap-3 cursor-pointer group">
+                <input type="checkbox" class="w-3.5 h-3.5 rounded-sm border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
+                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">IT & Digitalisierung</span>
+              </label>
+            </div>
+          </div>
+          
+          <!-- Format -->
+          <div class="mb-10">
+            <h3 class="text-[9px] font-bold text-on-surface-variant uppercase tracking-[0.2em] mb-5">Format</h3>
+            <div class="space-y-4">
+              <label class="flex items-center gap-3 cursor-pointer group">
+                <input type="checkbox" class="w-3.5 h-3.5 rounded-sm border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
+                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">Aufzeichnung</span>
+              </label>
+              <label class="flex items-center gap-3 cursor-pointer group">
+                <input type="checkbox" class="w-3.5 h-3.5 rounded-sm border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
+                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">Live-Webinar</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Dauer -->
+          <div>
+            <h3 class="text-[9px] font-bold text-on-surface-variant uppercase tracking-[0.2em] mb-5">Dauer</h3>
+            <div class="space-y-4">
+              <label class="flex items-center gap-3 cursor-pointer group">
+                <input type="radio" name="dauer" class="w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
+                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">&lt; 2 Stunden</span>
+              </label>
+              <label class="flex items-center gap-3 cursor-pointer group">
+                <input type="radio" name="dauer" class="w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
+                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">2 - 5 Stunden</span>
+              </label>
+              <label class="flex items-center gap-3 cursor-pointer group">
+                <input type="radio" name="dauer" class="w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
+                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">Ganztägig</span>
+              </label>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Video Grid -->
+        <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-16">
+          {videos.map(video => (
+            <a href={`/mediathek/${video.slug}`} class="group flex flex-col bg-transparent">
+              <!-- Image with Badges -->
+              <div class="relative w-full aspect-[16/9] rounded-xl overflow-hidden mb-5 bg-[#05183a]/5">
+                <img src={video.image} alt={video.title} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
+                <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
+                  {video.badges.map(badge => (
+                    <span class="bg-white/95 backdrop-blur-md text-[#05183a] border border-white/50 text-[8px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-sm shadow-sm">{badge}</span>
+                  ))}
+                </div>
+              </div>
+              
+              <!-- Content -->
+              <h3 class="text-xl font-extrabold font-headline text-[#05183a] mb-2.5 leading-tight group-hover:text-primary-fixed-dim transition-colors">{video.title}</h3>
+              
+              <div class="flex items-center gap-5 text-[11px] font-medium text-[#05183a]/70 mb-8 border-b border-outline-variant/15 pb-6">
+                <div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px]">schedule</span> {video.duration}</div>
+                <div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px]">videocam</span> Aufzeichnung</div>
+              </div>
+
+              <!-- Price Footer -->
+              <div class="flex items-end justify-between mt-auto">
+                <div class="space-y-1">
+                  <div class="text-[8px] uppercase font-bold text-primary tracking-[0.1em]">Mitglieder: Inklusive</div>
+                  <div class="text-[10px] font-medium text-on-surface-variant uppercase tracking-widest">Extern: {video.price} €</div>
+                </div>
+                <!-- Cart Button -->
+                <button class="w-9 h-9 bg-[#05183a] hover:bg-primary-fixed-dim rounded-md flex items-center justify-center text-white transition-colors shadow-sm group-hover:shadow-md">
+                  <span class="material-symbols-outlined text-[16px]">shopping_cart</span>
+                </button>
+              </div>
+            </a>
+          ))}
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <AcademyFocusSection />
+  
+  <FooterSection />
+</Layout>

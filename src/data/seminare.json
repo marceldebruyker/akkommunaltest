@@ -1,0 +1,266 @@
+[
+  {
+    "id": "grundlagen-ertrag-1",
+    "dateIso": "2026-02-12",
+    "dateDisplay": "12.02. - 13.02.2026",
+    "moduleName": "Grundlagen-Modul",
+    "moduleId": "grundlagen",
+    "title": "Ertragsteuern (Teil 1 & 2)",
+    "topic": "1. Halbjahr",
+    "duration": "ca. 60-90 Min."
+  },
+  {
+    "id": "praktiker-taxcms-1",
+    "dateIso": "2026-02-27",
+    "dateDisplay": "27.02.2026",
+    "moduleName": "Praktiker-Modul",
+    "moduleId": "praktiker",
+    "title": "Tax CMS – Reihe",
+    "topic": "Teil 1: Theoretische Grundlagen",
+    "description": "Konzeption eines TAX-Compliance-Management-Systems",
+    "duration": "ca. 120 Min."
+  },
+  {
+    "id": "grundlagen-umsatz-1",
+    "dateIso": "2026-03-05",
+    "dateDisplay": "05.03. - 06.03.2026",
+    "moduleName": "Grundlagen-Modul",
+    "moduleId": "grundlagen",
+    "title": "Umsatzsteuer (Teil 1 & 2)",
+    "topic": "1. Halbjahr",
+    "duration": "ca. 60-90 Min."
+  },
+  {
+    "id": "spezial-2b-ustg",
+    "dateIso": "2026-03-12",
+    "dateDisplay": "12.03.2026",
+    "moduleName": "Spezialthemen-Modul",
+    "moduleId": "spezialthemen",
+    "title": "Einführung in § 2b UStG",
+    "topic": "Webinar",
+    "duration": "ca. 90-120 Min."
+  },
+  {
+    "id": "spezial-taxcms",
+    "dateIso": "2026-03-19",
+    "dateDisplay": "19.03.2026",
+    "moduleName": "Spezialthemen-Modul",
+    "moduleId": "spezialthemen",
+    "title": "Einführung eines Tax CMS",
+    "topic": "Webinar",
+    "duration": "ca. 90-120 Min."
+  },
+  {
+    "id": "praktiker-taxcms-2",
+    "dateIso": "2026-03-20",
+    "dateDisplay": "20.03.2026",
+    "moduleName": "Praktiker-Modul",
+    "moduleId": "praktiker",
+    "title": "Tax CMS – Reihe",
+    "topic": "Teil 2: Aufbau IKS",
+    "description": "Aufbau und Dokumentation eines internen Kontrollsystems",
+    "duration": "ca. 180 Min."
+  },
+  {
+    "id": "praktiker-aktuelles-1",
+    "dateIso": "2026-03-26",
+    "dateDisplay": "26.03.2026",
+    "moduleName": "Praktiker-Modul",
+    "moduleId": "praktiker",
+    "title": "Aktuelles aus dem Steuerrecht",
+    "topic": "Quartal 1",
+    "description": "Update zu aktuellen Entwicklungen im Ertrag- und Umsatzsteuerrecht",
+    "duration": "30-45 Min."
+  },
+  {
+    "id": "spezial-pv-bhkw",
+    "dateIso": "2026-04-16",
+    "dateDisplay": "16.04.2026",
+    "moduleName": "Spezialthemen-Modul",
+    "moduleId": "spezialthemen",
+    "title": "PV-Anlagen und BHKW im Ertrag- und Umsatzsteuerrecht",
+    "topic": "Webinar",
+    "duration": "ca. 90-120 Min."
+  },
+  {
+    "id": "spezial-cybersecurity",
+    "dateIso": "2026-04-23",
+    "dateDisplay": "23.04.2026",
+    "moduleName": "Spezialthemen-Modul",
+    "moduleId": "spezialthemen",
+    "title": "Cyber-Security und Datensicherheit",
+    "topic": "Webinar",
+    "description": "Für Kommunen und kommunale Gesellschaften",
+    "duration": "ca. 90-120 Min."
+  },
+  {
+    "id": "spezial-erechnung",
+    "dateIso": "2026-04-30",
+    "dateDisplay": "30.04.2026",
+    "moduleName": "Spezialthemen-Modul",
+    "moduleId": "spezialthemen",
+    "title": "E-Rechnung: Umsetzung, Pflicht und Praxis",
+    "topic": "Webinar",
+    "duration": "ca. 90-120 Min."
+  },
+  {
+    "id": "praktiker-jahresabschluss",
+    "dateIso": "2026-05-21",
+    "dateDisplay": "21.05.2026",
+    "moduleName": "Praktiker-Modul",
+    "moduleId": "praktiker",
+    "title": "Jahresabschluss von Eigenbetrieben (HGB, Doppik)",
+    "topic": "Webinar",
+    "description": "Erläuterung von ausgewählten Themen (bspw. Anhang, Rückstellungen, Liquiditätsrechnung etc.)",
+    "duration": "ca. 90-120 Min."
+  },
+  {
+    "id": "praktiker-taxcms-3",
+    "dateIso": "2026-06-12",
+    "dateDisplay": "12.06.2026",
+    "moduleName": "Praktiker-Modul",
+    "moduleId": "praktiker",
+    "title": "Tax CMS – Reihe",
+    "topic": "Teil 3: Risikomanagement",
+    "description": "Aufbau und Dokumentation eines Risikomanagementsystems",
+    "duration": "ca. 180 Min."
+  },
+  {
+    "id": "praktiker-aktuelles-2",
+    "dateIso": "2026-06-25",
+    "dateDisplay": "25.06.2026",
+    "moduleName": "Praktiker-Modul",
+    "moduleId": "praktiker",
+    "title": "Aktuelles aus dem Steuerrecht",
+    "topic": "Quartal 2",
+    "description": "Update zu aktuellen Entwicklungen im Ertrag- und Umsatzsteuerrecht",
+    "duration": "30-45 Min."
+  },
+  {
+    "id": "praktiker-2b-ustg-1",
+    "dateIso": "2026-07-02",
+    "dateDisplay": "02.07.2026",
+    "moduleName": "Praktiker-Modul",
+    "moduleId": "praktiker",
+    "title": "Neuigkeiten und Auffrischung § 2b UStG",
+    "topic": "Best of § 2b UStG I",
+    "description": "Aktuelle Entwicklungen zur Einführung des § 2b UStG zum 1. Januar 2027",
+    "duration": "ca. 90-120 Min."
+  },
+  {
+    "id": "praktiker-taxcms-4",
+    "dateIso": "2026-07-10",
+    "dateDisplay": "10.07.2026",
+    "moduleName": "Praktiker-Modul",
+    "moduleId": "praktiker",
+    "title": "Tax CMS – Reihe",
+    "topic": "Teil 4: Fallstricke bei der Umsetzung",
+    "description": "Einsatz von Mustern und Arbeitshilfen",
+    "duration": "ca. 120 Min."
+  },
+  {
+    "id": "praktiker-taxcms-praxis",
+    "dateIso": "2026-07-16",
+    "dateDisplay": "16.07.2026",
+    "moduleName": "Praktiker-Modul",
+    "moduleId": "praktiker",
+    "title": "Praxisfälle Tax CMS",
+    "topic": "Webinar",
+    "description": "Ausgewählte Fallbeispiele zur praktischen Umsetzung",
+    "duration": "ca. 90-120 Min."
+  },
+  {
+    "id": "grundlagen-umsatz-2",
+    "dateIso": "2026-09-17",
+    "dateDisplay": "17.09. - 18.09.2026",
+    "moduleName": "Grundlagen-Modul",
+    "moduleId": "grundlagen",
+    "title": "Umsatzsteuer (Teil 1 & 2)",
+    "topic": "2. Halbjahr",
+    "duration": "ca. 60-90 Min."
+  },
+  {
+    "id": "grundlagen-ertrag-2",
+    "dateIso": "2026-09-24",
+    "dateDisplay": "24.09. - 25.09.2026",
+    "moduleName": "Grundlagen-Modul",
+    "moduleId": "grundlagen",
+    "title": "Ertragsteuern (Teil 1 & 2)",
+    "topic": "2. Halbjahr",
+    "duration": "ca. 60-90 Min."
+  },
+  {
+    "id": "praktiker-aktuelles-3",
+    "dateIso": "2026-10-01",
+    "dateDisplay": "01.10.2026",
+    "moduleName": "Praktiker-Modul",
+    "moduleId": "praktiker",
+    "title": "Aktuelles aus dem Steuerrecht",
+    "topic": "Quartal 3",
+    "description": "Update zu aktuellen Entwicklungen im Ertrag- und Umsatzsteuerrecht",
+    "duration": "30-45 Min."
+  },
+  {
+    "id": "spezial-datenschutz",
+    "dateIso": "2026-10-08",
+    "dateDisplay": "08.10.2026",
+    "moduleName": "Spezialthemen-Modul",
+    "moduleId": "spezialthemen",
+    "title": "Datenschutz und Datensicherheit (insb. p.D.)",
+    "topic": "Webinar",
+    "description": "Bei Kommunen und kommunalen Gesellschaften",
+    "duration": "ca. 90-120 Min."
+  },
+  {
+    "id": "spezial-benefits",
+    "dateIso": "2026-10-15",
+    "dateDisplay": "15.10.2026",
+    "moduleName": "Spezialthemen-Modul",
+    "moduleId": "spezialthemen",
+    "title": "Benefits Lohnsteuer und Umsatzsteuer",
+    "topic": "Webinar",
+    "duration": "ca. 90-120 Min."
+  },
+  {
+    "id": "spezial-pv-bhkw-2",
+    "dateIso": "2026-10-22",
+    "dateDisplay": "22.10.2026",
+    "moduleName": "Spezialthemen-Modul",
+    "moduleId": "spezialthemen",
+    "title": "PV-Anlagen, BHKW & Co",
+    "topic": "Webinar",
+    "description": "Aktueller energierechtlicher Überblick",
+    "duration": "ca. 90-120 Min."
+  },
+  {
+    "id": "praktiker-2b-ustg-2",
+    "dateIso": "2026-11-05",
+    "dateDisplay": "05.11.2026",
+    "moduleName": "Praktiker-Modul",
+    "moduleId": "praktiker",
+    "title": "Neuigkeiten und Auffrischung § 2b UStG",
+    "topic": "Best of § 2b UStG II",
+    "duration": "ca. 90-120 Min."
+  },
+  {
+    "id": "spezial-einnahmen",
+    "dateIso": "2026-11-26",
+    "dateDisplay": "26.11.2026",
+    "moduleName": "Spezialthemen-Modul",
+    "moduleId": "spezialthemen",
+    "title": "Einnahmenüberschussrechnung und steuerliches Einlagekonto",
+    "topic": "Webinar",
+    "duration": "ca. 90-120 Min."
+  },
+  {
+    "id": "praktiker-aktuelles-4",
+    "dateIso": "2026-12-10",
+    "dateDisplay": "10.12.2026",
+    "moduleName": "Praktiker-Modul",
+    "moduleId": "praktiker",
+    "title": "Aktuelles aus dem Steuerrecht",
+    "topic": "Quartal 4 (Jahresrückblick)",
+    "description": "Vollständiger Überblick über wichtige Neuerungen in 2026",
+    "duration": "ca. 2 Std."
+  }
+]

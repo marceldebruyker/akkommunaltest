@@ -1,0 +1,92 @@
+---
+import Layout from '../layouts/Layout.astro';
+import TopNavBar from '../components/TopNavBar.astro';
+import FooterSection from '../components/FooterSection.astro';
+
+const newsItems = [
+  {
+    title: "Neue BMF-Schreiben zur § 2b UStG Umsatzbesteuerung",
+    date: "25. März 2026",
+    category: "Rechtsprechung",
+    excerpt: "Das Bundesfinanzministerium hat heute wegweisende Klarstellungen zur Anwendung des § 2b UStG bei interkommunaler Zusammenarbeit veröffentlicht. Wir analysieren die Folgen."
+  },
+  {
+    title: "Erfolgreicher Workshop zum Tax Compliance Management",
+    date: "12. Februar 2026",
+    category: "Event",
+    excerpt: "Unser intensiv Workshop zum Aufbau eines TCMS war komplett ausgebucht. Die Aufzeichnung steht Mitgliedern nun in der Mediathek zur Verfügung."
+  },
+  {
+    title: "Grundsteuerreform: Fristen und Stolperfallen",
+    date: "15. Januar 2026",
+    category: "Steuern",
+    excerpt: "Die Neuveranlagung der Grundsteuer bringt für viele Kommunen erheblichen Mehraufwand mit sich. Ein Überblick über die aktuellen Deadlines."
+  },
+  {
+    title: "Jahresauftakt AK Kommunal: Was 2026 wichtig wird",
+    date: "05. Januar 2026",
+    category: "Allgemein",
+    excerpt: "Ein Ausblick auf die steuerlichen Herausforderungen für die öffentliche Hand im neuen Jahr und wie unser Arbeitskreis Sie dabei unterstützt."
+  }
+];
+---
+
+<Layout title="Aktuelles - AK Kommunal">
+  <TopNavBar />
+
+  <main class="w-full bg-surface pt-32 pb-24 min-h-screen relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+
+    <div class="max-w-6xl mx-auto px-6 lg:px-10 relative z-10 mb-12 animate-[fadeInUp_1s_ease-out]">
+      <div class="flex items-center gap-4 mb-4">
+        <div class="h-[2px] w-12 bg-primary"></div>
+        <h2 class="text-[10px] md:text-xs font-bold text-primary tracking-widest uppercase">
+          News & Insights
+        </h2>
+      </div>
+      <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold font-headline text-primary tracking-tight leading-[1.1] pb-2 mb-6 max-w-3xl">
+        Aktuelles aus<br/>
+        <span class="text-primary-fixed-dim">der Praxis.</span>
+      </h1>
+      <p class="text-lg font-body leading-relaxed font-light text-on-surface-variant max-w-2xl">
+        Bleiben Sie informiert. Lesen Sie tiefgehende Analysen, Event-Rückblicke und Expertenbeiträge speziell für kommunale Akteure.
+      </p>
+    </div>
+
+    <!-- Blog Grid -->
+    <div class="max-w-6xl mx-auto px-6 lg:px-10 animate-[fadeInUp_1s_ease-out_0.2s_both]">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {newsItems.map((item) => (
+          <article class="bg-surface-container-lowest p-8 md:p-10 rounded-3xl shadow-sm hover:shadow-xl transition-all duration-500 border border-outline-variant/30 flex flex-col h-full group hover:-translate-y-1 cursor-pointer">
+            <div class="flex items-center justify-between mb-6">
+              <span class="bg-primary/5 text-primary text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full border border-primary/10">
+                {item.category}
+              </span>
+              <time class="text-xs text-on-surface-variant font-medium tracking-wide">
+                {item.date}
+              </time>
+            </div>
+            <h3 class="text-2xl font-extrabold font-headline text-primary mb-4 group-hover:text-primary-fixed-dim transition-colors line-clamp-2">
+              {item.title}
+            </h3>
+            <p class="text-on-surface-variant leading-relaxed text-[15px] font-light mb-8 flex-grow">
+              {item.excerpt}
+            </p>
+            <div class="mt-auto pt-6 border-t border-outline-variant/20 flex items-center text-primary font-bold text-sm group-hover:gap-2 transition-all">
+              Artikel lesen <span class="material-symbols-outlined text-[18px] ml-1 group-hover:translate-x-1 transition-transform">arrow_forward</span>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      <!-- Pagination Placeholder -->
+      <div class="mt-16 flex justify-center gap-2">
+        <button class="w-10 h-10 rounded-xl bg-primary text-white font-bold flex items-center justify-center">1</button>
+        <button class="w-10 h-10 rounded-xl bg-surface-variant/50 text-on-surface-variant font-bold hover:bg-primary/10 hover:text-primary transition-colors flex items-center justify-center">2</button>
+        <button class="w-10 h-10 rounded-xl bg-surface-variant/50 text-on-surface-variant font-bold hover:bg-primary/10 hover:text-primary transition-colors flex items-center justify-center">3</button>
+      </div>
+    </div>
+  </main>
+
+  <FooterSection />
+</Layout>
