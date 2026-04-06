@@ -1,7 +1,20 @@
 ---
 import '../styles/global.css';
 import BrandLogo from '../components/BrandLogo.astro';
+import { getSupabaseServer } from '../lib/supabase';
+
 const { title, currentPath } = Astro.props;
+
+const supabase = getSupabaseServer(Astro.request, Astro.cookies);
+const { data: { user } } = await supabase.auth.getUser();
+
+const email = user?.email || 'Gast';
+const firstName = user?.user_metadata?.first_name || '';
+const lastName = user?.user_metadata?.last_name || '';
+const displayName = firstName ? `${firstName} ${lastName}` : email;
+const initials = firstName ? `${firstName.charAt(0)}${lastName?.charAt(0) || ''}` : email.charAt(0).toUpperCase();
+
+// We can pass user info to slots if needed via locals, or components just use their own fetches.
 ---
 
 <!doctype html>
@@ -53,7 +66,7 @@ const { title, currentPath } = Astro.props;
       <header class="h-16 bg-white border-b border-[#e5e7eb] flex items-center justify-between px-8 flex-shrink-0 z-10 w-full shadow-sm">
         <div class="flex items-center gap-4 text-gray-400">
            <span class="material-symbols-outlined cursor-pointer hover:text-[#05183a] transition-colors">menu</span>
-           <span class="text-sm font-medium text-gray-800">Welcome back, Jan Müller</span>
+           <span class="text-sm font-medium text-gray-800">Welcome back, {displayName}</span>
         </div>
         <div class="flex items-center gap-4">
           <button class="w-10 h-10 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition-colors relative">
@@ -61,7 +74,7 @@ const { title, currentPath } = Astro.props;
             <span class="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
           </button>
           <div class="w-10 h-10 rounded-full bg-[#05183a] text-white flex items-center justify-center font-bold text-sm shadow-md">
-            JM
+            {initials}
           </div>
         </div>
       </header>
