@@ -1,6 +1,7 @@
 ---
 import AppLayout from '../../layouts/AppLayout.astro';
 import { getSupabaseServer } from '../../lib/supabase';
+import Stripe from 'stripe';
 
 const supabase = getSupabaseServer(Astro.request, Astro.cookies);
 const { data: { user } } = await supabase.auth.getUser();
@@ -49,6 +50,25 @@ if (Astro.request.method === 'POST') {
 const firstName = user.user_metadata?.first_name || '';
 const lastName = user.user_metadata?.last_name || '';
 const email = user.email || '';
+
+// Fetch Stripe Invoices
+let userInvoices: Stripe.Invoice[] = [];
+const rawStripeKey = import.meta.env.STRIPE_SECRET_KEY;
+if (rawStripeKey && email) {
+  const stripe = new Stripe(rawStripeKey.trim());
+  try {
+    const customers = await stripe.customers.list({ email: email, limit: 3 });
+    for (const customer of customers.data) {
+      const invoices = await stripe.invoices.list({ customer: customer.id, limit: 10, status: 'paid' });
+      const openInvoices = await stripe.invoices.list({ customer: customer.id, limit: 10, status: 'open' });
+      userInvoices = [...userInvoices, ...invoices.data, ...openInvoices.data];
+    }
+    // Sort by created descending
+    userInvoices.sort((a, b) => b.created - a.created);
+  } catch (err) {
+    console.error("Error fetching stripe invoices", err);
+  }
+}
 ---
 
 <AppLayout title="Profil & Einstellungen - AK Kommunal App" currentPath="/app/profil">
@@ -119,32 +139,34 @@ const email = user.email || '';
             </tr>
           </thead>
           <tbody class="text-sm font-medium text-gray-700">
-            <tr class="hover:bg-gray-50 transition-colors group">
-              <td class="p-4 border-b border-gray-100 pl-8">01.03.2026</td>
-              <td class="p-4 border-b border-gray-100">
-                 Spezialthemen Modul (Jahreslizenz)<br/>
-                 <span class="text-xs text-gray-400 font-normal">Rechnungs-Nr: RE-260301-442</span>
-              </td>
-              <td class="p-4 border-b border-gray-100 font-bold text-[#05183a]">700,00 €</td>
-              <td class="p-4 border-b border-gray-100 text-right pr-8">
-                <button class="w-8 h-8 rounded-lg border border-gray-200 group-hover:bg-[#05183a] group-hover:text-white group-hover:border-[#05183a] flex items-center justify-center ml-auto transition-colors text-gray-400" title="PDF PDF Herunterladen">
-                  <span class="material-symbols-outlined text-[18px]">download</span>
-                </button>
-              </td>
-            </tr>
-            <tr class="hover:bg-gray-50 transition-colors group">
-              <td class="p-4 border-b border-gray-100 pl-8">15.01.2025</td>
-              <td class="p-4 border-b border-gray-100">
-                 Grundlagen Modul (Jahreslizenz)<br/>
-                 <span class="text-xs text-gray-400 font-normal">Rechnungs-Nr: RE-250115-112</span>
-              </td>
-              <td class="p-4 border-b border-gray-100 font-bold text-[#05183a]">500,00 €</td>
-              <td class="p-4 border-b border-gray-100 text-right pr-8">
-                <button class="w-8 h-8 rounded-lg border border-gray-200 group-hover:bg-[#05183a] group-hover:text-white group-hover:border-[#05183a] flex items-center justify-center ml-auto transition-colors text-gray-400" title="PDF PDF Herunterladen">
-                  <span class="material-symbols-outlined text-[18px]">download</span>
-                </button>
-              </td>
-            </tr>
+            {userInvoices.length === 0 ? (
+               <tr>
+                 <td colspan="4" class="p-8 text-center text-gray-400">Keine generierten Rechnungen gefunden.</td>
+               </tr>
+            ) : userInvoices.map((inv) => (
+              <tr class="hover:bg-gray-50 transition-colors group">
+                <td class="p-4 border-b border-gray-100 pl-8">
+                  {new Date(inv.created * 1000).toLocaleDateString('de-DE')}
+                </td>
+                <td class="p-4 border-b border-gray-100">
+                   {inv.lines.data.map(l => l.description).join(', ') || 'Fachvideo / Modul'}<br/>
+                   <span class="text-xs text-gray-400 font-normal">Rechnungs-Nr: {inv.number || 'Wird generiert...'}</span>
+                   {inv.status === 'open' && <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800">Unbezahlt</span>}
+                </td>
+                <td class="p-4 border-b border-gray-100 font-bold text-[#05183a]">
+                  {(inv.amount_due / 100).toLocaleString('de-DE', { style: 'currency', currency: 'EUR' })}
+                </td>
+                <td class="p-4 border-b border-gray-100 text-right pr-8">
+                  {inv.invoice_pdf ? (
+                    <a href={inv.invoice_pdf} target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-lg border border-gray-200 group-hover:bg-[#05183a] group-hover:text-white group-hover:border-[#05183a] flex items-center justify-center ml-auto transition-colors text-gray-400" title="PDF Herunterladen">
+                      <span class="material-symbols-outlined text-[18px]">download</span>
+                    </a>
+                  ) : (
+                    <span class="text-xs text-gray-400 font-medium">In Bearbeitung</span>
+                  )}
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
