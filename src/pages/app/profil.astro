@@ -74,7 +74,9 @@ const rawStripeKey = import.meta.env.STRIPE_SECRET_KEY;
 if (rawStripeKey && email) {
   const stripe = new Stripe(rawStripeKey.trim());
   try {
+    console.log(`[DEBUG] Fetching customers for email: ${email}`);
     const customers = await stripe.customers.list({ email: email, limit: 3 });
+    console.log(`[DEBUG] Found ${customers.data.length} customers.`);
     for (const customer of customers.data) {
       const invoices = await stripe.invoices.list({ customer: customer.id, limit: 10, status: 'paid' });
       const openInvoices = await stripe.invoices.list({ customer: customer.id, limit: 10, status: 'open' });
@@ -82,9 +84,12 @@ if (rawStripeKey && email) {
     }
     // Sort by created descending
     userInvoices.sort((a, b) => b.created - a.created);
+    console.log(`[DEBUG] Found total invoices: ${userInvoices.length}`);
   } catch (err) {
-    console.error("Error fetching stripe invoices", err);
+    console.error(`[DEBUG] Error fetching stripe invoices:`, err);
   }
+} else {
+  console.log(`[DEBUG] Skipping invoice fetch. Key exists: ${!!rawStripeKey}, Email: ${email}`);
 }
 ---
 

@@ -45,9 +45,10 @@ const initials = firstName ? `${firstName.charAt(0)}${lastName?.charAt(0) || ''}
         <a href="/app/fachportal" class={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${currentPath === '/app/fachportal' ? 'bg-[#05183a]/5 text-[#05183a]' : 'text-gray-500 hover:bg-gray-50 hover:text-[#05183a]'}`}>
           <span class="material-symbols-outlined text-[20px]">video_library</span> Mein Fachportal
         </a>
-        <a href="/app/forum" class={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${currentPath === '/app/forum' ? 'bg-[#05183a]/5 text-[#05183a]' : 'text-gray-500 hover:bg-gray-50 hover:text-[#05183a]'}`}>
+        <div class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-gray-400 cursor-not-allowed bg-gray-50/50" title="Funktion folgt in Kürze">
           <span class="material-symbols-outlined text-[20px]">forum</span> Community
-        </a>
+          <span class="ml-auto text-[9px] uppercase tracking-wider font-bold bg-gray-200 text-gray-500 px-1.5 py-0.5 rounded">Bald</span>
+        </div>
         <a href="/app/profil" class={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${currentPath === '/app/profil' ? 'bg-[#05183a]/5 text-[#05183a]' : 'text-gray-500 hover:bg-gray-50 hover:text-[#05183a]'}`}>
           <span class="material-symbols-outlined text-[20px]">person</span> Profil & Rechnungen
         </a>
