@@ -44,27 +44,35 @@ const videos = sanitySeminars.map((video: any) => ({
         <p class="text-gray-500">Ihre freigeschalteten Fachvideos und der Gesamtkatalog.</p>
       </div>
       
-      <!-- Filter -->
-      <div class="flex gap-2">
-         <select class="bg-white border border-gray-200 text-sm rounded-lg px-4 py-2 outline-none focus:border-blue-500 text-gray-700 font-medium shadow-sm cursor-pointer">
-           <option>Alle Videos</option>
-           <option>Nur freigeschaltete</option>
-           <option>Grundlagen Modul</option>
-           <option>Praktiker Modul</option>
+      <!-- Filter Controls -->
+      <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+         <div class="relative w-full sm:w-64">
+           <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[18px]">search</span>
+           <input type="text" id="searchInput" placeholder="Videos durchsuchen..." class="bg-white border border-gray-200 text-sm rounded-lg pl-9 pr-4 py-2.5 outline-none focus:border-blue-500 text-gray-700 font-medium shadow-sm w-full transition-colors" />
+         </div>
+         <select id="filterSelect" class="bg-white border border-gray-200 text-sm rounded-lg px-4 py-2.5 outline-none focus:border-blue-500 text-gray-700 font-medium shadow-sm w-full sm:w-auto cursor-pointer">
+           <option value="all">Alle Videos & Module</option>
+           <option value="access">Nur Freigeschaltete</option>
+           <option value="grundlagen">Grundlagen Modul</option>
+           <option value="spezialthemen">Spezialthemen Modul</option>
+           <option value="praktiker">Praktiker Modul</option>
+           <option value="experten">Experten Modul</option>
          </select>
       </div>
     </div>
 
     <!-- Video-Archiv / Aufzeichnungen -->
     {videos.filter((v: any) => v.status === 'aufzeichnung').length > 0 && (
-      <div class="mb-14">
+      <div class="mb-14 section-wrapper">
         <h2 class="text-xl font-bold font-headline text-[#05183a] mb-6 flex items-center gap-2">
           <span class="material-symbols-outlined text-emerald-600">video_library</span>
           Video-Archiv & Aufzeichnungen
         </h2>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {videos.filter((v: any) => v.status === 'aufzeichnung').map((video: any) => (
-             <LernweltCard video={video} />
+             <div class="video-card-wrapper h-full" data-modul={(video.moduleName || '').toLowerCase()} data-access={video.hasAccess ? 'true' : 'false'} data-search={video.title.toLowerCase()}>
+               <LernweltCard video={video} />
+             </div>
           ))}
         </div>
       </div>
@@ -72,14 +80,16 @@ const videos = sanitySeminars.map((video: any) => ({
 
     <!-- Anstehende Live-Termine -->
     {videos.filter((v: any) => v.status === 'live').length > 0 && (
-      <div class="mb-8">
+      <div class="mb-8 section-wrapper">
         <h2 class="text-xl font-bold font-headline text-[#05183a] mb-6 flex items-center gap-2">
           <span class="material-symbols-outlined text-blue-600">event</span>
-          Anstehende Live-Sessions
+          Anstehende Live-Seminar Termine
         </h2>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {videos.filter((v: any) => v.status === 'live').map((video: any) => (
-             <LernweltCard video={video} />
+             <div class="video-card-wrapper h-full" data-modul={(video.moduleName || '').toLowerCase()} data-access={video.hasAccess ? 'true' : 'false'} data-search={video.title.toLowerCase()}>
+               <LernweltCard video={video} />
+             </div>
           ))}
         </div>
       </div>
@@ -87,3 +97,46 @@ const videos = sanitySeminars.map((video: any) => ({
 
   </div>
 </AppLayout>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const searchInput = document.getElementById('searchInput') as HTMLInputElement;
+    const filterSelect = document.getElementById('filterSelect') as HTMLSelectElement;
+    const items = document.querySelectorAll('.video-card-wrapper');
+    const sections = document.querySelectorAll('.section-wrapper');
+
+    function filterItems() {
+      const searchTerm = searchInput.value.toLowerCase();
+      const filterValue = filterSelect.value;
+      let visibleCount = 0;
+
+      items.forEach(item => {
+        const title = item.getAttribute('data-search') || '';
+        const modul = item.getAttribute('data-modul') || '';
+        const access = item.getAttribute('data-access') === 'true';
+
+        let showBySearch = title.includes(searchTerm);
+        let showByFilter = true;
+
+        if (filterValue === 'access') showByFilter = access;
+        else if (filterValue !== 'all') showByFilter = modul.includes(filterValue);
+
+        if (showBySearch && showByFilter) {
+          (item as HTMLElement).style.display = 'block';
+          visibleCount++;
+        } else {
+          (item as HTMLElement).style.display = 'none';
+        }
+      });
+      
+      // Optionally hide sections if completely empty
+      sections.forEach(section => {
+         const hasVisibleItems = Array.from(section.querySelectorAll('.video-card-wrapper')).some(item => (item as HTMLElement).style.display === 'block');
+         (section as HTMLElement).style.display = hasVisibleItems ? 'block' : 'none';
+      });
+    }
+
+    searchInput?.addEventListener('input', filterItems);
+    filterSelect?.addEventListener('change', filterItems);
+  });
+</script>
