@@ -85,6 +85,17 @@ const initials = firstName ? `${firstName.charAt(0)}${lastName?.charAt(0) || ''}
       </main>
     </div>
 
+    <script>
+      import { clearCart } from '../store/cartStore';
+      document.addEventListener('DOMContentLoaded', () => {
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('session_id') || params.get('success') === 'invoice') {
+          clearCart();
+          // Optional: Clean up URL for a better experience
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+      });
+    </script>
 	</body>
 </html>
 <style is:global>
