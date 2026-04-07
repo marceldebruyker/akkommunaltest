@@ -58,11 +58,15 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     const sanityProducts = await sanityClient.fetch(`*[_type == "seminar"]{ "id": slug.current, title, price }`);
 
     // 4. Checkout Session generieren
-    const session = await stripe.checkout.sessions.create({
+    const sessionConfig: any = {
       mode: isSubscription ? 'subscription' : 'payment',
       payment_method_types: ['card', 'paypal', 'sepa_debit'],
       customer_email: authUser.email,
       client_reference_id: authUser.id,
+      billing_address_collection: 'required', // Erzwingt eine Rechnungsadresse
+      tax_id_collection: {
+        enabled: true, // Erlaubt Firmenkunden die Eingabe ihrer Umsatzsteuer-ID
+      },
       line_items: items.map((item: any) => {
         let slug = item.id;
         let title = item.title;
@@ -94,7 +98,14 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       },
       success_url: `${origin}/app/dashboard?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/kasse`,
-    });
+    };
+
+    // Invoice Creation darf nur im 'payment' Modus übergeben werden
+    if (!isSubscription) {
+      sessionConfig.invoice_creation = { enabled: true };
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionConfig);
 
     return new Response(JSON.stringify({ url: session.url, success: true }), { status: 200 });
 

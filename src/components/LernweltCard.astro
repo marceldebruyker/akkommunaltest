@@ -18,7 +18,7 @@ const { video } = Astro.props;
     <div class="p-6 flex-1 flex flex-col justify-between">
       <div>
         <span class={`text-[9px] uppercase font-bold tracking-widest px-2 py-1 rounded w-fit mb-3 border inline-block ${video.status === 'live' ? 'text-blue-600 bg-blue-50 border-blue-100' : 'text-emerald-600 bg-emerald-50 border-emerald-100'}`}>
-           {video.status === 'live' ? 'Live Session' : 'Freigeschaltet'}
+           {video.status === 'live' ? 'Live-Webinar' : 'Freigeschaltet'}
         </span>
         <h3 class="text-lg font-bold text-[#05183a] mb-2 leading-tight">{video.title}</h3>
         <div class="text-xs text-gray-500 font-medium flex items-center gap-1.5 mb-5 pb-5 border-b border-gray-100">
@@ -59,7 +59,7 @@ const { video } = Astro.props;
     
     <div class="p-6 flex-1 flex flex-col justify-center opacity-60">
       <span class="text-[9px] uppercase font-bold tracking-widest text-gray-500 bg-gray-200 px-2 py-1 rounded w-fit mb-3">
-         Nicht gebucht
+         Noch nicht gebucht
       </span>
       <h3 class="text-lg font-bold text-gray-700 mb-2 leading-tight line-clamp-2">{video.title}</h3>
       <div class="text-xs text-gray-500 font-medium flex items-center gap-1.5 mt-auto pt-4">
@@ -72,8 +72,8 @@ const { video } = Astro.props;
       <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mb-3 shadow-sm">
         <span class="material-symbols-outlined text-[24px]">lock</span>
       </div>
-      <p class="font-bold text-[#05183a] text-sm mb-1">Video gesperrt</p>
-      <p class="text-xs text-gray-600">Dieses Video benötigt das <strong>{video.moduleName}</strong>.<br/>Klicken Sie hier zur Buchung.</p>
+      <p class="font-bold text-[#05183a] text-sm mb-1">Inhalt gesperrt</p>
+      <p class="text-xs text-gray-600">Dieses Video benötigt das <strong>{video.moduleName}</strong>.<br/>Klicken Sie hier, um zur Buchung zu gelangen.</p>
     </a>
   </div>
 )}
