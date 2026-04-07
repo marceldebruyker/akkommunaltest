@@ -13,6 +13,7 @@ export default function CheckoutFlow({ user = null }: { user?: any }) {
   const [aboIds, setAboIds] = useState<string[] | null>(null);
   const [isMounted, setIsMounted] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [paymentType, setPaymentType] = useState<'stripe' | 'invoice'>('stripe');
   const cart = useStore(cartItems);
   const isLoggedIn = !!user;
 
@@ -64,16 +65,21 @@ export default function CheckoutFlow({ user = null }: { user?: any }) {
       const nachname = formData.get('nachname') as string || '';
       const leitwegId = formData.get('leitwegId') as string || '';
       const behorde = formData.get('behorde') as string || '';
+      const strasse = formData.get('strasse') as string || '';
+      const plz = formData.get('plz') as string || '';
+      const ort = formData.get('ort') as string || '';
 
       const payload = {
         items: isSubscription
           ? aboItems.map((item, idx) => ({ id: aboIds![idx], title: item.title, price: item.price }))
           : cart.map(item => ({ id: item.id, title: item.title, price: item.price })),
         isSubscription,
-        user: { email, password, vorname, nachname, leitwegId, behorde }
+        user: { email, password, vorname, nachname, leitwegId, behorde, strasse, plz, ort }
       };
 
-      const res = await fetch('/api/create-checkout-session', {
+      const endpoint = paymentType === 'invoice' ? '/api/buy-on-invoice' : '/api/create-checkout-session';
+
+      const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -83,6 +89,8 @@ export default function CheckoutFlow({ user = null }: { user?: any }) {
 
       if (data.url) {
         window.location.href = data.url; // Redirect to Stripe hosted Checkout
+      } else if (data.success && paymentType === 'invoice') {
+        window.location.href = '/app/fachportal?success=invoice'; // Redirect immediately to Fachportal
       } else {
         alert('Fehler: ' + (data.error || 'Unbekannter Fehler'));
         setIsLoading(false);
@@ -203,8 +211,24 @@ export default function CheckoutFlow({ user = null }: { user?: any }) {
           )}
 
           <div className="space-y-1.5 mb-4">
-             <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wide">Behörde / Kommune</label>
+             <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wide">Behörde / Kommune / Firma</label>
              <input name="behorde" required={!isLoggedIn} type="text" className="w-full bg-surface border border-outline-variant/40 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-outline-variant/60" placeholder="Stadtverwaltung Musterstadt" />
+          </div>
+
+          <div className="space-y-1.5 mb-4">
+            <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wide">Straße & Hausnummer</label>
+            <input name="strasse" required type="text" className="w-full bg-surface border border-outline-variant/40 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-outline-variant/60" placeholder="Rathausplatz 1" />
+          </div>
+
+          <div className="grid grid-cols-3 gap-4 mb-4">
+            <div className="space-y-1.5 col-span-1">
+              <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wide">PLZ</label>
+              <input name="plz" required type="text" className="w-full bg-surface border border-outline-variant/40 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-outline-variant/60" placeholder="12345" />
+            </div>
+            <div className="space-y-1.5 col-span-2">
+              <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wide">Ort</label>
+              <input name="ort" required type="text" className="w-full bg-surface border border-outline-variant/40 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-outline-variant/60" placeholder="Musterstadt" />
+            </div>
           </div>
           
           <div className="space-y-1.5 mb-8">
@@ -228,19 +252,25 @@ export default function CheckoutFlow({ user = null }: { user?: any }) {
             </>
           )}
 
-          <button type="submit" disabled={isLoading} className="w-full bg-primary-fixed-dim hover:bg-primary hover:text-white text-primary text-base font-extrabold py-4 px-6 rounded-xl transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed">
-            {isLoading ? (
-              <>
-                <span className="animate-spin material-symbols-outlined text-[20px]">progress_activity</span>
-                Weiterleitung zu Stripe...
-              </>
-            ) : (
-              <>
-                <span className="material-symbols-outlined text-[20px] group-hover:translate-x-1 transition-transform">lock</span>
-                {isSubscription ? 'Kostenpflichtig abonnieren' : 'Kostenpflichtig bestellen'}
-              </>
-            )}
-          </button>
+          <div className="flex flex-col gap-3">
+             <button type="submit" onClick={() => setPaymentType('invoice')} disabled={isLoading} className="w-full bg-[#05183a] hover:bg-[#0a2354] text-white text-base font-extrabold py-4 px-6 rounded-xl transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed">
+               {isLoading && paymentType === 'invoice' ? (
+                 <span className="animate-spin material-symbols-outlined text-[20px]">progress_activity</span>
+               ) : (
+                 <span className="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">receipt_long</span>
+               )}
+               Jetzt buchen (Kauf auf Rechnung)
+             </button>
+             
+             <button type="submit" onClick={() => setPaymentType('stripe')} disabled={isLoading} className="w-full bg-surface hover:bg-surface-container border border-outline-variant/50 text-on-surface text-sm font-bold py-3.5 px-6 rounded-xl transition-all shadow-sm active:scale-[0.98] flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed">
+               {isLoading && paymentType === 'stripe' ? (
+                 <span className="animate-spin material-symbols-outlined text-[18px]">progress_activity</span>
+               ) : (
+                 <span className="material-symbols-outlined text-[18px]">credit_card</span>
+               )}
+               Per Kreditkarte / PayPal zahlen
+             </button>
+          </div>
           
           <div className="mt-4 text-[11px] text-center text-on-surface-variant">
             Mit Bestätigung der Zahlung akzeptieren Sie unsere <a href="/agb" className="underline hover:text-primary">AGB</a>.

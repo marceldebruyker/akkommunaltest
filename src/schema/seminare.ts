@@ -28,8 +28,16 @@ export const seminar = defineType({
     }),
     defineField({
       name: 'moduleName',
-      title: 'Modul Name (z.B. Spezialthemen Modul)',
+      title: 'Modul Name (Dropdown)',
       type: 'string',
+      options: {
+        list: [
+          { title: 'Grundlagen Modul', value: 'Grundlagen Modul' },
+          { title: 'Spezialthemen Modul', value: 'Spezialthemen Modul' },
+          { title: 'Praktiker Modul', value: 'Praktiker Modul' },
+        ],
+        layout: 'dropdown',
+      },
       validation: (Rule) => Rule.required(),
     }),
     defineField({
