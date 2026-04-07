@@ -100,5 +100,14 @@ export const seminar = defineType({
         }
       }],
     }),
+    defineField({
+      name: 'validUntil',
+      title: 'Verfügbar bis (Ablaufdatum)',
+      description: 'Optional: Bis zu welchem Datum steht das Video / die Aufzeichnung den Kunden zur Verfügung?',
+      type: 'date',
+      options: {
+        dateFormat: 'DD.MM.YYYY',
+      }
+    }),
   ],
 })
