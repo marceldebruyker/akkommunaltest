@@ -1,5 +1,6 @@
 ---
 import AppLayout from '../../layouts/AppLayout.astro';
+import LernweltCard from '../../components/LernweltCard.astro';
 
 import { getSupabaseServer } from '../../lib/supabase';
 import { sanityClient } from '../../lib/sanity';
@@ -54,87 +55,35 @@ const videos = sanitySeminars.map((video: any) => ({
       </div>
     </div>
 
-    <!-- Video Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      {videos.map((video: any) => (
-        video.hasAccess ? (
-          /* ACTIVE STATE */
-          /* ACTIVE STATE */
-          <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col sm:flex-row transition-all h-full">
-            <a href={video.status === 'live' ? (video.teamsLink || '#') : `/app/player/${video.slug}`} target={video.status === 'live' ? "_blank" : "_self"} class="w-full sm:w-2/5 relative h-48 sm:h-auto border-b sm:border-b-0 sm:border-r border-gray-100 block group cursor-pointer overflow-hidden isolate">
-               <img src={video.image} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
-               <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors z-10"></div>
-               <div class="absolute bottom-3 right-3 bg-black/70 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded z-20">
-                 {video.duration || '90 Min.'}
-               </div>
-               <div class="absolute top-3 left-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-[#05183a] shadow-sm transform group-hover:scale-110 transition-transform z-20">
-                 <span class="material-symbols-outlined text-[18px] ml-0.5">{video.status === 'live' ? 'groups' : 'play_arrow'}</span>
-               </div>
-            </a>
-            <div class="p-6 flex-1 flex flex-col justify-between">
-              <div>
-                <span class={`text-[9px] uppercase font-bold tracking-widest px-2 py-1 rounded w-fit mb-3 border inline-block ${video.status === 'live' ? 'text-blue-600 bg-blue-50 border-blue-100' : 'text-emerald-600 bg-emerald-50 border-emerald-100'}`}>
-                   {video.status === 'live' ? 'Live Session' : 'Freigeschaltet'}
-                </span>
-                <h3 class="text-lg font-bold text-[#05183a] mb-2 leading-tight">{video.title}</h3>
-                <div class="text-xs text-gray-500 font-medium flex items-center gap-1.5 mb-5 pb-5 border-b border-gray-100">
-                   <span class="material-symbols-outlined text-[14px]">videocam</span> {video.moduleName || 'Seminar'}
-                </div>
-              </div>
-              
-              <!-- Action Buttons -->
-              <div class="flex flex-col gap-3">
-                 <a href={video.status === 'live' ? (video.teamsLink || '#') : `/app/player/${video.slug}`} target={video.status === 'live' ? "_blank" : "_self"} class="bg-[#05183a] hover:bg-[#0a2354] text-white text-[13px] font-bold px-4 py-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors shadow-sm">
-                   <span class="material-symbols-outlined text-[18px]">{video.status === 'live' ? 'groups' : 'play_arrow'}</span>
-                   {video.status === 'live' ? 'MS Teams beitreten' : 'Video ansehen'}
-                 </a>
-                 
-                 {video.materials && video.materials.length > 0 && (
-                   <div class="space-y-2 mt-2">
-                     <span class="text-[9px] uppercase font-bold text-gray-400 tracking-widest block mb-1">Kursunterlagen ({video.materials.length})</span>
-                     {video.materials.map((mat: any) => (
-                       <a href={`${mat.url}?dl=${mat.originalFilename}`} target="_blank" class="bg-gray-50 hover:bg-blue-50 hover:border-blue-200 border border-gray-200 text-gray-700 hover:text-blue-700 text-xs font-semibold px-3 py-2 rounded-lg flex items-center justify-between transition-colors group">
-                         <div class="flex items-center gap-2 overflow-hidden">
-                           <span class="material-symbols-outlined text-[16px] text-red-500 shrink-0">picture_as_pdf</span>
-                           <span class="truncate">{mat.originalFilename || 'Dokument herunterladen'}</span>
-                         </div>
-                         <span class="material-symbols-outlined text-[16px] text-gray-400 group-hover:text-blue-500 shrink-0">download</span>
-                       </a>
-                     ))}
-                   </div>
-                 )}
-              </div>
-            </div>
-          </div>
-        ) : (
-          /* LOCKED STATE */
-          <div class="bg-gray-50 rounded-2xl border border-dashed border-gray-300 overflow-hidden flex flex-col sm:flex-row group relative h-full">
-            <div class="w-full sm:w-2/5 relative h-48 sm:h-auto border-b sm:border-b-0 sm:border-r border-gray-200 grayscale opacity-60">
-               <img src={video.image} class="w-full h-full object-cover" />
-            </div>
-            
-            <div class="p-6 flex-1 flex flex-col justify-center opacity-60">
-              <span class="text-[9px] uppercase font-bold tracking-widest text-gray-500 bg-gray-200 px-2 py-1 rounded w-fit mb-3">
-                 Nicht gebucht
-              </span>
-              <h3 class="text-lg font-bold text-gray-700 mb-2 leading-tight line-clamp-2">{video.title}</h3>
-              <div class="text-xs text-gray-500 font-medium flex items-center gap-1.5 mt-auto pt-4">
-                 <span class="material-symbols-outlined text-[14px]">videocam</span> Online-Seminar • {video.moduleName}
-              </div>
-            </div>
+    <!-- Video-Archiv / Aufzeichnungen -->
+    {videos.filter((v: any) => v.status === 'aufzeichnung').length > 0 && (
+      <div class="mb-14">
+        <h2 class="text-xl font-bold font-headline text-[#05183a] mb-6 flex items-center gap-2">
+          <span class="material-symbols-outlined text-emerald-600">video_library</span>
+          Video-Archiv & Aufzeichnungen
+        </h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {videos.filter((v: any) => v.status === 'aufzeichnung').map((video: any) => (
+             <LernweltCard video={video} />
+          ))}
+        </div>
+      </div>
+    )}
 
-            <!-- Lock Overlay Hover Effect -->
-            <div class="absolute inset-0 bg-white/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-center p-6 border border-red-200 rounded-2xl cursor-pointer">
-              <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mb-3 shadow-sm">
-                <span class="material-symbols-outlined text-[24px]">lock</span>
-              </div>
-              <p class="font-bold text-[#05183a] text-sm mb-1">Video gesperrt</p>
-              <p class="text-xs text-gray-600">Dieses Video benötigt das <strong>{video.moduleName}</strong>.<br/>Klicken Sie hier für ein Upgrade.</p>
-            </div>
-          </div>
-        )
-      ))}
-    </div>
+    <!-- Anstehende Live-Termine -->
+    {videos.filter((v: any) => v.status === 'live').length > 0 && (
+      <div class="mb-8">
+        <h2 class="text-xl font-bold font-headline text-[#05183a] mb-6 flex items-center gap-2">
+          <span class="material-symbols-outlined text-blue-600">event</span>
+          Anstehende Live-Sessions
+        </h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {videos.filter((v: any) => v.status === 'live').map((video: any) => (
+             <LernweltCard video={video} />
+          ))}
+        </div>
+      </div>
+    )}
 
   </div>
 </AppLayout>
