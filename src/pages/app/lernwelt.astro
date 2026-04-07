@@ -18,11 +18,11 @@ const { data: purchases } = await supabase
 
 const purchasedSlugs = purchases ? purchases.map(p => p.video_slug) : [];
 
-// Fetch ALL seminars from Sanity
 const sanitySeminars = await sanityClient.fetch(`*[_type == "seminar"] | order(eventDate asc) {
   "slug": slug.current,
   title, status, eventDate, teamsLink, vimeoId, moduleName, duration, price,
-  "imageUrl": image.asset->url
+  "imageUrl": image.asset->url,
+  "materials": materials[].asset->{url, originalFilename}
 }`);
 
 // Determine which seminars the user has access to
@@ -59,27 +59,53 @@ const videos = sanitySeminars.map((video: any) => ({
       {videos.map((video: any) => (
         video.hasAccess ? (
           /* ACTIVE STATE */
-          <a href={video.status === 'live' ? (video.teamsLink || '#') : `/app/player/${video.slug}`} target={video.status === 'live' ? "_blank" : "_self"} class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col sm:flex-row group hover:shadow-lg hover:border-blue-200 transition-all cursor-pointer h-full">
-            <div class="w-full sm:w-2/5 relative h-48 sm:h-auto border-b sm:border-b-0 sm:border-r border-gray-100">
+          /* ACTIVE STATE */
+          <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden flex flex-col sm:flex-row transition-all h-full">
+            <a href={video.status === 'live' ? (video.teamsLink || '#') : `/app/player/${video.slug}`} target={video.status === 'live' ? "_blank" : "_self"} class="w-full sm:w-2/5 relative h-48 sm:h-auto border-b sm:border-b-0 sm:border-r border-gray-100 block group cursor-pointer overflow-hidden isolate">
                <img src={video.image} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
-               <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors"></div>
-               <div class="absolute bottom-3 right-3 bg-black/70 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded">
+               <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors z-10"></div>
+               <div class="absolute bottom-3 right-3 bg-black/70 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded z-20">
                  {video.duration || '90 Min.'}
                </div>
-               <div class="absolute top-3 left-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-[#05183a] shadow-sm transform group-hover:scale-110 transition-transform">
+               <div class="absolute top-3 left-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur flex items-center justify-center text-[#05183a] shadow-sm transform group-hover:scale-110 transition-transform z-20">
                  <span class="material-symbols-outlined text-[18px] ml-0.5">{video.status === 'live' ? 'groups' : 'play_arrow'}</span>
                </div>
-            </div>
-            <div class="p-6 flex-1 flex flex-col justify-center">
-              <span class={`text-[9px] uppercase font-bold tracking-widest px-2 py-1 rounded w-fit mb-3 border ${video.status === 'live' ? 'text-blue-600 bg-blue-50 border-blue-100' : 'text-emerald-600 bg-emerald-50 border-emerald-100'}`}>
-                 {video.status === 'live' ? 'Live Session' : 'Freigeschaltet'}
-              </span>
-              <h3 class="text-lg font-bold text-[#05183a] mb-2 leading-tight group-hover:text-blue-600 transition-colors">{video.title}</h3>
-              <div class="text-xs text-gray-500 font-medium flex items-center gap-1.5 mt-auto pt-4">
-                 <span class="material-symbols-outlined text-[14px]">videocam</span> Online-Seminar • {video.moduleName || 'Seminar'}
+            </a>
+            <div class="p-6 flex-1 flex flex-col justify-between">
+              <div>
+                <span class={`text-[9px] uppercase font-bold tracking-widest px-2 py-1 rounded w-fit mb-3 border inline-block ${video.status === 'live' ? 'text-blue-600 bg-blue-50 border-blue-100' : 'text-emerald-600 bg-emerald-50 border-emerald-100'}`}>
+                   {video.status === 'live' ? 'Live Session' : 'Freigeschaltet'}
+                </span>
+                <h3 class="text-lg font-bold text-[#05183a] mb-2 leading-tight">{video.title}</h3>
+                <div class="text-xs text-gray-500 font-medium flex items-center gap-1.5 mb-5 pb-5 border-b border-gray-100">
+                   <span class="material-symbols-outlined text-[14px]">videocam</span> {video.moduleName || 'Seminar'}
+                </div>
+              </div>
+              
+              <!-- Action Buttons -->
+              <div class="flex flex-col gap-3">
+                 <a href={video.status === 'live' ? (video.teamsLink || '#') : `/app/player/${video.slug}`} target={video.status === 'live' ? "_blank" : "_self"} class="bg-[#05183a] hover:bg-[#0a2354] text-white text-[13px] font-bold px-4 py-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors shadow-sm">
+                   <span class="material-symbols-outlined text-[18px]">{video.status === 'live' ? 'groups' : 'play_arrow'}</span>
+                   {video.status === 'live' ? 'MS Teams beitreten' : 'Video ansehen'}
+                 </a>
+                 
+                 {video.materials && video.materials.length > 0 && (
+                   <div class="space-y-2 mt-2">
+                     <span class="text-[9px] uppercase font-bold text-gray-400 tracking-widest block mb-1">Kursunterlagen ({video.materials.length})</span>
+                     {video.materials.map((mat: any) => (
+                       <a href={`${mat.url}?dl=${mat.originalFilename}`} target="_blank" class="bg-gray-50 hover:bg-blue-50 hover:border-blue-200 border border-gray-200 text-gray-700 hover:text-blue-700 text-xs font-semibold px-3 py-2 rounded-lg flex items-center justify-between transition-colors group">
+                         <div class="flex items-center gap-2 overflow-hidden">
+                           <span class="material-symbols-outlined text-[16px] text-red-500 shrink-0">picture_as_pdf</span>
+                           <span class="truncate">{mat.originalFilename || 'Dokument herunterladen'}</span>
+                         </div>
+                         <span class="material-symbols-outlined text-[16px] text-gray-400 group-hover:text-blue-500 shrink-0">download</span>
+                       </a>
+                     ))}
+                   </div>
+                 )}
               </div>
             </div>
-          </a>
+          </div>
         ) : (
           /* LOCKED STATE */
           <div class="bg-gray-50 rounded-2xl border border-dashed border-gray-300 overflow-hidden flex flex-col sm:flex-row group relative h-full">

@@ -88,5 +88,17 @@ export const seminar = defineType({
       type: 'array',
       of: [{ type: 'string' }],
     }),
+    defineField({
+      name: 'materials',
+      title: 'Kursunterlagen (PDFs)',
+      description: 'Hier können begleitende Dateien (, Präsentationen, Skripte) hochgeladen werden. Diese tauchen in der persönlichen Lernwelt der Käufer auf.',
+      type: 'array',
+      of: [{ 
+        type: 'file',
+        options: {
+          storeOriginalFilename: true
+        }
+      }],
+    }),
   ],
 })
