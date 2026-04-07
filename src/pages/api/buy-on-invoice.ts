@@ -88,14 +88,9 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
       await stripe.invoiceItems.create({
         customer: customer.id,
-        price_data: {
-          currency: 'eur',
-          unit_amount: Math.round(price * 100),
-          product_data: {
-            name: title
-          }
-        },
-        description: isSubscription ? 'Abonnement Gebühr (jährlich)' : 'Fachvideo / Seminar',
+        currency: 'eur',
+        amount: Math.round(price * 100),
+        description: `${isSubscription ? 'Abonnement Gebühr (jährlich) -' : 'Fachvideo / Seminar -'} ${title}`,
       });
     }
 

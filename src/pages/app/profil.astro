@@ -1,5 +1,17 @@
 ---
 import AppLayout from '../../layouts/AppLayout.astro';
+import { getSupabaseServer } from '../../lib/supabase';
+
+const supabase = getSupabaseServer(Astro.request, Astro.cookies);
+const { data: { user } } = await supabase.auth.getUser();
+
+if (!user) {
+  return Astro.redirect('/login');
+}
+
+const firstName = user.user_metadata?.first_name || '';
+const lastName = user.user_metadata?.last_name || '';
+const email = user.email || '';
 ---
 
 <AppLayout title="Profil & Einstellungen - AK Kommunal App" currentPath="/app/profil">
@@ -22,17 +34,17 @@ import AppLayout from '../../layouts/AppLayout.astro';
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="space-y-2">
               <label class="text-xs font-bold text-gray-600 uppercase tracking-widest">Vorname</label>
-              <input type="text" value="Jan" class="w-full bg-gray-50 border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 px-4 py-2.5 rounded-lg outline-none text-sm font-medium text-[#05183a]" />
+              <input type="text" name="firstname" value={firstName} class="w-full bg-gray-50 border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 px-4 py-2.5 rounded-lg outline-none text-sm font-medium text-[#05183a]" />
             </div>
             <div class="space-y-2">
               <label class="text-xs font-bold text-gray-600 uppercase tracking-widest">Nachname</label>
-              <input type="text" value="Müller" class="w-full bg-gray-50 border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 px-4 py-2.5 rounded-lg outline-none text-sm font-medium text-[#05183a]" />
+              <input type="text" name="lastname" value={lastName} class="w-full bg-gray-50 border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 px-4 py-2.5 rounded-lg outline-none text-sm font-medium text-[#05183a]" />
             </div>
           </div>
           
           <div class="space-y-2">
             <label class="text-xs font-bold text-gray-600 uppercase tracking-widest">E-Mail Adresse (Login)</label>
-            <input type="email" value="jan.mueller@kommune-musterstadt.de" class="w-full bg-gray-50 border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 px-4 py-2.5 rounded-lg outline-none text-sm font-medium text-[#05183a]" />
+            <input type="email" name="email" value={email} readonly disabled class="w-full bg-gray-100 border border-gray-200 px-4 py-2.5 rounded-lg outline-none text-sm font-medium text-gray-500 cursor-not-allowed" title="E-Mail kann aktuell nur über den Support geändert werden" />
           </div>
 
           <div class="space-y-2">
