@@ -9,6 +9,43 @@ if (!user) {
   return Astro.redirect('/login');
 }
 
+let notification = '';
+
+if (Astro.request.method === 'POST') {
+  try {
+    const formData = await Astro.request.formData();
+    const firstname = formData.get('firstname')?.toString() || '';
+    const lastname = formData.get('lastname')?.toString() || '';
+    const password = formData.get('password')?.toString();
+
+    const updates: any = {
+      data: {
+        first_name: firstname,
+        last_name: lastname,
+      }
+    };
+
+    if (password && password.trim() !== '') {
+      updates.password = password;
+    }
+
+    const { error: updateError } = await supabase.auth.updateUser(updates);
+
+    if (updateError) {
+      notification = `Fehler: ${updateError.message}`;
+    } else {
+      // Fetch latest user data
+      const { data: { user: updatedUser } } = await supabase.auth.getUser();
+      if (updatedUser) {
+        user.user_metadata = updatedUser.user_metadata;
+      }
+      notification = 'Änderungen erfolgreich gespeichert!';
+    }
+  } catch (err: any) {
+    notification = `Ein Fehler ist aufgetreten: ${err.message}`;
+  }
+}
+
 const firstName = user.user_metadata?.first_name || '';
 const lastName = user.user_metadata?.last_name || '';
 const email = user.email || '';
@@ -29,8 +66,14 @@ const email = user.email || '';
         <h2 class="text-lg font-bold text-[#05183a] mb-6 flex items-center gap-2 border-b border-gray-100 pb-4">
           <span class="material-symbols-outlined text-gray-400">tune</span> Kontoeinstellungen
         </h2>
+
+        {notification && (
+          <div class={`mb-6 p-4 rounded-xl text-sm font-semibold border ${notification.startsWith('Fehler') ? 'bg-red-50 text-red-600 border-red-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'}`}>
+            {notification}
+          </div>
+        )}
         
-        <form class="space-y-6" onsubmit="event.preventDefault(); alert('Änderungen gespeichert!');">
+        <form method="POST" class="space-y-6">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="space-y-2">
               <label class="text-xs font-bold text-gray-600 uppercase tracking-widest">Vorname</label>
@@ -49,7 +92,7 @@ const email = user.email || '';
 
           <div class="space-y-2">
             <label class="text-xs font-bold text-gray-600 uppercase tracking-widest">Neues Passwort setzen</label>
-            <input type="password" placeholder="••••••••" class="w-full bg-gray-50 border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 px-4 py-2.5 rounded-lg outline-none text-sm font-medium text-[#05183a]" />
+            <input type="password" name="password" placeholder="•••••••• (Leer lassen für keine Änderung)" class="w-full bg-gray-50 border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 px-4 py-2.5 rounded-lg outline-none text-sm font-medium text-[#05183a]" />
           </div>
 
           <div class="pt-4 flex justify-end">
