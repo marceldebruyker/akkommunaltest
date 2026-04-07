@@ -26,6 +26,23 @@ if (Astro.request.method === 'POST') {
       }
     };
 
+    const avatarFile = formData.get('avatar');
+    if (avatarFile && typeof avatarFile === 'object' && avatarFile.size > 0) {
+      const arrayBuffer = await avatarFile.arrayBuffer();
+      const buffer = new Uint8Array(arrayBuffer);
+      const filePath = `${user.id}/${Date.now()}_${avatarFile.name.replace(/[^a-zA-Z0-9.]/g, '')}`;
+      
+      const { data: uploadData, error: uploadError } = await supabase.storage.from('avatars').upload(filePath, buffer, {
+        contentType: avatarFile.type,
+        upsert: true
+      });
+
+      if (!uploadError && uploadData) {
+        const { data: publicUrlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
+        updates.data.avatar_url = publicUrlData.publicUrl;
+      }
+    }
+
     if (password && password.trim() !== '') {
       updates.password = password;
     }
@@ -93,7 +110,27 @@ if (rawStripeKey && email) {
           </div>
         )}
         
-        <form method="POST" class="space-y-6">
+        <form method="POST" id="profile-form" enctype="multipart/form-data" class="space-y-6">
+          
+          <!-- Avatar Upload -->
+          <div class="flex items-center gap-6 border-b border-gray-100 pb-8 mb-6">
+            <div class="relative w-20 h-20 rounded-full bg-[#05183a] text-white flex items-center justify-center font-bold text-xl shadow-[0_4px_14px_0_rgba(5,24,58,0.2)] overflow-hidden group">
+              {user.user_metadata?.avatar_url ? (
+                 <img src={user.user_metadata.avatar_url} class="w-full h-full object-cover">
+              ) : (
+                 <span>{firstName ? firstName.charAt(0) : email.charAt(0).toUpperCase()}{lastName ? lastName.charAt(0) : ''}</span>
+              )}
+              <div class="absolute inset-0 bg-black/50 hidden flex flex-col gap-1 items-center justify-center cursor-pointer group-hover:flex transition-opacity" onclick="document.getElementById('avatar-input').click()">
+                <span class="material-symbols-outlined text-white text-[20px]">photo_camera</span>
+              </div>
+            </div>
+            <div>
+              <h3 class="font-bold text-[#05183a] text-[15px]">Profilbild</h3>
+              <p class="text-sm text-gray-500 mt-1 max-w-xs">Klicken Sie auf Ihr Bild, um ein neues hochzuladen. Änderungen können etwas dauern.</p>
+            </div>
+            <input type="file" id="avatar-input" name="avatar" accept="image/jpeg, image/png, image/webp" class="hidden" onchange="document.getElementById('profile-submit-btn').click()">
+          </div>
+
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="space-y-2">
               <label class="text-xs font-bold text-gray-600 uppercase tracking-widest">Vorname</label>
@@ -115,8 +152,8 @@ if (rawStripeKey && email) {
             <input type="password" name="password" placeholder="•••••••• (Leer lassen für keine Änderung)" class="w-full bg-gray-50 border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 px-4 py-2.5 rounded-lg outline-none text-sm font-medium text-[#05183a]" />
           </div>
 
-          <div class="pt-4 flex justify-end">
-             <button type="submit" class="bg-[#05183a] text-white px-6 py-2.5 rounded-lg text-sm font-bold shadow-md hover:bg-blue-900 transition-colors">
+          <div class="pt-4 flex justify-end gap-3">
+             <button type="submit" id="profile-submit-btn" class="bg-[#05183a] text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-[0_4px_14px_0_rgba(5,24,58,0.2)] hover:bg-blue-900 transition-all hover:-translate-y-0.5">
                Speichern
              </button>
           </div>

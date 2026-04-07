@@ -1,5 +1,68 @@
 ---
 import AppLayout from '../../layouts/AppLayout.astro';
+import { getSupabaseServer } from '../../lib/supabase';
+
+const supabase = getSupabaseServer(Astro.request, Astro.cookies);
+const { data: { user } } = await supabase.auth.getUser();
+
+if (!user) {
+  return Astro.redirect('/login');
+}
+
+const firstName = user.user_metadata?.first_name || '';
+const lastName = user.user_metadata?.last_name || '';
+const displayName = firstName ? `${firstName} ${lastName}` : (user.email || 'Gast');
+const avatarUrl = user.user_metadata?.avatar_url || null;
+
+let notification = '';
+
+// Form POST (neues Thema)
+if (Astro.request.method === 'POST') {
+  try {
+    const formData = await Astro.request.formData();
+    const title = formData.get('title')?.toString();
+    const category = formData.get('category')?.toString();
+    const content = formData.get('content')?.toString();
+
+    if (title && category && content) {
+      const { error: insertError } = await supabase.from('forum_topics').insert({
+        title,
+        category,
+        content,
+        author_id: user.id,
+        author_name: displayName,
+        author_avatar_url: avatarUrl
+      });
+      if (insertError) {
+        notification = `Fehler beim Erstellen: ${insertError.message}`;
+      } else {
+        notification = 'Thema erfolgreich erstellt!';
+      }
+    }
+  } catch (err: any) {
+    notification = `Systemfehler: ${err.message}`;
+  }
+}
+
+// Fetch Live Topics
+const { data: rawTopics, error } = await supabase
+  .from('forum_topics')
+  .select('*')
+  .order('created_at', { ascending: false });
+
+const forumTopics = rawTopics || [];
+
+function timeAgo(dateString: string) {
+  const date = new Date(dateString);
+  const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000);
+  let interval = seconds / 86400;
+  if (interval > 1) return Math.floor(interval) + " Tagen";
+  interval = seconds / 3600;
+  if (interval > 1) return Math.floor(interval) + " Stunden";
+  interval = seconds / 60;
+  if (interval >= 1) return Math.floor(interval) + " Minuten";
+  return "gerade eben";
+}
 ---
 
 <AppLayout title="Community Forum - AK Kommunal App" currentPath="/app/forum">
@@ -23,7 +86,7 @@ import AppLayout from '../../layouts/AppLayout.astro';
             <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-[20px]">search</span>
             <input type="text" placeholder="Forum durchsuchen..." class="w-full bg-gray-50 border border-gray-200 text-sm rounded-xl py-2.5 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-[#05183a] font-medium placeholder-gray-400">
           </div>
-          <button class="bg-[#05183a] text-white px-5 py-2.5 rounded-xl text-[14px] font-bold shadow-[0_4px_14px_0_rgba(5,24,58,0.2)] hover:bg-blue-900 transition-all hover:-translate-y-0.5 flex items-center gap-2 shrink-0">
+          <button onclick="document.getElementById('new-topic-modal').classList.remove('hidden')" class="bg-[#05183a] text-white px-5 py-2.5 rounded-xl text-[14px] font-bold shadow-md hover:bg-blue-900 transition-all hover:-translate-y-0.5 flex items-center gap-2 shrink-0">
             <span class="material-symbols-outlined text-[18px]">add</span> Neues Thema
           </button>
         </div>
@@ -79,39 +142,8 @@ import AppLayout from '../../layouts/AppLayout.astro';
             </div>
           </div>
 
-          <!-- Top Contributors -->
-          <div>
-            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 pl-2">Top Experten</h3>
-            <div class="bg-white rounded-2xl border border-gray-200 p-4 shadow-sm flex flex-col gap-4">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-blue-100 border-2 border-white shadow-sm flex items-center justify-center overflow-hidden shrink-0">
-                  <img src="/team/ma4-800x533.jpg" alt="Experte" class="w-full h-full object-cover">
-                </div>
-                <div>
-                  <h4 class="text-sm font-bold text-[#05183a]">Rainer Bäuerle</h4>
-                  <p class="text-[11px] text-gray-500 font-medium">Referent · 482 Antworten</p>
-                </div>
-              </div>
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-orange-100 border-2 border-white shadow-sm flex items-center justify-center overflow-hidden shrink-0">
-                  <img src="/team/IMG_3724-Bearbeitet-600x400.jpg" alt="Experte" class="w-full h-full object-cover">
-                </div>
-                <div>
-                  <h4 class="text-sm font-bold text-[#05183a]">Freya Marx</h4>
-                  <p class="text-[11px] text-gray-500 font-medium">Orga-Team · 315 Antworten</p>
-                </div>
-              </div>
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-gray-100 border-2 border-white shadow-sm flex items-center justify-center font-bold text-[#05183a] text-xs shrink-0">
-                  MS
-                </div>
-                <div>
-                  <h4 class="text-sm font-bold text-[#05183a]">Michael Schwarz</h4>
-                  <p class="text-[11px] text-gray-500 font-medium">Kämmerer · 156 Antworten</p>
-                </div>
-              </div>
-            </div>
-          </div>
+          <!-- Top Contributors Removed as requested -->
+
 
         </div>
 
@@ -158,69 +190,52 @@ import AppLayout from '../../layouts/AppLayout.astro';
                 </div>
               </div>
             </div>
-          </a>
+             {notification && (
+            <div class={`p-4 rounded-xl text-sm font-bold border ${notification.startsWith('Fehler') ? 'bg-red-50 text-red-600 border-red-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'}`}>
+              {notification}
+            </div>
+          )}
 
-          <!-- Standard Topic 1 -->
-          <a href="#" class="bg-white border border-gray-200 rounded-2xl p-5 hover:border-blue-300 hover:shadow-md transition-all flex gap-5 group">
-            <div class="w-12 h-12 rounded-full border-2 border-gray-50 bg-orange-100 text-orange-600 flex items-center justify-center font-bold text-lg shrink-0 mt-1">
-               TW
+          <!-- Dynamic Forum Topics -->
+          {forumTopics.length === 0 ? (
+            <div class="bg-white border border-gray-200 rounded-2xl p-10 text-center flex flex-col items-center gap-3">
+              <span class="material-symbols-outlined text-gray-300 text-[48px]">forum</span>
+              <h3 class="text-lg font-bold text-[#05183a]">Noch keine Themen</h3>
+              <p class="text-sm text-gray-500">Seien Sie der Erste, der eine Diskussion startet!</p>
             </div>
-            <div class="flex-1">
-              <div class="flex items-center gap-2 mb-1.5">
-                <span class="bg-orange-50 text-orange-600 border border-orange-100 text-[10px] font-bold px-2 py-0.5 rounded-md">Finanzwesen</span>
+          ) : forumTopics.map(topic => (
+            <a href="#" class="bg-white border border-gray-200 rounded-2xl p-5 hover:border-blue-300 hover:shadow-md transition-all flex gap-5 group">
+              <div class="w-12 h-12 rounded-full border-2 border-gray-50 bg-[#05183a] text-white flex items-center justify-center font-bold text-lg shrink-0 mt-1 overflow-hidden">
+                 {topic.author_avatar_url ? (
+                   <img src={topic.author_avatar_url} class="w-full h-full object-cover" />
+                 ) : (
+                   topic.author_name.charAt(0).toUpperCase()
+                 )}
               </div>
-              <h3 class="text-lg font-bold text-[#05183a] group-hover:text-blue-600 transition-colors mb-2 leading-tight">Erfahrungen mit TCMS Software-Anbietern für Kommunen?</h3>
-              <p class="text-sm text-gray-500 line-clamp-2 leading-relaxed mb-4">
-                Hallo zusammen, wir prüfen aktuell die Einführung eines Tax Compliance Management Systems. Hat jemand bereits Erfahrungen mit speziellen Anbietern, die den kommunalen Kontext gut abdecken?
-              </p>
-              <div class="flex items-center justify-between text-[13px]">
-                <div class="flex items-center gap-2 text-gray-500 font-medium">
-                  <span class="font-bold text-[#05183a]">Thomas Wagner</span>
-                  <span>·</span>
-                  <span>Gestern, 14:30</span>
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-1.5">
+                  <span class="bg-blue-50 text-blue-600 border border-blue-100 text-[10px] font-bold px-2 py-0.5 rounded-md">
+                    {topic.category}
+                  </span>
                 </div>
-                <div class="flex items-center gap-4 text-gray-500 font-medium">
-                  <div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px]">visibility</span> 234</div>
-                  <div class="flex items-center gap-1.5 text-blue-600"><span class="material-symbols-outlined text-[16px]">chat_bubble</span> 12</div>
-                </div>
-              </div>
-            </div>
-            <!-- Avatars of repliers -->
-            <div class="hidden md:flex items-end mb-1">
-              <div class="flex -space-x-3">
-                <img class="w-8 h-8 rounded-full border-2 border-white" src="/team/ma4-800x533.jpg" alt="">
-                <img class="w-8 h-8 rounded-full border-2 border-white" src="/team/ma5-800x533.jpg" alt="">
-                <div class="flex items-center justify-center w-8 h-8 rounded-full border-2 border-white bg-gray-100 text-[10px] font-bold text-gray-500">+3</div>
-              </div>
-            </div>
-          </a>
-
-          <!-- Standard Topic 2 -->
-          <a href="#" class="bg-white border border-gray-200 rounded-2xl p-5 hover:border-blue-300 hover:shadow-md transition-all flex gap-5 group">
-            <div class="w-12 h-12 rounded-full border-2 border-gray-50 bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold text-lg shrink-0 mt-1">
-               LB
-            </div>
-            <div class="flex-1">
-              <div class="flex items-center gap-2 mb-1.5">
-                <span class="bg-emerald-50 text-emerald-600 border border-emerald-100 text-[10px] font-bold px-2 py-0.5 rounded-md">Steuerrecht</span>
-                <span class="bg-gray-100 text-gray-500 text-[10px] font-bold px-2 py-0.5 rounded-md">§ 2b UStG</span>
-              </div>
-              <h3 class="text-lg font-bold text-[#05183a] group-hover:text-blue-600 transition-colors mb-2 leading-tight">Berechnung der Bagatellgrenze bei interkommunaler Zusammenarbeit</h3>
-              <p class="text-sm text-gray-500 line-clamp-2 leading-relaxed mb-4">
-                Wie exakt berechnet ihr die 35.000€ Grenze bei der interkommunalen Zusammenarbeit nach § 2b UStG wenn Personalkosten erst nachlaufend spitz abgerechnet werden?
-              </p>
-              <div class="flex items-center justify-between text-[13px]">
-                <div class="flex items-center gap-2 text-gray-500 font-medium">
-                  <span class="font-bold text-[#05183a]">Laura Bauer</span>
-                  <span>·</span>
-                  <span>22. März 2026</span>
-                </div>
-                <div class="flex items-center gap-4 text-gray-500 font-medium">
-                  <div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px]">visibility</span> 891</div>
-                  <div class="flex items-center gap-1.5 text-gray-400"><span class="material-symbols-outlined text-[16px]">chat_bubble</span> 0</div>
+                <h3 class="text-lg font-bold text-[#05183a] group-hover:text-blue-600 transition-colors mb-2 leading-tight">{topic.title}</h3>
+                <p class="text-sm text-gray-500 line-clamp-2 leading-relaxed mb-4">
+                  {topic.content}
+                </p>
+                <div class="flex items-center justify-between text-[13px]">
+                  <div class="flex items-center gap-2 text-gray-500 font-medium">
+                    <span class="font-bold text-[#05183a]">{topic.author_name}</span>
+                    <span>·</span>
+                    <span>vor {timeAgo(topic.created_at)}</span>
+                  </div>
+                  <div class="flex items-center gap-4 text-gray-500 font-medium">
+                    <div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px]">visibility</span> {topic.views || 0}</div>
+                    <div class="flex items-center gap-1.5 text-blue-600"><span class="material-symbols-outlined text-[16px]">chat_bubble</span> {topic.replies || 0}</div>
+                  </div>
                 </div>
               </div>
-            </div>
+            </a>
+          ))}  </div>
           </a>
 
           <!-- Pagination -->
@@ -241,8 +256,69 @@ import AppLayout from '../../layouts/AppLayout.astro';
         </div>
       </div>
       
-      <!-- Footer spacing -->
       <div class="h-12"></div>
     </div>
   </div>
+
+  <!-- Modal for Creating New Topic -->
+  <div id="new-topic-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 opacity-0 transition-opacity aria-[hidden=false]:opacity-100" style="transition: opacity 0.2s">
+    <div class="bg-white rounded-3xl w-full max-w-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+      <div class="px-8 py-6 border-b border-gray-100 flex items-center justify-between shrink-0">
+        <h2 class="text-xl font-bold text-[#05183a] font-headline">Neues Thema erstellen</h2>
+        <button onclick="document.getElementById('new-topic-modal').classList.add('hidden')" class="text-gray-400 hover:text-[#05183a] transition-colors">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <form method="POST" class="p-8 flex flex-col gap-6 overflow-y-auto">
+        <div class="space-y-2">
+          <label class="text-xs font-bold text-gray-600 uppercase tracking-widest">Kategorie</label>
+          <select name="category" required class="w-full bg-gray-50 border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 px-4 py-3 rounded-xl outline-none text-sm font-medium text-[#05183a] appearance-none">
+            <option value="Finanzwesen">Finanzwesen</option>
+            <option value="Praktiker Modul">Praktiker Modul</option>
+            <option value="Steuerrecht">Steuerrecht</option>
+            <option value="Off-Topic">Off-Topic</option>
+          </select>
+        </div>
+        <div class="space-y-2">
+          <label class="text-xs font-bold text-gray-600 uppercase tracking-widest">Titel des Themas</label>
+          <input type="text" name="title" required placeholder="Fassen Sie Ihr Thema kurz zusammen..." class="w-full bg-gray-50 border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 px-4 py-3 rounded-xl outline-none text-sm font-bold text-[#05183a]" />
+        </div>
+        <div class="space-y-2">
+          <label class="text-xs font-bold text-gray-600 uppercase tracking-widest">Ihr Beitrag</label>
+          <textarea name="content" required rows="6" placeholder="Beschreiben Sie Ihr Anliegen, Ihre Frage oder Ihr Problem..." class="w-full bg-gray-50 border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 px-4 py-3 rounded-xl outline-none text-sm font-medium text-[#05183a] resize-none"></textarea>
+        </div>
+        
+        <div class="pt-4 flex justify-end gap-3 shrink-0">
+           <button type="button" onclick="document.getElementById('new-topic-modal').classList.add('hidden')" class="px-6 py-2.5 rounded-xl text-sm font-bold text-gray-500 hover:bg-gray-100 transition-colors">
+             Abbrechen
+           </button>
+           <button type="submit" class="bg-[#05183a] text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-md hover:bg-blue-900 transition-all hover:-translate-y-0.5">
+             Eintrag veröffentlichen
+           </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Just a quick helper to open the modal nicely
+    const modal = document.getElementById('new-topic-modal');
+    if (modal) {
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+            const isHidden = modal.classList.contains('hidden');
+            if (!isHidden) {
+              // trigger reflow
+              void modal.offsetWidth;
+              modal.setAttribute('aria-hidden', 'false');
+            } else {
+              modal.setAttribute('aria-hidden', 'true');
+            }
+          }
+        });
+      });
+      observer.observe(modal, { attributes: true });
+    }
+  </script>
 </AppLayout>
