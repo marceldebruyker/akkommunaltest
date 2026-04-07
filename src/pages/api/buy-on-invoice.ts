@@ -100,6 +100,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       collection_method: 'send_invoice',
       days_until_due: 14,
       auto_advance: true, // Stripe tries to finalize and send it out based on configured intervals
+      pending_invoice_items_behavior: 'include',
       custom_fields: userData.leitwegId ? [
         { name: 'Leitweg-ID', value: userData.leitwegId }
       ] : undefined
