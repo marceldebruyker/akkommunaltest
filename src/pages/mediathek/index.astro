@@ -3,8 +3,13 @@ import Layout from '../../layouts/Layout.astro';
 import TopNavBar from '../../components/TopNavBar.astro';
 import FooterSection from '../../components/FooterSection.astro';
 import AcademyFocusSection from '../../components/AcademyFocusSection.astro';
+import { sanityClient } from '../../lib/sanity';
 
-import videos from '../../data/videos.json';
+const rawVideos = await sanityClient.fetch(`*[_type == "seminar" && status == "aufzeichnung"]{
+  "slug": slug.current,
+  title, duration, price, badges,
+  "image": image.asset->url
+}`);
 ---
 
 <Layout title="Videothek - AK Kommunal">
@@ -96,13 +101,19 @@ import videos from '../../data/videos.json';
 
         <!-- Video Grid -->
         <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-16">
-          {videos.map(video => (
+          {rawVideos.map((video: any) => (
             <a href={`/mediathek/${video.slug}`} class="group flex flex-col bg-transparent">
               <!-- Image with Badges -->
               <div class="relative w-full aspect-[16/9] rounded-xl overflow-hidden mb-5 bg-[#05183a]/5">
-                <img src={video.image} alt={video.title} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
+                {video.image ? (
+                  <img src={video.image} alt={video.title} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
+                ) : (
+                  <div class="w-full h-full bg-[#05183a]/10 flex items-center justify-center">
+                    <span class="material-symbols-outlined text-4xl text-[#05183a]/20">movie</span>
+                  </div>
+                )}
                 <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
-                  {video.badges.map(badge => (
+                  {(video.badges || []).map((badge: string) => (
                     <span class="bg-white/95 backdrop-blur-md text-[#05183a] border border-white/50 text-[8px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-sm shadow-sm">{badge}</span>
                   ))}
                 </div>
@@ -112,7 +123,7 @@ import videos from '../../data/videos.json';
               <h3 class="text-xl font-extrabold font-headline text-[#05183a] mb-2.5 leading-tight group-hover:text-primary-fixed-dim transition-colors">{video.title}</h3>
               
               <div class="flex items-center gap-5 text-[11px] font-medium text-[#05183a]/70 mb-8 border-b border-outline-variant/15 pb-6">
-                <div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px]">schedule</span> {video.duration}</div>
+                <div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px]">schedule</span> {video.duration || '60 Min.'}</div>
                 <div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px]">videocam</span> Aufzeichnung</div>
               </div>
 
@@ -120,15 +131,22 @@ import videos from '../../data/videos.json';
               <div class="flex items-end justify-between mt-auto">
                 <div class="space-y-1">
                   <div class="text-[8px] uppercase font-bold text-primary tracking-[0.1em]">Mitglieder: Inklusive</div>
-                  <div class="text-[10px] font-medium text-on-surface-variant uppercase tracking-widest">Extern: {video.price} €</div>
+                  <div class="text-[10px] font-medium text-on-surface-variant uppercase tracking-widest">Extern: {video.price || 0} €</div>
                 </div>
                 <!-- Cart Button -->
-                <button class="w-9 h-9 bg-[#05183a] hover:bg-primary-fixed-dim rounded-md flex items-center justify-center text-white transition-colors shadow-sm group-hover:shadow-md">
-                  <span class="material-symbols-outlined text-[16px]">shopping_cart</span>
+                <button class="w-9 h-9 bg-[#05183a] hover:bg-primary-fixed-dim rounded-md flex items-center justify-center text-white transition-colors shadow-sm group-hover:shadow-md pointer-events-none">
+                  <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
                 </button>
               </div>
             </a>
           ))}
+          
+          {rawVideos.length === 0 && (
+             <div class="col-span-1 md:col-span-2 text-center py-20 opacity-60">
+                 <span class="material-symbols-outlined text-4xl mb-2">videocam_off</span>
+                 <p class="font-bold text-lg text-[#05183a]">Bisher keine Aufzeichnungen verfügbar.</p>
+             </div>
+          )}
         </div>
 
       </div>

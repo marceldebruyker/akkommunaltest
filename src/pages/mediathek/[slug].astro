@@ -3,12 +3,17 @@ import Layout from '../../layouts/Layout.astro';
 import TopNavBar from '../../components/TopNavBar.astro';
 import FooterSection from '../../components/FooterSection.astro';
 import BuyVideoButton from '../../components/BuyVideoButton.tsx';
-import videos from '../../data/videos.json';
-
+import { sanityClient } from '../../lib/sanity';
 import { getSupabaseServer } from '../../lib/supabase';
 
 const { slug } = Astro.params;
-const video = videos.find(v => v.slug === slug);
+
+// Fetch directly from Sanity for Mediathek (only Aufzeichnungen)
+const video = await sanityClient.fetch(`*[_type == "seminar" && status == "aufzeichnung" && slug.current == $slug][0]{
+  "slug": slug.current,
+  title, description, moduleName, duration, price, badges,
+  "image": image.asset->url
+}`, { slug });
 
 if (!video) {
   return Astro.redirect('/404');
@@ -149,7 +154,7 @@ if (user) {
               </div>
 
               <!-- Connecting to SideCart -->
-              <BuyVideoButton client:load video={video} />
+              <BuyVideoButton client:load video={{ id: video.slug, title: video.title, price: video.price || 0 }} />
 
               <p class="text-center text-[10px] text-on-surface-variant/80 uppercase mt-4 font-bold tracking-widest">
                 Oder <a href={`/login?redirect=/mediathek/${video.slug}`} class="text-primary hover:underline">Einloggen</a>

@@ -145,7 +145,7 @@ function formatDate(iso: string) {
               </h2>
               <div class="space-y-4">
                 {(module.seminars as any[]).map((seminar: any) => (
-                    <div class="seminar-card flex flex-col items-start md:flex-row md:items-stretch gap-5 p-6 md:p-8 bg-surface-container-lowest border border-outline-variant/30 rounded-2xl hover:border-primary/30 hover:shadow-md transition-all group" data-module-id={module.moduleId} data-topic-id={getEventTopic(seminar.title)}>
+                    <div class="seminar-card relative flex flex-col items-start md:flex-row md:items-stretch gap-5 p-6 md:p-8 bg-surface-container-lowest border border-outline-variant/30 rounded-2xl hover:border-primary/30 hover:shadow-md transition-all group" data-module-id={module.moduleId} data-topic-id={getEventTopic(seminar.title)}>
                       
                       <!-- Events Block -->
                       <div class="md:w-56 shrink-0 relative flex flex-col justify-center border-b md:border-b-0 md:border-r border-outline-variant/15 pb-4 md:pb-0 md:pr-6">
@@ -157,7 +157,9 @@ function formatDate(iso: string) {
                       
                       <!-- Context & Topic -->
                       <div class="flex-grow flex flex-col justify-center py-2 md:pl-2">
-                         <h3 class="text-lg md:text-xl font-bold text-primary leading-snug mb-1">{seminar.title}</h3>
+                         <h3 class="text-lg md:text-xl font-bold text-primary leading-snug mb-1">
+                           <a href={`/termine/${seminar.slug}`} class="after:absolute after:inset-0 hover:underline">{seminar.title}</a>
+                         </h3>
                          <div class="text-[13px] font-bold text-primary-fixed-dim mb-2">{seminar.moduleName}</div>
                          {seminar.description && (
                            <p class="text-[14px] text-on-surface-variant font-light leading-relaxed">
@@ -167,7 +169,7 @@ function formatDate(iso: string) {
                       </div>
                       
                       <!-- Meta & Action -->
-                      <div class="w-full md:w-auto md:text-right shrink-0 mt-4 md:mt-0 flex flex-row md:flex-col items-center justify-between md:justify-center gap-4 md:pl-6 md:min-w-[140px]">
+                      <div class="w-full md:w-auto md:text-right shrink-0 mt-4 md:mt-0 flex flex-row md:flex-col items-center justify-between md:justify-center gap-4 md:pl-6 md:min-w-[140px] relative z-20">
                          <div class="text-[11px] font-bold text-secondary flex items-center gap-1.5 uppercase tracking-widest bg-secondary/5 px-2.5 py-1 rounded-md">
                            <span class="material-symbols-outlined text-[14px]">schedule</span> 
                            {seminar.duration || '90 Min.'}
