@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import { getSupabaseServer } from '../../lib/supabase';
 import { createClient } from '@supabase/supabase-js';
 import { sanityClient } from '../../lib/sanity';
+import { Resend } from 'resend';
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   try {
@@ -130,6 +131,45 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     if (insertError) {
       console.error('Error granting access on invoice purchase:', insertError.message);
       return new Response(JSON.stringify({ error: 'Rechnung generiert, aber Freischaltung verzögert. Bitte Support kontaktieren.' }), { status: 500 });
+    }
+
+    // 5. Send Confirmation Email via Resend
+    if (process.env.RESEND_API_KEY) {
+      const resend = new Resend(process.env.RESEND_API_KEY);
+      const senderEmail = process.env.RESEND_API_KEY.includes('re_') && process.env.VERCEL_ENV !== 'production' 
+        ? 'onboarding@resend.dev' 
+        : 'noreply@bw-partner.de'; // Later set to noreply@bw-partner.de or verified domain
+
+      const itemListHtml = items.map((i: any) => `<li><strong>${i.title}</strong></li>`).join('');
+
+      try {
+        await resend.emails.send({
+           from: `AK Kommunal Plattform <${senderEmail}>`,
+           to: [authUser.email!],
+           subject: 'Erfolgreiche Anmeldung / Bestellung',
+           html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;">
+              <div style="background-color: #05183a; padding: 20px; text-align: center;">
+                <h1 style="color: white; margin: 0; font-size: 20px;">AK Kommunal Plattform</h1>
+              </div>
+              <div style="padding: 30px; background-color: #ffffff;">
+                <h2 style="color: #05183a; margin-top: 0;">Vielen Dank für Ihre Buchung!</h2>
+                <p style="color: #4b5563; line-height: 1.6;">Guten Tag ${userData.vorname || ''} ${userData.nachname || ''},<br><br>Ihre Buchung war erfolgreich. Die Rechnung haben wir Ihnen aus unserem Stripe-System separat zukommen lassen.</p>
+                <div style="background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                  <p style="margin: 0 0 10px 0; color: #374151;"><strong>Ihre gebuchten Inhalte:</strong></p>
+                  <ul style="margin: 0; color: #374151; padding-left: 20px;">
+                    ${itemListHtml}
+                  </ul>
+                </div>
+                <p style="color: #4b5563; line-height: 1.6;">Die Inhalte sind ab sofort in Ihrem persönlichen Dashboard freigeschaltet.</p>
+                <a href="${new URL(request.url).origin}/app/dashboard" style="display: inline-block; background-color: #05183a; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 10px;">Zum Fachportal</a>
+              </div>
+            </div>
+           `
+        });
+      } catch (err) {
+        console.error("Resend Confirmation Error (Non-Fatal):", err);
+      }
     }
 
     return new Response(JSON.stringify({ success: true, invoiceId: invoice.id }), { status: 200 });

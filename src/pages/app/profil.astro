@@ -2,6 +2,9 @@
 import AppLayout from '../../layouts/AppLayout.astro';
 import { getSupabaseServer } from '../../lib/supabase';
 import Stripe from 'stripe';
+import { sanityClient } from '../../lib/sanity';
+import { Resend } from 'resend';
+import { createClient } from '@supabase/supabase-js';
 
 const supabase = getSupabaseServer(Astro.request, Astro.cookies);
 const { data: { user } } = await supabase.auth.getUser();
@@ -12,12 +15,72 @@ if (!user) {
 
 let notification = '';
 
+const email = user.email || '';
+const isAdmin = email === 'marceldebruyker@gmail.com' || email === 'marcel.murschel@googlemail.com';
+
 if (Astro.request.method === 'POST') {
   try {
     const formData = await Astro.request.formData();
-    const firstname = formData.get('firstname')?.toString() || '';
-    const lastname = formData.get('lastname')?.toString() || '';
-    const password = formData.get('password')?.toString();
+    const actionType = formData.get('actionType')?.toString();
+
+    if (actionType === 'sendTeamsLink' && isAdmin) {
+      const slug = formData.get('slug')?.toString();
+      if (slug) {
+        // Fetch all users who purchased this slug
+        const supabaseAdmin = createClient(
+          import.meta.env.PUBLIC_SUPABASE_URL,
+          import.meta.env.SUPABASE_SERVICE_ROLE_KEY,
+          { auth: { autoRefreshToken: false, persistSession: false } }
+        );
+        
+        const { data: purchases } = await supabaseAdmin.from('purchases').select('user_id').eq('video_slug', slug);
+        if (purchases && purchases.length > 0 && process.env.RESEND_API_KEY) {
+          const userIds = purchases.map(p => p.user_id);
+          // Assuming user email is stored in profiles or we need auth admin fetch. 
+          // Wait, 'purchases' doesn't have emails. We need to query auth.users? We can't join auth.users easily.
+          // Wait, we need the emails! Let's just fetch all users from admin API and filter.
+          const { data: { users: allAuthUsers } } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1000 });
+          const buyerEmails = allAuthUsers.filter(u => userIds.includes(u.id)).map(u => u.email).filter(Boolean) as string[];
+
+          if (buyerEmails.length > 0) {
+            const seminarDetails = await sanityClient.fetch(`*[_type == "seminar" && slug.current == $slug][0]{ title, date, msTeamsLink }`, { slug });
+            const resend = new Resend(process.env.RESEND_API_KEY);
+            const senderEmail = process.env.RESEND_API_KEY.includes('re_') && process.env.VERCEL_ENV !== 'production' 
+              ? 'onboarding@resend.dev' 
+              : 'noreply@bw-partner.de'; 
+
+            await resend.emails.send({
+              from: `AK Kommunal Plattform <${senderEmail}>`,
+              to: buyerEmails,
+              subject: `Einwahldaten: ${seminarDetails?.title}`,
+              html: `
+                <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;">
+                  <div style="background-color: #05183a; padding: 20px; text-align: center;">
+                    <h1 style="color: white; margin: 0; font-size: 20px;">AK Kommunal Plattform</h1>
+                  </div>
+                  <div style="padding: 30px; background-color: #ffffff;">
+                    <h2 style="color: #05183a; margin-top: 0;">Ihr Zugangslink ist da!</h2>
+                    <p style="color: #4b5563; line-height: 1.6;">Guten Tag,<br><br>Ihre Live-Session <strong>${seminarDetails?.title}</strong> startet bald.</p>
+                    <div style="background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                      <p style="margin: 0 0 10px 0; color: #374151;"><strong>Datum:</strong> ${seminarDetails?.date || 'Demnächst'}</p>
+                      <a href="${seminarDetails?.msTeamsLink || '#'}" style="display: inline-block; background-color: #05183a; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 10px;">Jetzt MS Teams beitreten</a>
+                    </div>
+                  </div>
+                </div>
+              `
+            });
+            notification = `Teams-Link erfolgreich an ${buyerEmails.length} Teilnehmer versendet.`;
+          } else {
+            notification = 'Fehler: Keine E-Mails für Käufer gefunden.';
+          }
+        } else {
+           notification = 'Keine Käufer gefunden oder Resend API Key fehlt.';
+        }
+      }
+    } else {
+      const firstname = formData.get('firstname')?.toString() || '';
+      const lastname = formData.get('lastname')?.toString() || '';
+      const password = formData.get('password')?.toString();
 
     const updates: any = {
       data: {
@@ -59,6 +122,7 @@ if (Astro.request.method === 'POST') {
       }
       notification = 'Änderungen erfolgreich gespeichert!';
     }
+    } // Close else
   } catch (err: any) {
     notification = `Ein Fehler ist aufgetreten: ${err.message}`;
   }
@@ -66,7 +130,24 @@ if (Astro.request.method === 'POST') {
 
 const firstName = user.user_metadata?.first_name || '';
 const lastName = user.user_metadata?.last_name || '';
-const email = user.email || '';
+
+// Admin Data Fetching
+let adminSeminars: any[] = [];
+if (isAdmin) {
+  const sanityProducts = await sanityClient.fetch(`*[_type == "seminar" && status == "Live Event (Anstehend)"]{ "id": slug.current, title, date, msTeamsLink }`);
+  
+  const supabaseAdmin = createClient(
+    import.meta.env.PUBLIC_SUPABASE_URL,
+    import.meta.env.SUPABASE_SERVICE_ROLE_KEY,
+    { auth: { autoRefreshToken: false, persistSession: false } }
+  );
+  
+  const { data: purchasesData } = await supabaseAdmin.from('purchases').select('video_slug');
+  adminSeminars = sanityProducts.map((p: any) => {
+     let count = purchasesData?.filter(pr => pr.video_slug === p.id).length || 0;
+     return { ...p, participantCount: count };
+  });
+}
 
 // Fetch Stripe Invoices
 let userInvoices: Stripe.Invoice[] = [];
@@ -103,6 +184,44 @@ if (rawStripeKey && email) {
 
     <div class="grid grid-cols-1 gap-10">
       
+      {isAdmin && (
+        <div class="bg-[#05183a] rounded-2xl border border-gray-800 shadow-lg p-8 relative overflow-hidden">
+          <div class="absolute top-0 right-0 p-4 opacity-10">
+            <span class="material-symbols-outlined text-[100px] text-white">admin_panel_settings</span>
+          </div>
+          <h2 class="text-xl font-bold text-white mb-6 flex items-center gap-2 border-b border-gray-700 pb-4 relative z-10">
+            <span class="material-symbols-outlined text-blue-400">admin_panel_settings</span> Admin-Bereich: Event Verwaltung
+          </h2>
+          
+          <div class="grid grid-cols-1 gap-4 relative z-10">
+            {adminSeminars.length === 0 ? (
+              <p class="text-gray-400 text-sm">Keine anstehenden Live-Events in Sanity gefunden.</p>
+            ) : adminSeminars.map((seminar) => (
+              <div class="bg-white/10 border border-white/20 rounded-xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <h3 class="text-white font-bold mb-1">{seminar.title}</h3>
+                  <div class="flex gap-4 text-xs text-gray-300">
+                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">calendar_today</span> {seminar.date || 'Ohne Datum'}</span>
+                    <span class="flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">group</span> {seminar.participantCount} Anmeldungen</span>
+                  </div>
+                </div>
+                {seminar.msTeamsLink ? (
+                  <form method="POST" class="shrink-0" onsubmit="return confirm('Möchten Sie den Zugangslink jetzt wirklich an alle Teilnehmer senden? Diese Aktion kann nicht rückgängig gemacht werden.');">
+                    <input type="hidden" name="actionType" value="sendTeamsLink" />
+                    <input type="hidden" name="slug" value={seminar.id} />
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-500 text-white text-sm font-bold py-2 px-4 rounded-lg shadow-sm transition-colors flex items-center gap-2">
+                       <span class="material-symbols-outlined text-[18px]">send</span> Link an Verteiler senden
+                    </button>
+                  </form>
+                ) : (
+                  <div class="text-xs text-amber-300 font-bold bg-amber-500/10 px-3 py-2 rounded">Kein Teams-Link in Sanity</div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <!-- Account Settings -->
       <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-8">
         <h2 class="text-lg font-bold text-[#05183a] mb-6 flex items-center gap-2 border-b border-gray-100 pb-4">
