@@ -1293,3 +1293,11 @@ AstroError [ResponseSentError]: The response has already been sent to the browse
 09:02:22 [200] /termine 258ms
 09:02:23 [200] /app/dashboard 1290ms
 09:04:29 [200] /admin/structure/seminar;f17f1217-b445-44c8-93ae-fb9edcd76442 9ms
+09:06:44 [watch] /src/styles/global.css
+09:06:45 [200] /admin/structure/seminar;f8b79e84-e1fe-4852-b273-c1858a02eb58 13ms
+09:06:45 [200] /admin/structure/post;775cffac-7f4b-40cc-8587-258419c7d83b%2Ctemplate%3Dpost 7ms
+09:06:45 [200] /admin/structure/seminar;f17f1217-b445-44c8-93ae-fb9edcd76442 3ms
+09:06:45 [200] /mitglied-werden 17ms
+09:06:45 [200] / 30ms
+09:06:45 [200] /termine 221ms
+09:06:46 [200] /app/dashboard 647ms

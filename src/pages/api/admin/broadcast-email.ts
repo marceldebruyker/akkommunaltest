@@ -37,9 +37,9 @@ export const POST: APIRoute = async ({ request }) => {
     const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
     const supabaseKey = import.meta.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-    if (!resendKey || !supabaseUrl || !supabaseKey) {
-      return new Response(JSON.stringify({ error: 'Missing environment variables.' }), { status: 500 });
-    }
+    if (!resendKey) return new Response(JSON.stringify({ error: 'Missing RESEND_API_KEY in Vercel.' }), { status: 500 });
+    if (!supabaseUrl) return new Response(JSON.stringify({ error: 'Missing PUBLIC_SUPABASE_URL in Vercel.' }), { status: 500 });
+    if (!supabaseKey) return new Response(JSON.stringify({ error: 'Missing SUPABASE_SERVICE_ROLE_KEY in Vercel.' }), { status: 500 });
 
     const supabaseAdmin = createClient(supabaseUrl, supabaseKey, { auth: { autoRefreshToken: false, persistSession: false } });
 
