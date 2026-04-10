@@ -1,0 +1,385 @@
+---
+import AppLayout from '../../../layouts/AppLayout.astro';
+import { getSupabaseServer } from '../../../lib/supabase';
+
+const { id } = Astro.params;
+const supabase = getSupabaseServer(Astro.request, Astro.cookies);
+const { data: { user } } = await supabase.auth.getUser();
+
+if (!user) {
+  return Astro.redirect('/login');
+}
+
+const firstName = user.user_metadata?.first_name || '';
+const lastName = user.user_metadata?.last_name || '';
+const displayName = firstName ? `${firstName} ${lastName}` : (user.email || 'Gast');
+const avatarUrl = user.user_metadata?.avatar_url || null;
+
+let notification = '';
+
+// Form POST (neue Antwort)
+if (Astro.request.method === 'POST') {
+  try {
+    const formData = await Astro.request.formData();
+    const content = formData.get('content')?.toString();
+
+    if (content && id) {
+      const { error: insertError } = await supabase.from('forum_replies').insert({
+        topic_id: id,
+        content,
+        author_id: user.id,
+        author_name: displayName,
+        author_avatar_url: avatarUrl
+      });
+      
+      if (insertError) {
+        notification = `Fehler beim Senden: ${insertError.message}`;
+      } else {
+        // Erfolgreich gespeichert, der Trigger in der Datenbank
+        // hat automatisch topic.replies hochgezählt.
+        // Wir machen einen Redirect um Formular-Resubmission beim Reload zu verhindern.
+        return Astro.redirect(`/app/forum/${id}`);
+      }
+    }
+  } catch (err: any) {
+    notification = `Systemfehler: ${err.message}`;
+  }
+}
+
+// 1. Hole den Beitrag (Topic)
+const { data: topic, error: topicError } = await supabase
+  .from('forum_topics')
+  .select('*')
+  .eq('id', id)
+  .single();
+
+if (topicError || !topic) {
+  return Astro.redirect('/app/forum');
+}
+
+// 1.5 Prüfen, ob der Nutzer zur Ansicht berechtigt ist (Admin oder Mitglied)
+const { data: profile } = await supabase
+  .from('user_profiles')
+  .select('role, has_membership')
+  .eq('id', user.id)
+  .maybeSingle();
+
+const isAdmin = profile?.role === 'admin';
+const hasAccess = isAdmin || profile?.has_membership;
+
+// Wenn kein Zugriff, hart zur Hauptseite werfen (wo dann die große Paywall auftaucht)
+if (!hasAccess) {
+  return Astro.redirect('/app/forum');
+}
+
+// Erhöhe Views Count beim Anschauen (simpel implementiert für Demo)
+if (Astro.request.method === 'GET') {
+  await supabase.from('forum_topics').update({ views: (topic.views || 0) + 1 }).eq('id', id);
+}
+
+// Prüfen, ob der aktuelle Nutzer das Hauptthema gelikt hat
+const { data: topicLike } = await supabase
+  .from('forum_topic_likes')
+  .select('id')
+  .eq('topic_id', id)
+  .eq('user_id', user.id)
+  .maybeSingle();
+const hasLikedTopic = !!topicLike;
+
+// Alle Likes des Nutzers für die Antworten laden
+const { data: userReplyLikes } = await supabase
+  .from('forum_reply_likes')
+  .select('reply_id')
+  .eq('user_id', user.id);
+const likedReplyIds = new Set(userReplyLikes?.map(l => l.reply_id) || []);
+
+// 2. Hole die Antworten (Replies)
+const { data: replies, error: repliesError } = await supabase
+  .from('forum_replies')
+  .select('*')
+  .eq('topic_id', id)
+  .order('created_at', { ascending: true });
+
+function formatDateTime(dateString: string) {
+  const date = new Date(dateString);
+  return date.toLocaleDateString("de-DE", { 
+    day: "2-digit", month: "2-digit", year: "numeric", 
+    hour: "2-digit", minute: "2-digit" 
+  }) + " Uhr";
+}
+---
+
+<AppLayout title={`${topic.title} - AK Kommunal Community`} currentPath="/app/forum">
+  <div class="h-full bg-[#f8fafc] flex flex-col">
+    <!-- Thread Header -->
+    <div class="bg-white border-b border-gray-200 px-8 py-6 shrink-0 relative overflow-hidden">
+      <!-- Decorative background blur -->
+      <div class="absolute top-0 right-0 w-96 h-96 bg-primary/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
+      
+      <div class="max-w-5xl mx-auto relative z-10">
+        <a href="/app/forum" class="inline-flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-[#05183a] transition-colors mb-6 group">
+          <span class="material-symbols-outlined text-[18px] group-hover:-translate-x-1 transition-transform">arrow_back</span>
+          Zurück zur Übersicht
+        </a>
+        
+        <div class="flex items-center gap-2 mb-3">
+          <span class="bg-blue-50 text-blue-600 border border-blue-100 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-widest">
+            {topic.category}
+          </span>
+        </div>
+        <h1 class="text-3xl md:text-4xl font-extrabold font-headline text-[#05183a] tracking-tight leading-tight mb-2">
+          {topic.title}
+        </h1>
+      </div>
+    </div>
+
+    <!-- Thread Content Area -->
+    <div class="flex-1 overflow-y-auto">
+      <div class="max-w-5xl mx-auto px-8 py-8 flex flex-col gap-6">
+        
+        {notification && (
+          <div class="p-4 rounded-xl text-sm font-bold bg-amber-50 text-amber-700 border border-amber-200">
+            {notification}
+          </div>
+        )}
+
+        <!-- Originaler Start-Beitrag (Topic) -->
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden">
+          <div class="p-6 md:p-8 flex gap-6">
+            <div class="w-14 h-14 rounded-full border-2 border-gray-50 bg-[#05183a] text-white flex items-center justify-center font-bold text-xl shrink-0 overflow-hidden shadow-sm">
+               {topic.author_avatar_url ? (
+                 <img src={topic.author_avatar_url} class="w-full h-full object-cover" />
+               ) : (
+                 topic.author_name.charAt(0).toUpperCase()
+               )}
+            </div>
+            
+            <div class="flex-1">
+              <div class="flex items-center justify-between mb-4">
+                <div>
+                  <h3 class="font-bold text-[#05183a] text-lg">{topic.author_name}</h3>
+                  <span class="text-sm font-medium text-gray-500">{formatDateTime(topic.created_at)}</span>
+                </div>
+                <div class="bg-gray-100 text-gray-500 font-bold text-[10px] uppercase tracking-widest px-3 py-1 rounded-full">
+                  Verfasser
+                </div>
+              </div>
+              
+              <div class="prose prose-blue max-w-none text-gray-700 font-medium leading-relaxed whitespace-pre-wrap">
+                {topic.content}
+              </div>
+              
+              <div class="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <button data-like-topic={topic.id} data-liked={hasLikedTopic ? "true" : "false"} class={`flex items-center gap-1.5 px-4 py-2 rounded-xl border text-sm font-bold transition-all shadow-sm ${hasLikedTopic ? 'bg-blue-50 border-blue-200 text-blue-600' : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-[#05183a]'}`}>
+                     <span class="material-symbols-outlined text-[18px] icon-span">{hasLikedTopic ? 'thumb_up' : 'thumb_up'}</span>
+                     <span class="like-count">{topic.likes || 0}</span> Hilfreich
+                  </button>
+                  
+                  {isAdmin && (
+                    <button data-toggle-pin={topic.id} data-pinned={topic.is_pinned ? "true" : "false"} class={`flex items-center gap-1.5 px-4 py-2 rounded-xl border text-sm font-bold transition-all shadow-sm ${topic.is_pinned ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-[#05183a]'}`}>
+                       <span class="material-symbols-outlined text-[18px]">{topic.is_pinned ? 'do_not_disturb_on' : 'push_pin'}</span>
+                       <span class="pin-text">{topic.is_pinned ? 'Pin entfernen' : 'Anpinnen'}</span>
+                    </button>
+                  )}
+                </div>
+                <div class="flex items-center gap-4 text-gray-400 text-sm font-medium">
+                  <div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px]">visibility</span> {topic.views || 0}</div>
+                  <div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px]">chat_bubble</span> {topic.replies || 0}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Replies List -->
+        {replies && replies.length > 0 && (
+          <div class="pl-8 md:pl-16 flex flex-col gap-6 mt-4">
+            <h4 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Bisherige Antworten ({replies.length})</h4>
+            
+            {replies.map(reply => (
+              <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden relative">
+                <!-- Connector Line -->
+                <div class="absolute -top-10 left-8 w-[2px] h-10 bg-gray-200"></div>
+
+                <div class="p-6 flex gap-5">
+                  <div class="w-10 h-10 rounded-full border-2 border-gray-50 bg-gray-200 text-gray-600 flex items-center justify-center font-bold text-sm shrink-0 overflow-hidden">
+                     {reply.author_avatar_url ? (
+                       <img src={reply.author_avatar_url} class="w-full h-full object-cover" />
+                     ) : (
+                       reply.author_name.charAt(0).toUpperCase()
+                     )}
+                  </div>
+                  
+                  <div class="flex-1">
+                    <div class="flex items-center gap-3 mb-2">
+                      <h3 class="font-bold text-[#05183a] text-base">{reply.author_name}</h3>
+                      <span class="text-xs font-medium text-gray-400">{formatDateTime(reply.created_at)}</span>
+                    </div>
+                    
+                    <div class="text-gray-600 font-medium leading-relaxed text-[15px] whitespace-pre-wrap">
+                      {reply.content}
+                    </div>
+                    
+                    <div class="mt-3 pt-3 border-t border-gray-100 flex">
+                      <button data-like-reply={reply.id} data-liked={likedReplyIds.has(reply.id) ? "true" : "false"} class={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all ${likedReplyIds.has(reply.id) ? 'bg-blue-50 text-blue-600 border-blue-200' : 'bg-transparent border-transparent text-gray-400 hover:bg-gray-50 hover:text-gray-600'}`}>
+                        <span class="material-symbols-outlined text-[14px] icon-span">{likedReplyIds.has(reply.id) ? 'thumb_up' : 'thumb_up'}</span>
+                        <span class="like-count">{reply.likes || 0}</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <!-- Reply Form Box -->
+        <div class="pl-8 md:pl-16 mt-6">
+          <div class="bg-white rounded-3xl shadow-md border border-blue-100 overflow-hidden relative">
+             <div class="absolute top-0 left-0 w-1.5 h-full bg-blue-500"></div>
+             <form method="POST" class="p-6 md:p-8">
+               <h3 class="font-bold text-[#05183a] mb-4 flex items-center gap-2">
+                 <span class="material-symbols-outlined text-[20px] text-blue-500">reply</span>
+                 Antwort verfassen
+               </h3>
+               
+               <div class="flex gap-4">
+                 <div class="w-10 h-10 rounded-full border-2 border-gray-50 bg-[#05183a] text-white flex items-center justify-center font-bold text-sm shrink-0 overflow-hidden shadow-sm">
+                    {avatarUrl ? (
+                      <img src={avatarUrl} class="w-full h-full object-cover" />
+                    ) : (
+                      displayName.charAt(0).toUpperCase()
+                    )}
+                 </div>
+                 
+                 <div class="flex-1">
+                   <textarea 
+                     name="content" 
+                     required 
+                     rows="4" 
+                     placeholder="Schreiben Sie einen hilfreichen Beitrag..." 
+                     class="w-full bg-gray-50 border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 px-4 py-3 rounded-xl outline-none text-sm font-medium text-[#05183a] resize-none mb-4"
+                   ></textarea>
+                   
+                   <div class="flex justify-end">
+                     <button type="submit" class="bg-[#05183a] text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-md hover:bg-blue-900 transition-all hover:-translate-y-0.5 flex items-center gap-2">
+                       <span class="material-symbols-outlined text-[18px]">send</span> Antworten
+                     </button>
+                   </div>
+                 </div>
+               </div>
+             </form>
+          </div>
+        </div>
+
+      </div>
+      <div class="h-24"></div>
+    </div>
+  </div>
+
+  <script>
+    // Handles toggling topic likes
+    document.querySelectorAll('[data-like-topic]').forEach(button => {
+      button.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const btn = e.currentTarget as HTMLButtonElement;
+        const topicId = btn.getAttribute('data-like-topic');
+        const countSpan = btn.querySelector('.like-count');
+        const isLiked = btn.getAttribute('data-liked') === 'true';
+
+        // Optimistic UI Update
+        const currentCount = parseInt(countSpan?.textContent || '0');
+        if (isLiked) {
+          btn.setAttribute('data-liked', 'false');
+          btn.className = 'flex items-center gap-1.5 px-4 py-2 rounded-xl border text-sm font-bold transition-all shadow-sm bg-white border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-[#05183a]';
+          if(countSpan) countSpan.textContent = String(Math.max(0, currentCount - 1));
+        } else {
+          btn.setAttribute('data-liked', 'true');
+          btn.className = 'flex items-center gap-1.5 px-4 py-2 rounded-xl border text-sm font-bold transition-all shadow-sm bg-blue-50 border-blue-200 text-blue-600';
+          if(countSpan) countSpan.textContent = String(currentCount + 1);
+        }
+
+        try {
+          await fetch('/api/forum/like-topic', {
+            method: 'POST',
+            body: JSON.stringify({ topicId }),
+            headers: { 'Content-Type': 'application/json' }
+          });
+        } catch (err) {
+          console.error('Failed to toggle like', err);
+          // Normally would revert pessimistic UI here
+        }
+      });
+    });
+
+    // Handles toggling reply likes
+    document.querySelectorAll('[data-like-reply]').forEach(button => {
+      button.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const btn = e.currentTarget as HTMLButtonElement;
+        const replyId = btn.getAttribute('data-like-reply');
+        const countSpan = btn.querySelector('.like-count');
+        const isLiked = btn.getAttribute('data-liked') === 'true';
+
+        // Optimistic UI Update
+        const currentCount = parseInt(countSpan?.textContent || '0');
+        if (isLiked) {
+          btn.setAttribute('data-liked', 'false');
+          btn.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all bg-transparent border-transparent text-gray-400 hover:bg-gray-50 hover:text-gray-600';
+          if(countSpan) countSpan.textContent = String(Math.max(0, currentCount - 1));
+        } else {
+          btn.setAttribute('data-liked', 'true');
+          btn.className = 'flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-bold transition-all bg-blue-50 text-blue-600 border-blue-200';
+          if(countSpan) countSpan.textContent = String(currentCount + 1);
+        }
+
+        try {
+          await fetch('/api/forum/like-reply', {
+            method: 'POST',
+            body: JSON.stringify({ replyId }),
+            headers: { 'Content-Type': 'application/json' }
+          });
+        } catch (err) {
+          console.error('Failed to toggle like', err);
+        }
+      });
+    });
+
+    // Handles toggling topic Pin status (Admin only)
+    document.querySelectorAll('[data-toggle-pin]').forEach(button => {
+      button.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const btn = e.currentTarget as HTMLButtonElement;
+        const topicId = btn.getAttribute('data-toggle-pin');
+        const isPinned = btn.getAttribute('data-pinned') === 'true';
+        const newPinnedState = !isPinned;
+
+        // Optimistic Update
+        btn.setAttribute('data-pinned', String(newPinnedState));
+        const iconSpan = btn.querySelector('.material-symbols-outlined');
+        const textSpan = btn.querySelector('.pin-text');
+        
+        if (newPinnedState) {
+          btn.className = 'flex items-center gap-1.5 px-4 py-2 rounded-xl border text-sm font-bold transition-all shadow-sm bg-amber-50 border-amber-200 text-amber-700';
+          if(iconSpan) iconSpan.textContent = 'do_not_disturb_on';
+          if(textSpan) textSpan.textContent = 'Pin entfernen';
+        } else {
+          btn.className = 'flex items-center gap-1.5 px-4 py-2 rounded-xl border text-sm font-bold transition-all shadow-sm bg-white border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-[#05183a]';
+          if(iconSpan) iconSpan.textContent = 'push_pin';
+          if(textSpan) textSpan.textContent = 'Anpinnen';
+        }
+
+        try {
+          await fetch('/api/forum/toggle-pin', {
+            method: 'POST',
+            body: JSON.stringify({ topicId, isPinned: newPinnedState }),
+            headers: { 'Content-Type': 'application/json' }
+          });
+        } catch (err) {
+          console.error('Failed to toggle pin', err);
+        }
+      });
+    });
+  </script>
+</AppLayout>

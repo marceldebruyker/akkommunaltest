@@ -16,6 +16,7 @@ export default function CheckoutFlow({ user = null }: { user?: any }) {
   const [paymentType, setPaymentType] = useState<'stripe' | 'invoice'>('stripe');
   const cart = useStore(cartItems);
   const isLoggedIn = !!user;
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
 
   useEffect(() => {
     setIsMounted(true);
@@ -56,6 +57,7 @@ export default function CheckoutFlow({ user = null }: { user?: any }) {
   const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setCheckoutError(null);
 
     try {
       const formData = new FormData(e.currentTarget as HTMLFormElement);
@@ -92,11 +94,11 @@ export default function CheckoutFlow({ user = null }: { user?: any }) {
       } else if (data.success && paymentType === 'invoice') {
         window.location.href = '/app/fachportal?success=invoice'; // Redirect immediately to Fachportal
       } else {
-        alert('Fehler: ' + (data.error || 'Unbekannter Fehler'));
+        setCheckoutError(data.error || 'Es ist ein unbekannter Fehler aufgetreten.');
         setIsLoading(false);
       }
     } catch (err) {
-      alert('Verbindungsfehler. Bitte erneut versuchen.');
+      setCheckoutError('Fehler bei der Verbindung zum Server. Bitte versuchen Sie es erneut.');
       setIsLoading(false);
     }
   };
@@ -253,6 +255,13 @@ export default function CheckoutFlow({ user = null }: { user?: any }) {
           )}
 
           <div className="flex flex-col gap-3">
+             {checkoutError && (
+               <div className="bg-red-50 text-red-700 p-4 rounded-xl border border-red-200 text-sm font-medium mb-2 flex items-start gap-3">
+                 <span className="material-symbols-outlined text-[20px] text-red-500 mt-0.5">error</span>
+                 <span>{checkoutError}</span>
+               </div>
+             )}
+
              <button type="submit" onClick={() => setPaymentType('invoice')} disabled={isLoading} className="w-full bg-[#05183a] hover:bg-[#0a2354] text-white text-base font-extrabold py-4 px-6 rounded-xl transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed">
                {isLoading && paymentType === 'invoice' ? (
                  <span className="animate-spin material-symbols-outlined text-[20px]">progress_activity</span>

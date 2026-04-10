@@ -1,0 +1,92 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import TopNavBar from '../../components/TopNavBar.astro';
+import FooterSection from '../../components/FooterSection.astro';
+import { sanityClient } from '../../lib/sanity';
+import SanityPortableText from '../../components/SanityPortableText.tsx';
+
+const { slug } = Astro.params;
+
+// Fetch exactly this slug
+const post = await sanityClient.fetch(`*[_type == "post" && slug.current == $slug][0]{
+  title,
+  publishedAt,
+  category,
+  excerpt,
+  body,
+  "imageUrl": mainImage.asset->url
+}`, { slug });
+
+if (!post) {
+  return Astro.redirect('/aktuelles');
+}
+
+// Helper for formatting date
+const dateObj = new Date(post.publishedAt || Date.now());
+const formattedDate = dateObj.toLocaleDateString("de-DE", { day: "2-digit", month: "long", year: "numeric" });
+---
+
+<Layout title={`${post.title} - AK Kommunal`}>
+  <TopNavBar />
+
+  <main class="w-full bg-surface pt-32 pb-24 min-h-screen relative overflow-hidden">
+    <!-- Back Button -->
+    <div class="max-w-4xl mx-auto px-6 lg:px-8 relative z-10 mb-8 pt-4">
+      <a href="/aktuelles" class="inline-flex items-center gap-2 text-sm font-bold text-on-surface-variant hover:text-primary transition-colors group">
+        <span class="material-symbols-outlined text-[18px] group-hover:-translate-x-1 transition-transform">arrow_back</span>
+        Zurück zur Übersicht
+      </a>
+    </div>
+
+    <!-- Article Header -->
+    <article class="max-w-4xl mx-auto px-6 lg:px-8 relative z-10">
+      <div class="mb-10 text-center animate-[fadeInUp_1s_ease-out]">
+        <div class="flex items-center justify-center gap-4 mb-6">
+          <span class="bg-primary/5 text-primary text-[11px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-full border border-primary/10">
+            {post.category || 'Allgemein'}
+          </span>
+          <span class="text-sm font-medium text-on-surface-variant">{formattedDate}</span>
+        </div>
+        
+        <h1 class="text-3xl md:text-5xl lg:text-6xl font-extrabold font-headline text-primary tracking-tight leading-[1.1] mb-6">
+          {post.title}
+        </h1>
+        
+        <p class="text-xl md:text-2xl text-on-surface-variant font-light font-body max-w-3xl mx-auto leading-relaxed">
+          {post.excerpt}
+        </p>
+      </div>
+
+      {post.imageUrl && (
+        <div class="w-full h-64 md:h-96 lg:h-[500px] rounded-3xl overflow-hidden shadow-[0_20px_40px_-15px_rgba(5,24,58,0.1)] mb-16 animate-[fadeInUp_1s_ease-out_0.2s_both]">
+          <img src={post.imageUrl} alt={post.title} class="w-full h-full object-cover object-center" />
+        </div>
+      )}
+
+      <!-- Article Body Custom Markdown / Portable Text -->
+      <div class="bg-white p-8 md:p-12 lg:p-16 rounded-[40px] shadow-[0_8px_30px_rgb(0,0,0,0.03)] border border-gray-100 mx-auto animate-[fadeInUp_1s_ease-out_0.3s_both]">
+        {post.body ? (
+           <SanityPortableText value={post.body} />
+        ) : (
+           <p class="text-gray-500 italic">Noch kein Text hinterlegt.</p>
+        )}
+      </div>
+
+    </article>
+  </main>
+
+  <FooterSection />
+</Layout>
+
+<style>
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>

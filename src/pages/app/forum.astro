@@ -36,7 +36,8 @@ if (Astro.request.method === 'POST') {
       if (insertError) {
         notification = `Fehler beim Erstellen: ${insertError.message}`;
       } else {
-        notification = 'Thema erfolgreich erstellt!';
+        // Erfolgreich! Wir leiten um, damit F5 (Neuladen) das Formular nicht nochmal sendet
+        return Astro.redirect('/app/forum');
       }
     }
   } catch (err: any) {
@@ -44,13 +45,101 @@ if (Astro.request.method === 'POST') {
   }
 }
 
-// Fetch Live Topics
-const { data: rawTopics, error } = await supabase
-  .from('forum_topics')
-  .select('*')
-  .order('created_at', { ascending: false });
+// Profil abrufen für Berechtigungs-Check
+const { data: profile, error: profileError } = await supabase
+  .from('user_profiles')
+  .select('role, has_membership')
+  .eq('id', user.id)
+  .maybeSingle();
 
-const forumTopics = rawTopics || [];
+if (profileError) {
+  console.error("Supabase Profile Fetch Error:", profileError);
+}
+
+const isAdmin = profile?.role === 'admin';
+const hasAccess = isAdmin || profile?.has_membership;
+
+let forumTopics: any[] = [];
+let topPinnedTopic: any = null;
+let regularTopics: any[] = [];
+
+// Dynamische Paginierung & Filterung
+const currentPage = parseInt(Astro.url.searchParams.get('page') || '1');
+const currentCategory = Astro.url.searchParams.get('category');
+const currentSort = Astro.url.searchParams.get('sort') || 'newest';
+const ITEMS_PER_PAGE = 10;
+const offset = (currentPage - 1) * ITEMS_PER_PAGE;
+
+let totalCount = 0;
+let totalPages = 1;
+
+let categoryCounts = { total: 0, finanzwesen: 0, praktiker: 0, steuerrecht: 0, offtopic: 0 };
+
+if (hasAccess) {
+  // --- 1. Zähler für die Sidebar (Parallel) ---
+  const fetchCount = async (cat: string | null) => {
+    let q = supabase.from('forum_topics').select('id', { count: 'exact', head: true });
+    if (cat) q = q.eq('category', cat);
+    const { count } = await q;
+    return count || 0;
+  };
+  
+  const [total, finanzwesen, praktiker, steuerrecht, offtopic] = await Promise.all([
+    fetchCount(null),
+    fetchCount('Finanzwesen'),
+    fetchCount('Praktiker Modul'),
+    fetchCount('Steuerrecht'),
+    fetchCount('Off-Topic')
+  ]);
+  
+  categoryCounts = { total, finanzwesen, praktiker, steuerrecht, offtopic };
+
+  // --- 2. Dynamische Feed-Abfrage aufbauen ---
+  let query = supabase
+    .from('forum_topics')
+    .select('*', { count: 'exact' });
+
+  // Kategorie Filter
+  if (currentCategory) {
+    query = query.eq('category', currentCategory);
+  }
+
+  // Sortierungs-Bedingungen (Unbeantwortet / Eigene)
+  if (currentSort === 'mine') {
+    query = query.eq('author_id', user.id);
+  } else if (currentSort === 'unanswered') {
+    query = query.eq('replies', 0);
+  }
+
+  // Die Sortierung selbst
+  if (currentSort === 'popular') {
+    query = query.order('views', { ascending: false });
+  } else {
+    // Standard (Neueste) - Nur hier wollen wir den Pin ganz oben
+    if (!currentCategory && currentSort === 'newest') {
+      query = query.order('is_pinned', { ascending: false });
+    }
+    query = query.order('created_at', { ascending: false });
+  }
+
+  // Paginierung anwenden
+  query = query.range(offset, offset + ITEMS_PER_PAGE - 1);
+
+  const { data: rawTopics, count } = await query;
+
+  forumTopics = rawTopics || [];
+  totalCount = count || 0;
+  totalPages = Math.max(1, Math.ceil(totalCount / ITEMS_PER_PAGE));
+  
+  // Zeige den großen Header-Post nur auf Seite 1 an, wenn kein Filter/Sort aktiv ist
+  if (currentPage === 1 && currentSort === 'newest' && !currentCategory && forumTopics.length > 0 && forumTopics[0].is_pinned) {
+    topPinnedTopic = forumTopics[0];
+    regularTopics = forumTopics.slice(1);
+  } else {
+    // Filter aktiv oder nicht Seite 1 -> ganz normale Liste rendern
+    regularTopics = forumTopics;
+  }
+}
 
 function timeAgo(dateString: string) {
   const date = new Date(dateString);
@@ -62,6 +151,17 @@ function timeAgo(dateString: string) {
   interval = seconds / 60;
   if (interval >= 1) return Math.floor(interval) + " Minuten";
   return "gerade eben";
+}
+
+let paginationPages: (number | string)[] = [];
+if (totalPages > 1) {
+  for (let i = 1; i <= totalPages; i++) {
+    if (totalPages <= 7 || i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+      paginationPages.push(i);
+    } else if (i === currentPage - 2 || i === currentPage + 2) {
+      paginationPages.push('...');
+    }
+  }
 }
 ---
 
@@ -104,40 +204,40 @@ function timeAgo(dateString: string) {
           <div>
             <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 pl-2">Kategorien</h3>
             <div class="flex flex-col gap-1">
-              <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl bg-white shadow-sm border border-gray-100 text-[#05183a] font-bold text-sm">
+              <a href={`?sort=${currentSort}`} class={`flex items-center justify-between px-3 py-2.5 rounded-xl transition-colors text-sm ${!currentCategory ? 'font-bold bg-white shadow-sm border border-gray-100 text-[#05183a]' : 'font-medium text-gray-600 hover:bg-gray-100'}`}>
                 <div class="flex items-center gap-3">
-                  <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+                  <span class={`w-2.5 h-2.5 rounded-full ${!currentCategory ? 'bg-blue-500' : 'bg-gray-300'}`}></span>
                   Alle Themen
                 </div>
-                <span class="bg-gray-100 text-gray-500 text-[10px] px-2 py-0.5 rounded-full">142</span>
+                <span class={`${!currentCategory ? 'bg-gray-100 text-gray-500' : 'bg-white border border-gray-200 text-gray-400'} text-[10px] px-2 py-0.5 rounded-full`}>{categoryCounts.total}</span>
               </a>
-              <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-gray-100 text-gray-600 font-medium text-sm transition-colors">
+              <a href={`?category=Finanzwesen&sort=${currentSort}`} class={`flex items-center justify-between px-3 py-2.5 rounded-xl transition-colors text-sm ${currentCategory === 'Finanzwesen' ? 'font-bold bg-white shadow-sm border border-gray-100 text-[#05183a]' : 'font-medium text-gray-600 hover:bg-gray-100'}`}>
                 <div class="flex items-center gap-3">
-                  <span class="w-2.5 h-2.5 rounded-full border-2 border-orange-400"></span>
+                  <span class={`w-2.5 h-2.5 rounded-full border-2 ${currentCategory === 'Finanzwesen' ? 'border-orange-400 bg-orange-400' : 'border-orange-400'}`}></span>
                   Finanzwesen
                 </div>
-                <span class="bg-white border border-gray-200 text-gray-400 text-[10px] px-2 py-0.5 rounded-full">56</span>
+                <span class={`${currentCategory === 'Finanzwesen' ? 'bg-gray-100 text-gray-500' : 'bg-white border border-gray-200 text-gray-400'} text-[10px] px-2 py-0.5 rounded-full`}>{categoryCounts.finanzwesen}</span>
               </a>
-              <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-gray-100 text-gray-600 font-medium text-sm transition-colors">
+              <a href={`?category=Praktiker Modul&sort=${currentSort}`} class={`flex items-center justify-between px-3 py-2.5 rounded-xl transition-colors text-sm ${currentCategory === 'Praktiker Modul' ? 'font-bold bg-white shadow-sm border border-gray-100 text-[#05183a]' : 'font-medium text-gray-600 hover:bg-gray-100'}`}>
                 <div class="flex items-center gap-3">
-                  <span class="w-2.5 h-2.5 rounded-full border-2 border-emerald-500"></span>
+                  <span class={`w-2.5 h-2.5 rounded-full border-2 ${currentCategory === 'Praktiker Modul' ? 'border-emerald-500 bg-emerald-500' : 'border-emerald-500'}`}></span>
                   Praktiker Modul
                 </div>
-                <span class="bg-white border border-gray-200 text-gray-400 text-[10px] px-2 py-0.5 rounded-full">34</span>
+                <span class={`${currentCategory === 'Praktiker Modul' ? 'bg-gray-100 text-gray-500' : 'bg-white border border-gray-200 text-gray-400'} text-[10px] px-2 py-0.5 rounded-full`}>{categoryCounts.praktiker}</span>
               </a>
-              <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-gray-100 text-gray-600 font-medium text-sm transition-colors">
+              <a href={`?category=Steuerrecht&sort=${currentSort}`} class={`flex items-center justify-between px-3 py-2.5 rounded-xl transition-colors text-sm ${currentCategory === 'Steuerrecht' ? 'font-bold bg-white shadow-sm border border-gray-100 text-[#05183a]' : 'font-medium text-gray-600 hover:bg-gray-100'}`}>
                 <div class="flex items-center gap-3">
-                  <span class="w-2.5 h-2.5 rounded-full border-2 border-purple-500"></span>
+                  <span class={`w-2.5 h-2.5 rounded-full border-2 ${currentCategory === 'Steuerrecht' ? 'border-purple-500 bg-purple-500' : 'border-purple-500'}`}></span>
                   Steuerrecht
                 </div>
-                <span class="bg-white border border-gray-200 text-gray-400 text-[10px] px-2 py-0.5 rounded-full">28</span>
+                <span class={`${currentCategory === 'Steuerrecht' ? 'bg-gray-100 text-gray-500' : 'bg-white border border-gray-200 text-gray-400'} text-[10px] px-2 py-0.5 rounded-full`}>{categoryCounts.steuerrecht}</span>
               </a>
-              <a href="#" class="flex items-center justify-between px-3 py-2.5 rounded-xl hover:bg-gray-100 text-gray-600 font-medium text-sm transition-colors">
+              <a href={`?category=Off-Topic&sort=${currentSort}`} class={`flex items-center justify-between px-3 py-2.5 rounded-xl transition-colors text-sm ${currentCategory === 'Off-Topic' ? 'font-bold bg-white shadow-sm border border-gray-100 text-[#05183a]' : 'font-medium text-gray-600 hover:bg-gray-100'}`}>
                 <div class="flex items-center gap-3">
-                  <span class="w-2.5 h-2.5 rounded-full border-2 border-gray-400"></span>
+                  <span class={`w-2.5 h-2.5 rounded-full border-2 ${currentCategory === 'Off-Topic' ? 'border-gray-400 bg-gray-400' : 'border-gray-400'}`}></span>
                   Off-Topic
                 </div>
-                <span class="bg-white border border-gray-200 text-gray-400 text-[10px] px-2 py-0.5 rounded-full">24</span>
+                <span class={`${currentCategory === 'Off-Topic' ? 'bg-gray-100 text-gray-500' : 'bg-white border border-gray-200 text-gray-400'} text-[10px] px-2 py-0.5 rounded-full`}>{categoryCounts.offtopic}</span>
               </a>
             </div>
           </div>
@@ -151,107 +251,156 @@ function timeAgo(dateString: string) {
         <div class="flex-1 flex flex-col gap-4">
           <!-- Feed Filters -->
           <div class="flex items-center gap-6 border-b border-gray-200 pb-2">
-            <button class="text-sm font-bold text-[#05183a] border-b-2 border-[#05183a] pb-2 -mb-[9px]">Neueste</button>
-            <button class="text-sm font-semibold text-gray-400 hover:text-[#05183a] pb-2 -mb-[9px] transition-colors">Beliebt</button>
-            <button class="text-sm font-semibold text-gray-400 hover:text-[#05183a] pb-2 -mb-[9px] transition-colors">Ungelesen</button>
-            <button class="text-sm font-semibold text-gray-400 hover:text-[#05183a] pb-2 -mb-[9px] transition-colors">Eigene Beiträge</button>
+            <a href={`?sort=newest${currentCategory ? `&category=${currentCategory}` : ''}`} class={`text-sm tracking-wide transition-colors ${currentSort === 'newest' ? 'font-bold text-[#05183a] border-b-2 border-[#05183a] pb-2 -mb-[9px]' : 'font-semibold text-gray-400 hover:text-[#05183a] pb-2 -mb-[9px]'}`}>Neueste</a>
+            <a href={`?sort=popular${currentCategory ? `&category=${currentCategory}` : ''}`} class={`text-sm tracking-wide transition-colors ${currentSort === 'popular' ? 'font-bold text-[#05183a] border-b-2 border-[#05183a] pb-2 -mb-[9px]' : 'font-semibold text-gray-400 hover:text-[#05183a] pb-2 -mb-[9px]'}`}>Beliebt</a>
+            <a href={`?sort=unanswered${currentCategory ? `&category=${currentCategory}` : ''}`} class={`text-sm tracking-wide transition-colors ${currentSort === 'unanswered' ? 'font-bold text-[#05183a] border-b-2 border-[#05183a] pb-2 -mb-[9px]' : 'font-semibold text-gray-400 hover:text-[#05183a] pb-2 -mb-[9px]'}`}>Unbeantwortet</a>
+            <a href={`?sort=mine${currentCategory ? `&category=${currentCategory}` : ''}`} class={`text-sm tracking-wide transition-colors ${currentSort === 'mine' ? 'font-bold text-[#05183a] border-b-2 border-[#05183a] pb-2 -mb-[9px]' : 'font-semibold text-gray-400 hover:text-[#05183a] pb-2 -mb-[9px]'}`}>Eigene Beiträge</a>
           </div>
 
-          <!-- Pinned Topic -->
-          <a href="#" class="bg-blue-50/50 border border-blue-100 rounded-2xl p-5 hover:bg-blue-100/50 transition-colors flex gap-5 group relative overflow-hidden">
-            <!-- Pin Icon Badge -->
-            <div class="absolute top-0 right-0 w-16 h-16 pointer-events-none overflow-hidden rounded-tr-2xl">
-              <div class="absolute top-2 right-2 flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-600">
-                <span class="material-symbols-outlined text-[14px]">push_pin</span>
-              </div>
-            </div>
+          <!-- Das Forum / oder Paywall -->
+          {!hasAccess ? (
+            <div class="bg-white border text-center border-gray-200 rounded-2xl p-16 flex flex-col items-center justify-center gap-6 shadow-sm overflow-hidden relative">
+              <!-- Decorative background -->
+              <div class="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"></div>
 
-            <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm overflow-hidden shrink-0 mt-1">
-              <img src="/team/ma13-800x533.jpg" alt="Author" class="w-full h-full object-cover">
-            </div>
-            <div class="flex-1">
-              <div class="flex items-center gap-2 mb-1.5">
-                <span class="bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wide">Angepinnt</span>
-                <span class="bg-gray-200/50 text-gray-600 text-[10px] font-bold px-2 py-0.5 rounded-md">News</span>
+              <div class="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center shadow-inner relative z-10">
+                <span class="material-symbols-outlined text-[40px]">lock</span>
               </div>
-              <h3 class="text-lg font-bold text-[#05183a] group-hover:text-blue-600 transition-colors mb-2 leading-tight">Großes Update im Praktiker Modul: Neue BMF-Schreiben eingearbeitet</h3>
-              <p class="text-sm text-gray-500 line-clamp-2 leading-relaxed mb-4">
-                Wir haben soeben die neuesten Änderungen bezüglich der Vorsteueraufteilung aus dem BMF-Schreiben von letzter Woche in alle relevanten Video-Lektionen und Skripte übernommen. Hier ist eine kurze Zusammenfassung der wichtigsten Punkte...
-              </p>
-              <div class="flex items-center justify-between text-[13px]">
-                <div class="flex items-center gap-2 text-gray-500 font-medium">
-                  <span class="font-bold text-[#05183a]">Alexander Rummer</span>
-                  <span>·</span>
-                  <span>Heute, 09:00</span>
-                </div>
-                <div class="flex items-center gap-4 text-gray-500 font-medium">
-                  <div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px]">visibility</span> 1.2k</div>
-                  <div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px]">chat_bubble</span> 45</div>
-                </div>
-              </div>
-            </div>
-             {notification && (
-            <div class={`p-4 rounded-xl text-sm font-bold border ${notification.startsWith('Fehler') ? 'bg-red-50 text-red-600 border-red-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'}`}>
-              {notification}
-            </div>
-          )}
-
-          <!-- Dynamic Forum Topics -->
-          {forumTopics.length === 0 ? (
-            <div class="bg-white border border-gray-200 rounded-2xl p-10 text-center flex flex-col items-center gap-3">
-              <span class="material-symbols-outlined text-gray-300 text-[48px]">forum</span>
-              <h3 class="text-lg font-bold text-[#05183a]">Noch keine Themen</h3>
-              <p class="text-sm text-gray-500">Seien Sie der Erste, der eine Diskussion startet!</p>
-            </div>
-          ) : forumTopics.map(topic => (
-            <a href="#" class="bg-white border border-gray-200 rounded-2xl p-5 hover:border-blue-300 hover:shadow-md transition-all flex gap-5 group">
-              <div class="w-12 h-12 rounded-full border-2 border-gray-50 bg-[#05183a] text-white flex items-center justify-center font-bold text-lg shrink-0 mt-1 overflow-hidden">
-                 {topic.author_avatar_url ? (
-                   <img src={topic.author_avatar_url} class="w-full h-full object-cover" />
-                 ) : (
-                   topic.author_name.charAt(0).toUpperCase()
-                 )}
-              </div>
-              <div class="flex-1">
-                <div class="flex items-center gap-2 mb-1.5">
-                  <span class="bg-blue-50 text-blue-600 border border-blue-100 text-[10px] font-bold px-2 py-0.5 rounded-md">
-                    {topic.category}
-                  </span>
-                </div>
-                <h3 class="text-lg font-bold text-[#05183a] group-hover:text-blue-600 transition-colors mb-2 leading-tight">{topic.title}</h3>
-                <p class="text-sm text-gray-500 line-clamp-2 leading-relaxed mb-4">
-                  {topic.content}
+              
+              <div class="max-w-md mx-auto relative z-10 mt-2">
+                <h2 class="text-2xl font-extrabold text-[#05183a] mb-4 font-headline">Exklusiver Austausch<br/>für Mitglieder</h2>
+                <p class="text-gray-500 text-[15px] leading-relaxed mb-8 font-medium">
+                  Unser Behörden-Forum und der direkte Fachaustausch mit den Referenten steht aus Qualitätsgründen exklusiv den Mitgliedern von <strong class="text-[#05183a]">AK Kommunal</strong> zur Verfügung.
                 </p>
-                <div class="flex items-center justify-between text-[13px]">
-                  <div class="flex items-center gap-2 text-gray-500 font-medium">
-                    <span class="font-bold text-[#05183a]">{topic.author_name}</span>
-                    <span>·</span>
-                    <span>vor {timeAgo(topic.created_at)}</span>
-                  </div>
-                  <div class="flex items-center gap-4 text-gray-500 font-medium">
-                    <div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px]">visibility</span> {topic.views || 0}</div>
-                    <div class="flex items-center gap-1.5 text-blue-600"><span class="material-symbols-outlined text-[16px]">chat_bubble</span> {topic.replies || 0}</div>
-                  </div>
-                </div>
-              </div>
-            </a>
-          ))}  </div>
-          </a>
 
-          <!-- Pagination -->
-          <div class="flex items-center justify-center gap-2 mt-6">
-            <button class="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-gray-400 hover:text-[#05183a] hover:bg-gray-50 transition-colors shadow-sm disabled:opacity-50" disabled>
-              <span class="material-symbols-outlined text-[20px]">chevron_left</span>
-            </button>
-            <button class="w-10 h-10 rounded-xl bg-[#05183a] text-white font-bold shadow-sm">1</button>
-            <button class="w-10 h-10 rounded-xl bg-white border border-gray-200 font-bold text-gray-600 hover:bg-gray-50 transition-colors shadow-sm">2</button>
-            <button class="w-10 h-10 rounded-xl bg-white border border-gray-200 font-bold text-gray-600 hover:bg-gray-50 transition-colors shadow-sm">3</button>
-            <span class="text-gray-400 font-bold px-2">...</span>
-            <button class="w-10 h-10 rounded-xl bg-white border border-gray-200 font-bold text-gray-600 hover:bg-gray-50 transition-colors shadow-sm">12</button>
-            <button class="w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center text-[#05183a] hover:bg-gray-50 transition-colors shadow-sm">
-              <span class="material-symbols-outlined text-[20px]">chevron_right</span>
-            </button>
-          </div>
+                <a href="/mitglied-werden" class="inline-flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-[#05183a] to-blue-900 border border-transparent rounded-xl shadow-lg shadow-[#05183a]/20 text-white font-bold hover:shadow-xl hover:-translate-y-0.5 transition-all w-full justify-center">
+                  <span class="material-symbols-outlined text-[20px]">workspace_premium</span>
+                  Jetzt Mitglied werden
+                </a>
+              </div>
+            </div>
+          ) : (
+            <Fragment>
+              <!-- Dynamic Pinned Topic (Big Header) -->
+              {topPinnedTopic && (
+                <a href={`/app/forum/${topPinnedTopic.id}`} class="bg-blue-50/50 border border-blue-100 rounded-2xl p-5 hover:bg-blue-100/50 transition-colors flex gap-5 group relative overflow-hidden">
+                  <div class="absolute top-0 right-0 w-16 h-16 pointer-events-none overflow-hidden rounded-tr-2xl">
+                    <div class="absolute top-2 right-2 flex items-center justify-center w-6 h-6 rounded-full bg-blue-100 text-blue-600">
+                      <span class="material-symbols-outlined text-[14px]">push_pin</span>
+                    </div>
+                  </div>
+
+                  <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm overflow-hidden shrink-0 mt-1 bg-[#05183a] text-white flex items-center justify-center font-bold text-lg">
+                     {topPinnedTopic.author_avatar_url ? (
+                       <img src={topPinnedTopic.author_avatar_url} class="w-full h-full object-cover" />
+                     ) : (
+                       topPinnedTopic.author_name.charAt(0).toUpperCase()
+                     )}
+                  </div>
+                  <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1.5">
+                      <span class="bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wide">Angepinnt</span>
+                      <span class="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-0.5 rounded-md">{topPinnedTopic.category}</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-[#05183a] group-hover:text-blue-600 transition-colors mb-2 leading-tight">{topPinnedTopic.title}</h3>
+                    <p class="text-sm text-gray-500 line-clamp-2 leading-relaxed mb-4">
+                      {topPinnedTopic.content}
+                    </p>
+                    <div class="flex items-center justify-between text-[13px]">
+                      <div class="flex items-center gap-2 text-gray-500 font-medium">
+                        <span class="font-bold text-[#05183a]">{topPinnedTopic.author_name}</span>
+                        <span>·</span>
+                        <span>vor {timeAgo(topPinnedTopic.created_at)}</span>
+                      </div>
+                      <div class="flex items-center gap-4 text-gray-500 font-medium">
+                        <div class="flex items-center gap-1.5 text-blue-500"><span class="material-symbols-outlined text-[16px]">thumb_up</span> {topPinnedTopic.likes || 0}</div>
+                        <div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px]">visibility</span> {topPinnedTopic.views || 0}</div>
+                        <div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px]">chat_bubble</span> {topPinnedTopic.replies || 0}</div>
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              )}
+
+              {notification && (
+                <div class={`p-4 rounded-xl text-sm font-bold border ${notification.startsWith('Fehler') ? 'bg-red-50 text-red-600 border-red-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'}`}>
+                  {notification}
+                </div>
+              )}
+
+              <!-- Dynamic Forum Topics -->
+              {forumTopics.length === 0 ? (
+                <div class="bg-white border border-gray-200 rounded-2xl p-10 text-center flex flex-col items-center gap-3">
+                  <span class="material-symbols-outlined text-gray-300 text-[48px]">forum</span>
+                  <h3 class="text-lg font-bold text-[#05183a]">Noch keine Themen</h3>
+                  <p class="text-sm text-gray-500">Seien Sie der Erste, der eine Diskussion startet!</p>
+                </div>
+              ) : regularTopics.map((topic: any) => (
+                <a href={`/app/forum/${topic.id}`} class="bg-white border border-gray-200 rounded-2xl p-5 hover:border-blue-300 hover:shadow-md transition-all flex gap-5 group relative">
+                  {topic.is_pinned && (
+                    <div class="absolute top-4 right-4 text-amber-500" title="Angepinnt">
+                      <span class="material-symbols-outlined text-[18px]">push_pin</span>
+                    </div>
+                  )}
+                  <div class="w-12 h-12 rounded-full border-2 border-gray-50 bg-[#05183a] text-white flex items-center justify-center font-bold text-lg shrink-0 mt-1 overflow-hidden">
+                     {topic.author_avatar_url ? (
+                       <img src={topic.author_avatar_url} class="w-full h-full object-cover" />
+                     ) : (
+                       topic.author_name.charAt(0).toUpperCase()
+                     )}
+                  </div>
+                  <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1.5">
+                      <span class="bg-blue-50 text-blue-600 border border-blue-100 text-[10px] font-bold px-2 py-0.5 rounded-md">
+                        {topic.category}
+                      </span>
+                    </div>
+                    <h3 class="text-lg font-bold text-[#05183a] group-hover:text-blue-600 transition-colors mb-2 leading-tight">{topic.title}</h3>
+                    <p class="text-sm text-gray-500 line-clamp-2 leading-relaxed mb-4">
+                      {topic.content}
+                    </p>
+                    <div class="flex items-center justify-between text-[13px]">
+                      <div class="flex items-center gap-2 text-gray-500 font-medium">
+                        <span class="font-bold text-[#05183a]">{topic.author_name}</span>
+                        <span>·</span>
+                        <span>vor {timeAgo(topic.created_at)}</span>
+                      </div>
+                      <div class="flex items-center gap-4 text-gray-500 font-medium">
+                        <div class="flex items-center gap-1.5 text-blue-500"><span class="material-symbols-outlined text-[16px]">thumb_up</span> {topic.likes || 0}</div>
+                        <div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px]">visibility</span> {topic.views || 0}</div>
+                        <div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px]">chat_bubble</span> {topic.replies || 0}</div>
+                      </div>
+                    </div>
+                  </div>
+                </a>
+              ))}
+
+              <!-- Pagination -->
+              {totalPages > 1 && (
+                <div class="flex items-center justify-center gap-2 mt-6">
+                  <a href={currentPage > 1 ? `?page=${currentPage - 1}` : '#'} 
+                     class={`w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center transition-colors shadow-sm ${currentPage <= 1 ? 'text-gray-300 pointer-events-none' : 'text-gray-600 hover:text-[#05183a] hover:bg-gray-50'}`}>
+                    <span class="material-symbols-outlined text-[20px]">chevron_left</span>
+                  </a>
+                  
+                  {paginationPages.map((pageNum) => (
+                    pageNum === '...' ? (
+                      <span class="text-gray-400 font-bold px-1">...</span>
+                    ) : (
+                      <a href={`?page=${pageNum}`} class={`w-10 h-10 rounded-xl border flex items-center justify-center font-bold text-sm transition-colors shadow-sm ${pageNum === currentPage ? 'bg-[#05183a] text-white border-transparent' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
+                        {pageNum}
+                      </a>
+                    )
+                  ))}
+
+                  <a href={currentPage < totalPages ? `?page=${currentPage + 1}` : '#'} 
+                     class={`w-10 h-10 rounded-xl bg-white border border-gray-200 flex items-center justify-center transition-colors shadow-sm ${currentPage >= totalPages ? 'text-gray-300 pointer-events-none' : 'text-gray-600 hover:text-[#05183a] hover:bg-gray-50'}`}>
+                    <span class="material-symbols-outlined text-[20px]">chevron_right</span>
+                  </a>
+                </div>
+              )}
+            </Fragment>
+          )}
 
         </div>
       </div>
@@ -269,7 +418,7 @@ function timeAgo(dateString: string) {
           <span class="material-symbols-outlined">close</span>
         </button>
       </div>
-      <form method="POST" class="p-8 flex flex-col gap-6 overflow-y-auto">
+      <form method="POST" class="p-8 flex flex-col gap-6 overflow-y-auto" onsubmit="this.querySelector('button[type=submit]').disabled=true; this.querySelector('button[type=submit]').innerText='Wird veröffentlicht...';">
         <div class="space-y-2">
           <label class="text-xs font-bold text-gray-600 uppercase tracking-widest">Kategorie</label>
           <select name="category" required class="w-full bg-gray-50 border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 px-4 py-3 rounded-xl outline-none text-sm font-medium text-[#05183a] appearance-none">

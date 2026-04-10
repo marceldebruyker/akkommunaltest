@@ -16,7 +16,7 @@ if (!authData?.user) {
 // 2. Fetch Seminar from Sanity
 const video = await sanityClient.fetch(`*[_type == "seminar" && status == "aufzeichnung" && slug.current == $slug][0]{
   "slug": slug.current,
-  title, description, moduleName, duration, vimeoId,
+  title, description, moduleName, duration, vimeoId, bunnyVideoId,
   "materials": materials[].asset->{url, originalFilename},
   "imageUrl": image.asset->url
 }`, { slug });
@@ -38,9 +38,11 @@ if (!purchaseData) {
   return Astro.redirect(`/mediathek/${video.slug}`);
 }
 
-// 4. Parse Video Input (YouTube Link, Vimeo Link, or raw Vimeo ID)
+// 4. Parse Video Input
 let videoInfo = null;
-if (video.vimeoId) {
+if (video.bunnyVideoId) {
+  videoInfo = { type: 'bunny', id: video.bunnyVideoId.trim() };
+} else if (video.vimeoId) {
   const input = video.vimeoId.trim();
   const ytMatch = input.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
   const vimeoMatch = input.match(/(?:vimeo\.com\/|player\.vimeo\.com\/video\/)([0-9]+)/);
@@ -59,8 +61,18 @@ if (video.vimeoId) {
 <AppLayout title={`${video.title} - Video Player`} currentPath="/app/lernwelt">
   
   <!-- Video Player Section -->
-  <div class="bg-black w-full aspect-video md:h-[60vh] flex items-center justify-center relative shrink-0 overflow-hidden shadow-sm">
-     {videoInfo?.type === 'youtube' ? (
+  <div class="w-full max-w-5xl mx-auto px-0 md:px-6 mt-0 md:mt-8 mb-4 md:mb-8">
+    <div class="bg-black w-full aspect-video relative flex-shrink-0 overflow-hidden md:rounded-3xl shadow-2xl shadow-[#05183a]/10 ring-1 ring-[#05183a]/5">
+     {videoInfo?.type === 'bunny' ? (
+       <iframe 
+         src={`https://iframe.mediadelivery.net/embed/634463/${videoInfo.id}?autoplay=true&preload=true&responsive=true`}
+         loading="lazy"
+         class="absolute inset-0 w-full h-full"
+         style="border:0;"
+         allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;"
+         allowfullscreen={true}>
+       </iframe>
+     ) : videoInfo?.type === 'youtube' ? (
        <iframe 
          src={`https://www.youtube.com/embed/${videoInfo.id}?autoplay=1&rel=0`} 
          class="absolute inset-0 w-full h-full" 
@@ -80,12 +92,13 @@ if (video.vimeoId) {
        <div class="text-white text-center flex flex-col items-center p-8 bg-[#05183a]/50 rounded-2xl border border-white/10 backdrop-blur-md">
           <span class="material-symbols-outlined text-[48px] text-white/50 mb-4">videocam_off</span>
           <p class="text-xl font-bold">Video nicht gefunden</p>
-          <p class="text-white/70 text-sm mt-3 max-w-sm">Es ist kein gültiger Video-Link hinterlegt. Bitte überprüfen Sie den Link in Sanity (YouTube, Vimeo Link oder Vimeo ID erlaubt).</p>
+          <p class="text-white/70 text-sm mt-3 max-w-sm">Es ist kein gültiger Video-Link hinterlegt. Bitte überprüfen Sie den Link in Sanity (Bunny.net ID bevorzugt).</p>
        </div>
      )}
+    </div>
   </div>
 
-  <div class="p-8 max-w-5xl mx-auto">
+  <div class="p-8 pb-16 max-w-5xl mx-auto">
     
     <div class="flex flex-col md:flex-row md:items-start justify-between gap-8 mb-12">
       <div>

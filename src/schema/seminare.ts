@@ -85,8 +85,9 @@ export const seminar = defineType({
       hidden: ({ document }) => document?.status !== 'live',
     }),
     defineField({
-      name: 'vimeoId',
-      title: 'Vimeo Video ID (z.B. 823456789)',
+      name: 'bunnyVideoId',
+      title: 'Bunny.net Video ID',
+      description: 'Hier nur die Video-ID von Bunny.net einkopieren (z.B. d8823651-5329-4ec3-8661-5155ed33f983)',
       type: 'string',
       hidden: ({ document }) => document?.status !== 'aufzeichnung',
     }),

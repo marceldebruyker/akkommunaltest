@@ -3,32 +3,45 @@ import Layout from '../layouts/Layout.astro';
 import TopNavBar from '../components/TopNavBar.astro';
 import FooterSection from '../components/FooterSection.astro';
 
-const newsItems = [
-  {
-    title: "Neue BMF-Schreiben zur § 2b UStG Umsatzbesteuerung",
-    date: "25. März 2026",
-    category: "Rechtsprechung",
-    excerpt: "Das Bundesfinanzministerium hat heute wegweisende Klarstellungen zur Anwendung des § 2b UStG bei interkommunaler Zusammenarbeit veröffentlicht. Wir analysieren die Folgen."
-  },
-  {
-    title: "Erfolgreicher Workshop zum Tax Compliance Management",
-    date: "12. Februar 2026",
-    category: "Event",
-    excerpt: "Unser intensiv Workshop zum Aufbau eines TCMS war komplett ausgebucht. Die Aufzeichnung steht Mitgliedern nun in der Mediathek zur Verfügung."
-  },
-  {
-    title: "Grundsteuerreform: Fristen und Stolperfallen",
-    date: "15. Januar 2026",
-    category: "Steuern",
-    excerpt: "Die Neuveranlagung der Grundsteuer bringt für viele Kommunen erheblichen Mehraufwand mit sich. Ein Überblick über die aktuellen Deadlines."
-  },
-  {
-    title: "Jahresauftakt AK Kommunal: Was 2026 wichtig wird",
-    date: "05. Januar 2026",
-    category: "Allgemein",
-    excerpt: "Ein Ausblick auf die steuerlichen Herausforderungen für die öffentliche Hand im neuen Jahr und wie unser Arbeitskreis Sie dabei unterstützt."
-  }
-];
+import { sanityClient } from '../lib/sanity';
+
+// Fetch from Sanity
+let sanityPosts = [];
+try {
+  sanityPosts = await sanityClient.fetch(`*[_type == "post"] | order(publishedAt desc) {
+    "slug": slug.current,
+    title,
+    publishedAt,
+    category,
+    excerpt
+  }`);
+} catch (err) {
+  console.error("Sanity fetch error:", err);
+}
+
+// Fallback logic if Sanity is totally empty 
+let isMock = false;
+let displayItems = sanityPosts;
+
+if (!sanityPosts || sanityPosts.length === 0) {
+   isMock = true;
+   displayItems = [
+    {
+      slug: '#',
+      title: "Neue BMF-Schreiben zur § 2b UStG Umsatzbesteuerung",
+      publishedAt: "2026-03-25T10:00:00.000Z",
+      category: "Rechtsprechung",
+      excerpt: "Das Bundesfinanzministerium hat heute wegweisende Klarstellungen zur Anwendung des § 2b UStG bei interkommunaler Zusammenarbeit veröffentlicht. Wir analysieren die Folgen."
+    },
+    {
+      slug: '#',
+      title: "Erfolgreicher Workshop zum Tax Compliance Management",
+      publishedAt: "2026-02-12T10:00:00.000Z",
+      category: "Event",
+      excerpt: "Unser intensiv Workshop zum Aufbau eines TCMS war komplett ausgebucht. Die Aufzeichnung steht Mitgliedern nun in der Mediathek zur Verfügung."
+    }
+  ];
+}
 ---
 
 <Layout title="Aktuelles - AK Kommunal">
@@ -56,27 +69,35 @@ const newsItems = [
     <!-- Blog Grid -->
     <div class="max-w-6xl mx-auto px-6 lg:px-10 animate-[fadeInUp_1s_ease-out_0.2s_both]">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {newsItems.map((item) => (
-          <article class="bg-surface-container-lowest p-8 md:p-10 rounded-3xl shadow-sm hover:shadow-xl transition-all duration-500 border border-outline-variant/30 flex flex-col h-full group hover:-translate-y-1 cursor-pointer">
-            <div class="flex items-center justify-between mb-6">
+        {displayItems.map((item: any) => {
+          const dateObj = new Date(item.publishedAt || Date.now());
+          const formattedDate = dateObj.toLocaleDateString("de-DE", { day: "2-digit", month: "long", year: "numeric" });
+          return (
+          <a href={isMock ? '#' : `/aktuelles/${item.slug}`} class={`bg-surface-container-lowest p-8 md:p-10 rounded-3xl shadow-sm transition-all duration-500 border border-outline-variant/30 flex flex-col h-full group ${!isMock ? 'hover:shadow-xl hover:-translate-y-1 cursor-pointer' : 'opacity-70 grayscale cursor-default relative overflow-hidden'}`}>
+            {isMock && (
+              <div class="absolute inset-0 bg-white/40 flex items-center justify-center z-20 backdrop-blur-[2px]">
+                <span class="bg-primary text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg">Dummy Eintrag</span>
+              </div>
+            )}
+            <div class={`flex items-center justify-between mb-6 ${isMock ? 'opacity-30' : ''}`}>
               <span class="bg-primary/5 text-primary text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full border border-primary/10">
-                {item.category}
+                {item.category || 'Allgemein'}
               </span>
               <time class="text-xs text-on-surface-variant font-medium tracking-wide">
-                {item.date}
+                {formattedDate}
               </time>
             </div>
-            <h3 class="text-2xl font-extrabold font-headline text-primary mb-4 group-hover:text-primary-fixed-dim transition-colors line-clamp-2">
+            <h3 class={`text-2xl font-extrabold font-headline text-primary mb-4 transition-colors line-clamp-2 ${!isMock ? 'group-hover:text-primary-fixed-dim' : ''}`}>
               {item.title}
             </h3>
             <p class="text-on-surface-variant leading-relaxed text-[15px] font-light mb-8 flex-grow">
               {item.excerpt}
             </p>
-            <div class="mt-auto pt-6 border-t border-outline-variant/20 flex items-center text-primary font-bold text-sm group-hover:gap-2 transition-all">
-              Artikel lesen <span class="material-symbols-outlined text-[18px] ml-1 group-hover:translate-x-1 transition-transform">arrow_forward</span>
+            <div class={`mt-auto pt-6 border-t border-outline-variant/20 flex items-center text-primary font-bold text-sm transition-all ${!isMock ? 'group-hover:gap-2' : ''}`}>
+              Artikel lesen <span class={`material-symbols-outlined text-[18px] ml-1 transition-transform ${!isMock ? 'group-hover:translate-x-1' : ''}`}>arrow_forward</span>
             </div>
-          </article>
-        ))}
+          </a>
+        )})}
       </div>
 
       <!-- Pagination Placeholder -->

@@ -4,6 +4,7 @@ import BrandLogo from '../components/BrandLogo.astro';
 import '../styles/global.css';
 
 const error = Astro.url.searchParams.get('error');
+const message = Astro.url.searchParams.get('message');
 const redirectUrl = Astro.url.searchParams.get('redirect') || '';
 ---
 
@@ -73,6 +74,13 @@ const redirectUrl = Astro.url.searchParams.get('redirect') || '';
                     </div>
                 )}
 
+                {message === 'check_email' && (
+                    <div class="bg-emerald-50 text-emerald-700 border border-emerald-200 p-4 rounded-lg text-[13px] font-medium mb-6 w-full text-center flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-[18px]">mark_email_read</span>
+                        Bitte überprüfen Sie Ihr E-Mail-Postfach, um die Registrierung abzuschließen.
+                    </div>
+                )}
+
                 <form action="/api/auth/signin" method="POST" class="flex flex-col gap-6">
                     <input type="hidden" name="redirect" value={redirectUrl} />
                     
@@ -129,27 +137,18 @@ const redirectUrl = Astro.url.searchParams.get('redirect') || '';
                 </form>
             </div>
 
-            <!-- External Customer Box -->
-            <a href="/shop" class="w-full bg-[#f4f4f5] border border-gray-200/50 hover:bg-[#efeff0] transition-colors rounded-2xl p-4 flex items-center gap-5 cursor-pointer group mb-10">
-                <div class="w-12 h-12 bg-[#dbeafe] rounded-xl flex items-center justify-center flex-shrink-0 text-blue-800 group-hover:scale-105 transition-transform">
-                    <span class="material-symbols-outlined text-[24px]">group_add</span>
-                </div>
-                <div class="flex-1">
-                    <div class="text-[13px] font-extrabold text-[#0a152e] mb-0.5">Externe Kunden</div>
-                    <div class="text-[11px] text-gray-500 leading-tight">Zugang zu unserem öffentlichen Shop und freien Ressourcen</div>
-                </div>
-                <span class="material-symbols-outlined text-gray-400 group-hover:text-[#0a152e] group-hover:translate-x-1 transition-all">chevron_right</span>
-            </a>
+            <!-- Removed External Customer Box per request -->
 
             <!-- Create Account Link -->
-            <div class="text-center text-[13px] text-gray-500 mb-8 md:mb-0">
-                Neu bei AK Kommunal? <a href="/mitglied-werden" class="text-[#0a152e] font-extrabold border-b border-[#0a152e] pb-[1px] hover:text-blue-600 hover:border-blue-600 transition-colors ml-1">Konto erstellen</a>
+            <div class="text-center text-[13px] text-gray-500 mb-8 md:mb-0 flex flex-col gap-2">
+                <div>Neu bei AK Kommunal? <a href="/register" class="text-[#0a152e] font-extrabold border-b border-[#0a152e] pb-[1px] hover:text-blue-600 hover:border-blue-600 transition-colors ml-1">Kostenlos registrieren</a></div>
+                <div>Praktiker Modul erwerben? <a href="/mitglied-werden" class="text-[#0a152e] font-extrabold border-b border-[#0a152e] pb-[1px] hover:text-blue-600 hover:border-blue-600 transition-colors ml-1">Mitglied werden</a></div>
             </div>
 
         </div>
 
-        <!-- Absolute Footer on Right Side (Visible on large screens, nested correctly) -->
-        <div class="w-full mt-auto md:absolute md:bottom-12 md:left-0 md:right-0 md:mt-0 px-6">
+        <!-- Footer on Right Side -->
+        <div class="w-full mt-auto pt-16 pb-8 px-6">
             <div class="max-w-[400px] mx-auto border-t border-gray-200 pt-8 flex flex-col items-center">
                 <div class="flex flex-wrap justify-center gap-x-6 gap-y-3 mb-4">
                     <a href="/impressum" class="text-[9px] font-bold text-gray-400 uppercase tracking-[0.15em] hover:text-[#0a152e] transition-colors">IMPRESSUM</a>

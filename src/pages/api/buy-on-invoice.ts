@@ -57,6 +57,22 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     // Abgleich der Preise mit Sanity für Sicherheit
     const sanityProducts = await sanityClient.fetch(`*[_type == "seminar"]{ "id": slug.current, title, price }`);
 
+    // Prevent Duplicate Purchases (Verhindern von Mehrfachkäufen)
+    if (!isSubscription) {
+      const requestedSlugs = items.map((i: any) => i.id);
+      const { data: existingPurchases } = await supabase
+        .from('purchases')
+        .select('video_slug')
+        .eq('user_id', authUser.id)
+        .in('video_slug', requestedSlugs);
+
+      if (existingPurchases && existingPurchases.length > 0) {
+        return new Response(JSON.stringify({ 
+          error: 'Sie besitzen bereits Artikel, die sich in Ihrem Warenkorb befinden. Bitte entfernen Sie diese vor dem Bezahlen.' 
+        }), { status: 400 });
+      }
+    }
+
     // 1. Stripe Customer erstellen
     const customer = await stripe.customers.create({
       email: authUser.email,
@@ -148,23 +164,61 @@ export const POST: APIRoute = async ({ request, cookies }) => {
            to: [authUser.email!],
            subject: 'Erfolgreiche Anmeldung / Bestellung',
            html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden;">
-              <div style="background-color: #05183a; padding: 20px; text-align: center;">
-                <h1 style="color: white; margin: 0; font-size: 20px;">AK Kommunal Plattform</h1>
-              </div>
-              <div style="padding: 30px; background-color: #ffffff;">
-                <h2 style="color: #05183a; margin-top: 0;">Vielen Dank für Ihre Buchung!</h2>
-                <p style="color: #4b5563; line-height: 1.6;">Guten Tag ${userData.vorname || ''} ${userData.nachname || ''},<br><br>Ihre Buchung war erfolgreich. Die Rechnung haben wir Ihnen aus unserem Stripe-System separat zukommen lassen.</p>
-                <div style="background-color: #f3f4f6; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                  <p style="margin: 0 0 10px 0; color: #374151;"><strong>Ihre gebuchten Inhalte:</strong></p>
-                  <ul style="margin: 0; color: #374151; padding-left: 20px;">
-                    ${itemListHtml}
-                  </ul>
-                </div>
-                <p style="color: #4b5563; line-height: 1.6;">Die Inhalte sind ab sofort in Ihrem persönlichen Dashboard freigeschaltet.</p>
-                <a href="${new URL(request.url).origin}/app/dashboard" style="display: inline-block; background-color: #05183a; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; margin-top: 10px;">Zum Fachportal</a>
-              </div>
-            </div>
+                <!DOCTYPE html>
+                <html>
+                <head>
+                  <meta charset="utf-8">
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                </head>
+                <body style="margin: 0; padding: 40px 20px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f3f4f6; -webkit-font-smoothing: antialiased;">
+                  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);">
+                    <!-- Header -->
+                    <tr>
+                      <td style="background-color: #05183a; padding: 30px 40px; text-align: center;">
+                        <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px;">AK Kommunal Plattform</h1>
+                      </td>
+                    </tr>
+                    
+                    <!-- Content -->
+                    <tr>
+                      <td style="padding: 40px;">
+                        <h2 style="color: #05183a; margin-top: 0; margin-bottom: 20px; font-size: 20px; font-weight: 700;">Vielen Dank für Ihre Buchung!</h2>
+                        <p style="color: #4b5563; line-height: 1.6; margin: 0 0 24px 0; font-size: 16px;">Guten Tag ${userData.vorname || ''} ${userData.nachname || ''},<br><br>herzlichen Glückwunsch, Ihre Buchung (Kauf auf Rechnung) war erfolgreich. Die Rechnung für Ihre Unterlagen haben wir Ihnen aus unserem Stripe-System soeben separat an Sie versendet.</p>
+                        
+                        <!-- Order Summary Box -->
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 30px;">
+                          <tr>
+                            <td style="padding: 20px;">
+                              <p style="margin: 0 0 12px 0; color: #0f172a; font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px;">Ihre gebuchten Inhalte:</p>
+                              <ul style="margin: 0; color: #475569; padding-left: 20px; line-height: 1.6; font-size: 15px;">
+                                ${itemListHtml}
+                              </ul>
+                            </td>
+                          </tr>
+                        </table>
+
+                        <p style="color: #4b5563; line-height: 1.6; margin: 0 0 30px 0; font-size: 16px;">Ihre Weiterbildungsinhalte wurden Ihrem Konto zugewiesen und sind <strong>ab sofort</strong> in Ihrem persönlichen Dashboard für Sie abrufbar.</p>
+                        
+                        <!-- CTA Button -->
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                          <tr>
+                            <td align="center">
+                              <a href="${new URL(request.url).origin}/app/dashboard" style="display: inline-block; background-color: #f8981d; color: #ffffff; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 2px 4px rgba(248, 152, 29, 0.2);">Jetzt zum Fachportal</a>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                      <td style="background-color: #f8fafc; padding: 24px 40px; text-align: center; border-top: 1px solid #f1f5f9;">
+                        <p style="color: #94a3b8; font-size: 13px; margin: 0; line-height: 1.5;">Sie haben Fragen zu Ihrer Buchung oder Rechnung?<br>Antworten Sie einfach auf diese E-Mail oder kontaktieren Sie unseren Support.</p>
+                      </td>
+                    </tr>
+                  </table>
+                </body>
+                </html>
            `
         });
       } catch (err) {

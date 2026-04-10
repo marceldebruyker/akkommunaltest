@@ -30,100 +30,67 @@ import MembershipSection from '../components/MembershipSection.astro';
     </div>
 
     <!-- Interactive Membership Pricing (Reusing the Component) -->
-    <div class="animate-[fadeInUp_1s_ease-out_0.2s_both] relative z-10 -mt-16">
+    <div class="animate-[fadeInUp_1s_ease-out_0.2s_both] relative z-10 mt-8">
       <MembershipSection />
     </div>
 
-    <!-- Dedicated Application Form -->
-    <div class="max-w-3xl mx-auto px-6 lg:px-10 relative z-10 mt-12 animate-[fadeInUp_1s_ease-out_0.4s_both]">
-      
-      <div class="bg-surface-container-lowest p-8 md:p-12 rounded-3xl shadow-sm border border-outline-variant/30">
-        <h3 class="text-2xl font-bold font-headline text-primary mb-2">Verbindliche Anmeldung</h3>
-        <p class="text-on-surface-variant text-sm mb-8 font-light">
-          Füllen Sie das Formular aus, um sich für die AK Kommunal Plattform im Jahr 2026 zu registrieren. 
-          Wir setzen uns zeitnah mit Ihnen in Verbindung und stellen Ihre Rechnung aus.
-        </p>
-
-        <form class="space-y-6" id="signup-form">
-          <!-- Selection -->
-          <div>
-            <label class="block text-xs font-bold text-on-surface tracking-widest mb-3 uppercase">Gewünschtes Paket *</label>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <label class="flex items-center gap-3 p-4 border border-outline-variant/40 rounded-xl cursor-pointer hover:bg-surface transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
-                <input type="radio" name="package" value="grundlagen" class="text-primary w-4 h-4 focus:ring-primary" required>
-                <div>
-                  <div class="font-bold text-sm text-primary">Grundlagen Modul</div>
-                  <div class="text-xs text-on-surface-variant">500 € / Jahr</div>
-                </div>
-              </label>
-              
-              <label class="flex items-center gap-3 p-4 border border-outline-variant/40 rounded-xl cursor-pointer hover:bg-surface transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
-                <input type="radio" name="package" value="spezialthemen" class="text-primary w-4 h-4 focus:ring-primary">
-                <div>
-                  <div class="font-bold text-sm text-primary">Spezialthemen Modul</div>
-                  <div class="text-xs text-on-surface-variant">700 € / Jahr</div>
-                </div>
-              </label>
-
-              <label class="flex items-center gap-3 p-4 border border-outline-variant/40 rounded-xl cursor-pointer hover:bg-surface transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
-                <input type="radio" name="package" value="praktiker" class="text-primary w-4 h-4 focus:ring-primary">
-                <div>
-                  <div class="font-bold text-sm text-primary">Praktiker Modul</div>
-                  <div class="text-xs text-on-surface-variant">1.200 € / Jahr</div>
-                </div>
-              </label>
-
-              <label class="flex items-center gap-3 p-4 border border-primary-fixed-dim/50 rounded-xl cursor-pointer hover:bg-surface transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5 relative overflow-hidden group">
-                <div class="absolute inset-0 bg-gradient-to-br from-primary-fixed-dim/10 to-transparent pointer-events-none group-has-[:checked]:opacity-100 opacity-0 transition-opacity"></div>
-                <input type="radio" name="package" value="gesamt" class="text-primary w-4 h-4 focus:ring-primary" checked>
-                <div class="relative z-10">
-                  <div class="font-bold text-sm text-primary">Gesamtpaket <span class="text-[9px] uppercase tracking-widest bg-primary-fixed-dim text-primary px-1.5 py-0.5 rounded ml-1">Empfehlung</span></div>
-                  <div class="text-xs text-on-surface-variant">1.600 € / Jahr</div>
-                </div>
-              </label>
-            </div>
+    <!-- Trust / FAQ Section (integrated layout instead of generic SaaS box) -->
+    <div class="max-w-6xl mx-auto px-6 lg:px-10 relative z-10 mt-16 pb-12 animate-[fadeInUp_1s_ease-out_0.4s_both]">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+        <div class="lg:col-span-4">
+          <div class="flex items-center gap-4 mb-4">
+            <div class="h-[2px] w-12 bg-primary"></div>
+            <h2 class="text-[10px] md:text-xs font-bold text-primary tracking-widest uppercase">
+              Informationen
+            </h2>
           </div>
+          <h3 class="text-2xl md:text-3xl font-extrabold font-headline text-primary tracking-tight leading-tight">
+            So funktioniert <br/>die Buchung
+          </h3>
+          <p class="text-on-surface-variant text-base mt-4 font-light pr-4">
+            Wählen Sie oben Ihr gewünschtes Modul aus. Per Klick auf „Jetzt buchen" gelangen Sie direkt zur sicheren Abrechnung.
+          </p>
+        </div>
+        
+        <div class="lg:col-span-8 flex flex-col gap-6">
+           <!-- Steps list in a more serious/institutional format -->
+           <div class="bg-surface-container-lowest p-8 border border-outline-variant/30 rounded-2xl flex flex-col sm:flex-row gap-6 items-start sm:items-center">
+             <div class="w-12 h-12 rounded-full border border-primary text-primary flex items-center justify-center font-bold text-lg flex-shrink-0 font-headline">1</div>
+             <div>
+               <h4 class="font-bold text-primary text-lg mb-1">Modul wählen & Daten hinterlegen</h4>
+               <p class="text-on-surface-variant text-sm font-light leading-relaxed">Klicken Sie auf „Jetzt buchen" bei Ihrem Modul und geben Sie über unsere sichere Stripe-Schnittstelle Ihre Rechnungsdaten ein.</p>
+             </div>
+           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label class="block text-[11px] font-bold text-on-surface tracking-wide mb-2 uppercase" for="vorname">Vorname *</label>
-              <input type="text" id="vorname" required class="w-full bg-surface border border-outline-variant/30 rounded-lg px-4 py-3 text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
-            </div>
-            <div>
-              <label class="block text-[11px] font-bold text-on-surface tracking-wide mb-2 uppercase" for="nachname">Nachname *</label>
-              <input type="text" id="nachname" required class="w-full bg-surface border border-outline-variant/30 rounded-lg px-4 py-3 text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
-            </div>
-          </div>
+           <div class="bg-surface-container-lowest p-8 border border-outline-variant/30 rounded-2xl flex flex-col sm:flex-row gap-6 items-start sm:items-center">
+             <div class="w-12 h-12 rounded-full border border-primary text-primary flex items-center justify-center font-bold text-lg flex-shrink-0 font-headline">2</div>
+             <div>
+               <h4 class="font-bold text-primary text-lg mb-1">Zahlungsweise wählen</h4>
+               <p class="text-on-surface-variant text-sm font-light leading-relaxed">Als B2B-Kunde können Sie bequem "Kauf auf Rechnung" (SEPA/Überweisung) wählen oder klassisch per Kreditkarte/PayPal bezahlen.</p>
+             </div>
+           </div>
 
-          <div>
-             <label class="block text-[11px] font-bold text-on-surface tracking-wide mb-2 uppercase" for="unternehmen">Institution / Kommune / Unternehmen *</label>
-             <input type="text" id="unternehmen" required class="w-full bg-surface border border-outline-variant/30 rounded-lg px-4 py-3 text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
-          </div>
+           <div class="bg-surface-container-lowest p-8 border border-outline-variant/30 rounded-2xl flex flex-col sm:flex-row gap-6 items-start sm:items-center">
+             <div class="w-12 h-12 rounded-full border border-primary text-primary flex items-center justify-center font-bold text-lg flex-shrink-0 font-headline">3</div>
+             <div>
+               <h4 class="font-bold text-primary text-lg mb-1">Sofortiger digitaler Zugang</h4>
+               <p class="text-on-surface-variant text-sm font-light leading-relaxed">Direkt nach dem Abschluss wird Ihr persönlicher Zugang freigeschaltet. Sie müssen nicht auf manuelle Bestätigungen warten.</p>
+             </div>
+           </div>
 
-          <div>
-             <label class="block text-[11px] font-bold text-on-surface tracking-wide mb-2 uppercase" for="email">E-Mail Adresse *</label>
-             <input type="email" id="email" required class="w-full bg-surface border border-outline-variant/30 rounded-lg px-4 py-3 text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all">
-          </div>
-
-          <!-- DSGVO Checkbox (Explicitly implemented based on previous feedback) -->
-          <div class="flex items-start gap-3 mt-4 p-4 rounded-xl bg-surface border border-outline-variant/20">
-            <div class="flex items-center h-5 mt-0.5">
-              <input id="dsgvo" type="checkbox" required class="w-4 h-4 text-primary bg-surface border-outline-variant/40 rounded focus:ring-primary focus:ring-2 accent-primary cursor-pointer">
-            </div>
-            <label for="dsgvo" class="text-xs text-on-surface-variant font-medium leading-relaxed cursor-pointer">
-              Ich stimme zu, dass meine Angaben aus dem Kontaktformular zur Beantwortung meiner Anfrage erhoben und verarbeitet werden. Die Daten werden nach abgeschlossener Bearbeitung gelöscht. Hinweis: Sie können Ihre Einwilligung jederzeit für die Zukunft per E-Mail widerrufen. Detaillierte Informationen zum Umgang mit Nutzerdaten finden Sie in unserer <a href="/datenschutz" class="text-primary hover:underline">Datenschutzerklärung</a>. *
-            </label>
-          </div>
-
-          <div class="pt-4 border-t border-outline-variant/20">
-             <button type="submit" class="w-full bg-primary hover:bg-primary-fixed-dim text-white text-sm font-bold uppercase tracking-widest px-8 py-4 rounded-xl transition-all shadow-md group flex items-center justify-center gap-2">
-                Jetzt kostenpflichtig buchen
-                <span class="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">arrow_forward</span>
-             </button>
-             <p class="text-center text-[10px] text-on-surface-variant mt-3 font-medium">B2B Angebot: Alle Preise zzgl. USt. Es gelten unsere AGB.</p>
-          </div>
-        </form>
-
+           <div class="flex items-center gap-6 mt-4 text-xs text-on-surface-variant font-medium">
+             <div class="flex items-center gap-2">
+               <span class="material-symbols-outlined text-[16px] text-primary">verified</span>
+               SSL-Datenübertragung
+             </div>
+             <div class="flex items-center gap-2">
+               <span class="material-symbols-outlined text-[16px] text-primary">shield</span>
+               DSGVO-konform
+             </div>
+           </div>
+           
+           <p class="text-[10px] text-on-surface-variant/70 mt-2">Alle Preise verstehen sich zzgl. gesetzlicher USt. Es gelten unsere <a href="/agb" class="text-primary hover:underline">AGB</a>.</p>
+        </div>
       </div>
     </div>
   </main>
@@ -131,34 +98,8 @@ import MembershipSection from '../components/MembershipSection.astro';
   <FooterSection />
 </Layout>
 
-<script>
-  // Add smooth scroll behavior to MembershipSection buttons so they link down to the form
-  document.addEventListener('DOMContentLoaded', () => {
-    const membershipButtons = document.querySelectorAll('section button');
-    
-    membershipButtons.forEach((btn, index) => {
-      // We know there are 4 buttons in MembershipSection (Grundlagen, Spezial, Praktiker, Gesamt)
-      // Let's bind them to also select the right radio button
-      const packages = ['grundlagen', 'spezialthemen', 'praktiker', 'gesamt'];
-      
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        
-        // Select corresponding radio
-        if(packages[index]) {
-          const radioBtn = document.querySelector(`input[value="${packages[index]}"]`) as HTMLInputElement;
-          if (radioBtn) radioBtn.checked = true;
-        }
 
-        // Scroll to form
-        const form = document.getElementById('signup-form');
-        if (form) {
-          form.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      });
-    });
-  });
-</script>
+
 
 <style>
   @keyframes fadeInUp {

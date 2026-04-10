@@ -57,6 +57,22 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     // Fetch safe products from Sanity
     const sanityProducts = await sanityClient.fetch(`*[_type == "seminar"]{ "id": slug.current, title, price }`);
 
+    // Prevent Duplicate Purchases (Verhindern von Mehrfachkäufen)
+    if (!isSubscription) {
+      const requestedSlugs = items.map((i: any) => i.id);
+      const { data: existingPurchases } = await supabase
+        .from('purchases')
+        .select('video_slug')
+        .eq('user_id', authUser.id)
+        .in('video_slug', requestedSlugs);
+
+      if (existingPurchases && existingPurchases.length > 0) {
+        return new Response(JSON.stringify({ 
+          error: 'Sie besitzen bereits Artikel, die sich in Ihrem Warenkorb befinden. Bitte entfernen Sie diese vor dem Bezahlen.' 
+        }), { status: 400 });
+      }
+    }
+
     // 4. Checkout Session generieren
     const sessionConfig: any = {
       mode: isSubscription ? 'subscription' : 'payment',

@@ -22,6 +22,19 @@ export const blog = defineType({
       type: 'datetime',
     }),
     defineField({
+      name: 'category',
+      title: 'Kategorie',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Rechtsprechung', value: 'Rechtsprechung' },
+          { title: 'Event', value: 'Event' },
+          { title: 'Neuigkeit', value: 'Neuigkeit' },
+        ],
+      },
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
       name: 'excerpt',
       title: 'Zusammenfassung (Kurz)',
       type: 'text',

@@ -127,7 +127,7 @@ export default function MembershipConfigurator() {
               </div>
               <p className="text-xs text-on-surface-variant mb-6 font-medium">{mod.description}</p>
               
-              <ul className="text-xs space-y-4 mb-8 flex-1">
+              <ul className="text-xs space-y-4 mb-6 flex-1">
                 {mod.benefits.map((ben, i) => (
                   <li key={i} className="flex items-start gap-2">
                     <span className="material-symbols-outlined text-xs text-primary bg-primary/10 rounded-full p-0.5">check</span> 
@@ -135,6 +135,16 @@ export default function MembershipConfigurator() {
                   </li>
                 ))}
               </ul>
+              <button
+                onClick={(e) => { e.stopPropagation(); setSelectedModules([mod.id]); setIsGesamtpaket(false); setTimeout(() => { const planQuery = mod.id; if (cart.length > 0) { const confirmClear = window.confirm('Hinweis: Sie haben Einzelvideos im Warenkorb. Wenn Sie Module abonnieren, wird dieser geleert.\n\nMöchten Sie fortfahren?'); if (!confirmClear) return; clearCart(); } window.location.href = `/kasse?abo=${planQuery}`; }, 50); }}
+                className={`w-full py-3 rounded-xl text-sm font-bold transition-all ${
+                  isSelected
+                    ? 'bg-primary text-white shadow-md hover:bg-primary/90'
+                    : 'bg-primary/10 text-primary hover:bg-primary hover:text-white'
+                }`}
+              >
+                Jetzt buchen →
+              </button>
             </div>
           );
         })}
@@ -164,7 +174,7 @@ export default function MembershipConfigurator() {
           </div>
           <p className="text-xs text-white/80 mb-6 font-medium">{GESAMTPAKET.description}</p>
           
-          <ul className="text-xs space-y-4 mb-8 flex-1">
+          <ul className="text-xs space-y-4 mb-6 flex-1">
             {GESAMTPAKET.benefits.map((ben, i) => (
               <li key={i} className="flex items-start gap-2">
                 <span className="material-symbols-outlined text-xs text-primary-fixed-dim bg-primary-fixed-dim/20 rounded-full p-0.5">check</span> 
@@ -172,6 +182,16 @@ export default function MembershipConfigurator() {
               </li>
             ))}
           </ul>
+          <button
+            onClick={(e) => { e.stopPropagation(); setIsGesamtpaket(true); setSelectedModules([]); setTimeout(() => { if (cart.length > 0) { const confirmClear = window.confirm('Hinweis: Sie haben Einzelvideos im Warenkorb. Wenn Sie Module abonnieren, wird dieser geleert.\n\nMöchten Sie fortfahren?'); if (!confirmClear) return; clearCart(); } window.location.href = '/kasse?abo=gesamt'; }, 50); }}
+            className={`w-full py-3 rounded-xl text-sm font-bold transition-all ${
+              isGesamtpaket
+                ? 'bg-white text-primary shadow-md hover:bg-white/90'
+                : 'bg-white/20 text-white hover:bg-white hover:text-primary border border-white/30'
+            }`}
+          >
+            Gesamtpaket buchen →
+          </button>
         </div>
       </div>
 
