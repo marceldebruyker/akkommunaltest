@@ -89,24 +89,37 @@ export const POST: APIRoute = async ({ request }) => {
     let emailContent = '';
 
     if (emailType === 'ticket_invitation') {
-      subject = `Offizielle Einladung: ${seminar.title}`;
+      subject = `Einladung: Webinar „${seminar.title}“`;
       emailContent = `
-        <h2 style="color: #05183a; margin-top: 0; margin-bottom: 20px; font-size: 20px;">Ihre Einladung: ${seminar.title}</h2>
-        <p style="color: #4b5563; line-height: 1.6; margin: 0 0 24px 0; font-size: 16px;">Guten Tag, <br><br>hiermit laden wir Sie herzlich zu unserer kommenden Weiterbildung ein. Bitte notieren Sie sich den folgenden Termin in Ihrem Kalender:</p>
-                  
+        <h2 style="color: #05183a; margin-top: 0; margin-bottom: 20px; font-size: 20px;">Einladung zum Webinar</h2>
+        <p style="color: #4b5563; line-height: 1.6; margin: 0 0 24px 0; font-size: 16px;">Sehr geehrte Damen und Herren,<br><br>herzlich möchten wir Sie zu unserem nächsten Webinar <strong>„${seminar.title}“</strong> einladen.</p>
+
+        <!-- Dynamic Sanity Content (Thema / Inhalte) -->
+        ${seminar.description ? `<div style="color: #4b5563; line-height: 1.6; margin: 0 0 24px 0; font-size: 15px;">${seminar.description.replace(/\\n/g, '<br>')}</div>` : ''}
+
         <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 30px;">
           <tr>
              <td style="padding: 20px;">
-               <p style="margin: 0 0 10px 0; color: #0f172a; font-weight: 700; font-size: 16px;">${seminar.title}</p>
-               <p style="margin: 0 0 10px 0; color: #f8981d; font-weight: 600; font-size: 15px;">🗓️ ${formattedDate} Uhr</p>
-               ${seminar.duration ? `<p style="margin: 0; color: #64748b; font-size: 14px;">⏱️ Dauer: ca. ${seminar.duration}</p>` : ''}
+               <p style="margin: 0; color: #0f172a; font-weight: 700; font-size: 16px;">🗓️ Termin: ${formattedDate} Uhr</p>
               </td>
             </tr>
         </table>
-
-        ${seminar.description ? `<p style="color: #4b5563; line-height: 1.6; margin: 0 0 30px 0; font-size: 15px;"><strong>Darum geht es:</strong><br>${seminar.description}</p>` : ''}
-                  
-        <p style="color: #4b5563; line-height: 1.6; margin: 30px 0 0 0; font-size: 14px;"><strong>Hinweis zur Einwahl:</strong> Die genauen MS-Teams Einwahldaten senden wir Ihnen kurz vor der Veranstaltung separat und aktuell an diese E-Mail-Adresse zu.</p>
+        
+        <p style="color: #4b5563; line-height: 1.6; margin: 0 0 24px 0; font-size: 15px;">Die Teilnahmegebühr für das Webinar beträgt <strong>${seminar.price ? seminar.price : '260'} Euro</strong> zuzüglich Umsatzsteuer.</p>
+        
+        <p style="color: #4b5563; line-height: 1.6; margin: 0 0 16px 0; font-size: 15px;">Die Anmeldung für das Webinar können Sie gerne unter dem folgenden Link vornehmen:</p>
+        
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 30px;">
+          <tr>
+            <td align="left">
+              <a href="${new URL(request.url).origin}/termine/${seminar.slug}" style="display: inline-block; background-color: #f8981d; color: #ffffff; padding: 14px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 15px; box-shadow: 0 2px 4px rgba(248, 152, 29, 0.2);">ANMELDUNG: ${seminar.title}</a>
+            </td>
+          </tr>
+        </table>
+        
+        <p style="color: #4b5563; line-height: 1.6; margin: 0 0 30px 0; font-size: 14px; background-color: #f1f5f9; padding: 15px; border-radius: 8px;">Für Mitglieder des Arbeitskreises Kommunal ist die Teilnahme in der Jahresgebühr bereits enthalten (Spezialthemen-Modul oder Modul Gesamtpaket). Eine Anmeldung über den Link ist nicht erforderlich.</p>
+        
+        <p style="color: #4b5563; line-height: 1.6; margin: 0; font-size: 15px;">Wir freuen uns auf Ihre Anmeldung und Ihre Teilnahme an unserem Webinar.<br><br>Freundliche Grüße aus Stuttgart<br><br>i. A. Freya Marx<br>Assistentin<br><br><strong>BW PARTNER</strong><br>Telefon +49 711 1640 1650<br>E-Mail <a href="mailto:seminare@bw-partner.com" style="color: #3b82f6;">seminare@bw-partner.com</a></p>
       `;
     } else {
       // DEFAULT: teams_link
