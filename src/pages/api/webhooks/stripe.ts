@@ -67,7 +67,15 @@ export const POST: APIRoute = async ({ request }) => {
             
             const senderEmail = 'noreply@debruyker.de';
 
-            const customerNamePart = session.customer_details?.name ? ` ${session.customer_details.name},` : ',';
+            let salutationString = session.customer_details?.name ? `${session.customer_details.name}` : '';
+            if (userId) {
+              const { data: { user } } = await supabaseAdmin.auth.admin.getUserById(userId);
+              if (user?.user_metadata?.salutation_string) {
+                salutationString = user.user_metadata.salutation_string;
+              }
+            }
+
+            const customerNamePart = salutationString ? ` ${salutationString},` : ',';
 
             await resend.emails.send({
               from: `AK Kommunal Plattform <${senderEmail}>`,

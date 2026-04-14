@@ -156,6 +156,14 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
       const itemListHtml = items.map((i: any) => `<li><strong>${i.title}</strong></li>`).join('');
 
+      let salutationString = `${userData?.vorname || ''} ${userData?.nachname || ''}`.trim();
+      if (authUser?.user_metadata?.salutation_string) {
+         salutationString = authUser.user_metadata.salutation_string;
+      } else if (authUser?.user_metadata?.first_name) {
+         salutationString = `${authUser.user_metadata.first_name} ${authUser.user_metadata.last_name || ''}`.trim();
+      }
+      const customerNamePart = salutationString ? ` ${salutationString},` : ',';
+
       try {
         await resend.emails.send({
            from: `AK Kommunal Plattform <${senderEmail}>`,
@@ -181,7 +189,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
                     <tr>
                       <td style="padding: 40px;">
                         <h2 style="color: #05183a; margin-top: 0; margin-bottom: 20px; font-size: 20px; font-weight: 700;">Vielen Dank für Ihre Buchung!</h2>
-                        <p style="color: #4b5563; line-height: 1.6; margin: 0 0 24px 0; font-size: 16px;">Guten Tag ${userData.vorname || ''} ${userData.nachname || ''},<br><br>herzlichen Glückwunsch, Ihre Buchung (Kauf auf Rechnung) war erfolgreich. Die Rechnung für Ihre Unterlagen haben wir Ihnen aus unserem Stripe-System soeben separat an Sie versendet.</p>
+                        <p style="color: #4b5563; line-height: 1.6; margin: 0 0 24px 0; font-size: 16px;">Guten Tag${customerNamePart}<br><br>herzlichen Glückwunsch, Ihre Buchung (Kauf auf Rechnung) war erfolgreich. Die Rechnung für Ihre Unterlagen haben wir Ihnen aus unserem Stripe-System soeben separat an Sie versendet.</p>
                         
                         <!-- Order Summary Box -->
                         <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 30px;">
