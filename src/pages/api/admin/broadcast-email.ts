@@ -170,11 +170,25 @@ export const POST: APIRoute = async ({ request }) => {
           <head><meta charset="utf-8"></head>
           <body style="margin: 0; padding: 40px 20px; font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; background-color: #f3f4f6;">
             <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+              <!-- Top-Notch Premium Header: Logo + Typographie -->
               <tr>
-                <td style="background-color: #05183a; padding: 30px 40px; text-align: center;">
-                  <h1 style="color: #ffffff; margin: 0; font-size: 24px; font-weight: 800;">AK Kommunal Plattform</h1>
+                <td style="background-color: #ffffff; padding: 40px 40px 30px 40px; text-align: left; border-bottom: 2px solid #f1f5f9;">
+                  <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                    <tr>
+                      <!-- Lion Logo (Square) -->
+                      <td width="48" style="padding-right: 16px; vertical-align: middle;">
+                        <img src="${new URL(request.url).origin}/email-lion.svg" alt="AK Kommunal Logo" width="48" height="48" style="display: block; width: 48px; height: 48px; border: none;" />
+                      </td>
+                      <!-- Brand Typography -->
+                      <td style="vertical-align: middle;">
+                         <div style="font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; font-size: 24px; font-weight: 800; color: #05183a; letter-spacing: -0.5px; line-height: 1.1; margin: 0;">AK Kommunal</div>
+                         <div style="font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; font-size: 9px; font-weight: 600; color: #878787; text-transform: uppercase; letter-spacing: 0.18em; margin-top: 4px; line-height: 1;">Eine Marke von BW Partner</div>
+                      </td>
+                    </tr>
+                  </table>
                 </td>
               </tr>
+              <!-- Content Area -->
               <tr>
                 <td style="padding: 40px;">
                   ${emailContent}
