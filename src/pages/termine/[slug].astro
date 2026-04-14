@@ -3,6 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import TopNavBar from '../../components/TopNavBar.astro';
 import FooterSection from '../../components/FooterSection.astro';
 import BuyVideoButton from '../../components/BuyVideoButton.tsx';
+import SanityPortableText from '../../components/SanityPortableText.tsx';
 import { sanityClient } from '../../lib/sanity';
 import { getSupabaseServer } from '../../lib/supabase';
 
@@ -82,9 +83,15 @@ if (user) {
           {seminar.title}
         </h1>
 
-        <p class="text-xl md:text-2xl font-light text-on-surface-variant max-w-3xl leading-relaxed">
-          {seminar.description || 'Ein exklusives Live-Webinar der AK Kommunal.'}
-        </p>
+        <div class="text-xl md:text-2xl font-light text-on-surface-variant max-w-3xl leading-relaxed">
+          {typeof seminar.description === 'string' ? (
+            <p className="whitespace-pre-line">{seminar.description || 'Ein exklusives Live-Webinar der AK Kommunal.'}</p>
+          ) : Array.isArray(seminar.description) ? (
+            <SanityPortableText value={seminar.description} />
+          ) : (
+            <p className="whitespace-pre-line">Ein exklusives Live-Webinar der AK Kommunal.</p>
+          )}
+        </div>
     </div>
 
     <!-- Details Content Grid -->

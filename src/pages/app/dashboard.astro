@@ -1,7 +1,7 @@
 ---
 import AppLayout from '../../layouts/AppLayout.astro';
 import { getSupabaseServer } from '../../lib/supabase';
-import { sanityClient } from '../../lib/sanity';
+import { sanityClient, extractPlainTextFromPortableText } from '../../lib/sanity';
 
 const supabase = getSupabaseServer(Astro.request, Astro.cookies);
 const { data: { user } } = await supabase.auth.getUser();
@@ -128,7 +128,7 @@ const newSeminars = userSeminars.slice(1, 4);
               <div class="p-8 flex-1 flex flex-col justify-center">
                 <span class="text-[10px] uppercase font-bold text-[#05183a] tracking-widest mb-3 bg-[#05183a]/5 px-3 py-1 rounded-md border border-[#05183a]/10 w-fit">{recentSeminar.moduleName}</span>
                 <h3 class="text-2xl font-bold font-headline text-[#05183a] mb-3 leading-tight group-hover:text-blue-600 transition-colors">{recentSeminar.title}</h3>
-                <p class="text-sm text-gray-500 mb-6 line-clamp-2">{recentSeminar.description}</p>
+                <p class="text-sm text-gray-500 mb-6 line-clamp-2">{extractPlainTextFromPortableText(recentSeminar.description)}</p>
                 <div class="font-semibold text-blue-600 flex items-center gap-2 group-hover:gap-4 transition-all text-sm">Jetzt ansehen <span class="material-symbols-outlined text-[18px]">arrow_forward</span></div>
               </div>
             </a>

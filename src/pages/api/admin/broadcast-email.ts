@@ -111,7 +111,21 @@ export const POST: APIRoute = async ({ request }) => {
               <p style="color: #4b5563; line-height: 1.6; margin: 0 0 24px 0; font-size: 16px;">Guten Tag${salutationString}<br><br>herzlich möchten wir Sie zu unserem nächsten Webinar <strong>„${seminar.title}“</strong> einladen.</p>
 
               <!-- Dynamic Sanity Content (Thema / Inhalte) -->
-              ${seminar.description ? `<div style="color: #4b5563; line-height: 1.6; margin: 0 0 24px 0; font-size: 15px;">${seminar.description.replace(/\n/g, '<br>')}</div>` : ''}
+              ${(() => {
+                if (!seminar.description) return '';
+                let htmlDesc = '';
+                if (typeof seminar.description === 'string') {
+                  htmlDesc = seminar.description.replace(/\n/g, '<br>');
+                } else if (Array.isArray(seminar.description)) {
+                  htmlDesc = seminar.description.map((b: any) => {
+                    if (b._type !== 'block' || !b.children) return '';
+                    let text = b.children.map((c: any) => (c.marks && c.marks.length > 0) ? `<strong>${c.text}</strong>` : c.text).join('');
+                    if (b.listItem === 'bullet') return `<li style="margin-left: 20px;">${text}</li>`;
+                    return `<p style="margin-bottom: 8px;">${text}</p>`;
+                  }).join('');
+                }
+                return `<div style="color: #4b5563; line-height: 1.6; margin: 0 0 24px 0; font-size: 15px;">${htmlDesc}</div>`;
+              })()}
 
               <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 30px;">
                 <tr>

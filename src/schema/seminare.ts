@@ -24,7 +24,8 @@ export const seminar = defineType({
     defineField({
       name: 'description',
       title: 'Beschreibung',
-      type: 'text',
+      type: 'array',
+      of: [{ type: 'block' }],
     }),
     defineField({
       name: 'moduleName',

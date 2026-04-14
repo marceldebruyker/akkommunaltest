@@ -2,6 +2,7 @@
 import AppLayout from '../../../layouts/AppLayout.astro';
 import { sanityClient } from '../../../lib/sanity';
 import { getSupabaseServer } from '../../../lib/supabase';
+import SanityPortableText from '../../../components/SanityPortableText.tsx';
 
 const { slug } = Astro.params;
 
@@ -133,7 +134,13 @@ if (video.bunnyVideoId) {
     </div>
 
     <div class="prose prose-lg max-w-none text-gray-600 font-light leading-relaxed">
-      <p>{video.description || 'Keine weitere Beschreibung hinterlegt.'}</p>
+      {typeof video.description === 'string' ? (
+        <p className="whitespace-pre-line">{video.description || 'Keine weitere Beschreibung hinterlegt.'}</p>
+      ) : Array.isArray(video.description) ? (
+        <SanityPortableText value={video.description} />
+      ) : (
+        <p>Keine weitere Beschreibung hinterlegt.</p>
+      )}
     </div>
 
   </div>

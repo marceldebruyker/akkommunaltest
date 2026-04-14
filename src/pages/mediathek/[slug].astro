@@ -3,6 +3,7 @@ import Layout from '../../layouts/Layout.astro';
 import TopNavBar from '../../components/TopNavBar.astro';
 import FooterSection from '../../components/FooterSection.astro';
 import BuyVideoButton from '../../components/BuyVideoButton.tsx';
+import SanityPortableText from '../../components/SanityPortableText.tsx';
 import { sanityClient } from '../../lib/sanity';
 import { getSupabaseServer } from '../../lib/supabase';
 
@@ -72,7 +73,11 @@ if (user) {
         </h1>
 
         <p class="text-xl md:text-2xl font-light text-on-surface-variant max-w-3xl leading-relaxed">
-          {video.description}
+          {typeof video.description === 'string' ? (
+            <p className="whitespace-pre-line">{video.description}</p>
+          ) : Array.isArray(video.description) ? (
+            <SanityPortableText value={video.description} />
+          ) : null}
         </p>
     </div>
 

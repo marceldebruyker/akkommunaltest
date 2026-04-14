@@ -3,7 +3,7 @@ import Layout from '../layouts/Layout.astro';
 import TopNavBar from '../components/TopNavBar.astro';
 import FooterSection from '../components/FooterSection.astro';
 import BuyVideoButton from '../components/BuyVideoButton.tsx';
-import { sanityClient } from '../lib/sanity';
+import { sanityClient, extractPlainTextFromPortableText } from '../lib/sanity';
 
 export const prerender = false;
 
@@ -162,8 +162,8 @@ function formatDate(iso: string) {
                          </h3>
                          <div class="text-[13px] font-bold text-primary-fixed-dim mb-2">{seminar.moduleName}</div>
                          {seminar.description && (
-                           <p class="text-[14px] text-on-surface-variant font-light leading-relaxed">
-                             {seminar.description}
+                           <p class="text-[14px] text-on-surface-variant font-light leading-relaxed line-clamp-3">
+                             {extractPlainTextFromPortableText(seminar.description)}
                            </p>
                          )}
                       </div>
