@@ -84,7 +84,8 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(JSON.stringify({ error: 'Konnte keine E-Mail Adressen zu den Berechtigten finden.' }), { status: 400 });
     }
 
-    // 5. E-Mail Massenversand (Broadcast) form    const resend = new Resend(resendKey);
+    // 5. E-Mail Massenversand (Broadcast) formatieren
+    const resend = new Resend(resendKey);
     const senderEmail = 'noreply@debruyker.de';
 
     // Formatted Date
