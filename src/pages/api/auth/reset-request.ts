@@ -39,32 +39,39 @@ export const POST: APIRoute = async ({ request, redirect, url }) => {
         <html>
         <head>
           <style>
-            body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f8f9fa; margin: 0; padding: 40px; }
-            .container { background-color: #ffffff; max-width: 600px; margin: 0 auto; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.05); }
-            .header { background-color: #0a152e; padding: 30px 40px; text-align: center; }
-            .header h1 { color: #ffffff; margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.5px; }
-            .content { padding: 40px; color: #334155; line-height: 1.6; }
-            .content h2 { margin-top: 0; color: #0f172a; font-size: 20px; }
-            .button { display: inline-block; background-color: #0a152e; color: #ffffff !important; text-decoration: none; padding: 14px 28px; border-radius: 6px; font-weight: 600; font-size: 14px; margin: 20px 0; text-transform: uppercase; letter-spacing: 0.05em; }
-            .footer { background-color: #f1f5f9; padding: 20px 40px; font-size: 12px; color: #64748b; text-align: center; border-top: 1px solid #e2e8f0; }
+            body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: #f3f4f6; margin: 0; padding: 40px 20px; -webkit-font-smoothing: antialiased; }
+            .container { background-color: #ffffff; max-width: 600px; margin: 0 auto; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+            .header { background-color: #05183a; padding: 40px 20px; text-align: center; }
+            .header h1 { color: #ffffff; margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
+            .content { padding: 40px; color: #4b5563; line-height: 1.6; }
+            .content h2 { margin-top: 0; color: #05183a; font-size: 22px; font-weight: 800; mb-4; }
+            .button { display: inline-block; background-color: #f59e0b; color: #ffffff !important; text-decoration: none; padding: 16px 32px; border-radius: 8px; font-weight: 700; font-size: 16px; margin: 30px 0; }
+            .footer { background-color: #f8fafc; padding: 30px 40px; font-size: 13px; color: #94a3b8; text-align: center; border-top: 1px solid #f1f5f9; }
+            .copy-link { font-size: 13px; margin-top: 30px; line-height: 1.5; color: #64748b; }
+            .copy-link a { color: #3b82f6; text-decoration: underline; word-break: break-all; }
           </style>
         </head>
         <body>
           <div class="container">
             <div class="header">
-              <h1>AK Kommunal Fachportal</h1>
+              <h1>AK Kommunal Plattform</h1>
             </div>
             <div class="content">
               <h2>Passwort zurücksetzen</h2>
               <p>Guten Tag,</p>
-              <p>Es wurde eine Anfrage gestellt, um das Passwort für Ihr AK Kommunal Fachportal zurückzusetzen. Klicken Sie auf den folgenden Button, um ein neues Passwort zu vergeben:</p>
+              <p>Es wurde eine Anfrage gestellt, um das Passwort für Ihr AK Kommunal Fachportal zurückzusetzen. Klicken Sie auf den folgenden Button, um ein neues sicheres Passwort zu vergeben:</p>
               <div style="text-align: center;">
-                <a href="${actionUrl}" class="button">Neues Passwort vergeben</a>
+                <a href="${actionUrl}" class="button">Passwort jetzt ändern</a>
               </div>
-              <p style="font-size: 13px; color: #64748b; margin-top: 30px;">Falls Sie diese Anfrage nicht gestellt haben, können Sie diese E-Mail sicher ignorieren. Ihr aktuelles Passwort bleibt bestehen.</p>
+              
+              <div class="copy-link">
+                Alternativ können Sie auch diesen Link markieren und manuell in Ihren Browser kopieren:<br>
+                <a href="${actionUrl}">${actionUrl}</a>
+              </div>
             </div>
             <div class="footer">
-              <p>© 2026 AK Kommunal. Eine Marke der BW Partner Gruppe.</p>
+              Sie haben diese Passwort-Änderung nicht in die Wege geleitet?<br>
+              Dann können Sie diese E-Mail einfach ignorieren. Ihr aktuelles Passwort bleibt weiterhin gültig.
             </div>
           </div>
         </body>
