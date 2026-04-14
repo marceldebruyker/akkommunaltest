@@ -11,8 +11,17 @@ const { data: { user } } = await supabase.auth.getUser();
 const email = user?.email || 'Gast';
 const firstName = user?.user_metadata?.first_name || '';
 const lastName = user?.user_metadata?.last_name || '';
-const displayName = firstName ? `${firstName} ${lastName}` : email;
+const salutationString = user?.user_metadata?.salutation_string || '';
+const displayName = salutationString || (lastName ? `Herr/Frau ${lastName}` : (firstName ? `${firstName} ${lastName}` : email));
 const initials = firstName ? `${firstName.charAt(0)}${lastName?.charAt(0) || ''}` : email.charAt(0).toUpperCase();
+
+let timeGreeting = "Guten Tag";
+try {
+  const hourString = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Berlin', hour: 'numeric', hour12: false }).format(new Date());
+  const hour = parseInt(hourString, 10);
+  if (hour >= 5 && hour < 11) timeGreeting = "Guten Morgen";
+  else if (hour >= 18 || hour < 5) timeGreeting = "Guten Abend";
+} catch(e) {}
 
 // We can pass user info to slots if needed via locals, or components just use their own fetches.
 ---
@@ -66,7 +75,7 @@ const initials = firstName ? `${firstName.charAt(0)}${lastName?.charAt(0) || ''}
       <header class="h-16 bg-white border-b border-[#e5e7eb] flex items-center justify-between px-8 flex-shrink-0 z-10 w-full shadow-sm">
         <div class="flex items-center gap-4 text-gray-400">
            <span class="material-symbols-outlined cursor-pointer hover:text-[#05183a] transition-colors">menu</span>
-           <span class="text-sm font-medium text-gray-800">Guten Tag, {displayName}</span>
+           <span class="text-sm font-medium text-gray-800">{timeGreeting}, {displayName}</span>
         </div>
         <div class="flex items-center gap-4">
 
