@@ -128,7 +128,7 @@ export const POST: APIRoute = async ({ request }) => {
               <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 30px;">
                 <tr>
                   <td align="left">
-                    <a href="${new URL(request.url).origin}/termine/${seminar.slug}" style="display: inline-block; background-color: #f8981d; color: #ffffff; padding: 14px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 15px; box-shadow: 0 2px 4px rgba(248, 152, 29, 0.2);">ANMELDUNG: ${seminar.title}</a>
+                    <a href="${new URL(request.url).origin}/termine/${seminar.slug}" style="display: inline-block; background-color: #05183a; color: #ffffff; padding: 14px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 15px; box-shadow: 0 2px 4px rgba(5, 24, 58, 0.2);">ANMELDUNG: ${seminar.title}</a>
                   </td>
                 </tr>
               </table>
@@ -148,7 +148,7 @@ export const POST: APIRoute = async ({ request }) => {
                 <tr>
                   <td style="padding: 20px;">
                      <p style="margin: 0 0 10px 0; color: #0f172a; font-weight: 700; font-size: 16px;">${seminar.title}</p>
-                     <p style="margin: 0; color: #f8981d; font-weight: 600; font-size: 15px;">🗓️ ${formattedDate} Uhr</p>
+                     <p style="margin: 0; color: #05183a; font-weight: 600; font-size: 15px;">🗓️ ${formattedDate} Uhr</p>
                   </td>
                 </tr>
               </table>
@@ -156,7 +156,7 @@ export const POST: APIRoute = async ({ request }) => {
               <table width="100%" border="0" cellspacing="0" cellpadding="0">
                 <tr>
                   <td align="center">
-                    <a href="${seminar.teamsLink}" style="display: inline-block; background-color: #f8981d; color: #ffffff; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 2px 4px rgba(248, 152, 29, 0.2);">Jetzt MS-Teams Raum beitreten</a>
+                    <a href="${seminar.teamsLink}" style="display: inline-block; background-color: #05183a; color: #ffffff; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 2px 4px rgba(5, 24, 58, 0.2);">Jetzt MS-Teams Raum beitreten</a>
                   </td>
                 </tr>
               </table>
@@ -173,17 +173,17 @@ export const POST: APIRoute = async ({ request }) => {
             <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
               <!-- Top-Notch Premium Header: Logo + Typographie -->
               <tr>
-                <td style="background-color: #ffffff; padding: 40px 40px 30px 40px; text-align: left; border-bottom: 2px solid #f1f5f9;">
+                <td style="background-color: #05183a; padding: 40px 40px 30px 40px; text-align: left;">
                   <table border="0" cellspacing="0" cellpadding="0" width="100%">
                     <tr>
                       <!-- Lion Logo (Square) -->
                       <td width="48" style="padding-right: 16px; vertical-align: middle;">
-                        <img src="${new URL(request.url).origin}/email-lion.svg" alt="AK Kommunal Logo" width="48" height="48" style="display: block; width: 48px; height: 48px; border: none;" />
+                        <img src="${new URL(request.url).origin}/email-lion-inverted.svg" alt="AK Kommunal Logo" width="48" height="48" style="display: block; width: 48px; height: 48px; border: none;" />
                       </td>
                       <!-- Brand Typography -->
                       <td style="vertical-align: middle;">
-                         <div style="font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; font-size: 24px; font-weight: 800; color: #05183a; letter-spacing: -0.5px; line-height: 1.1; margin: 0;">AK Kommunal</div>
-                         <div style="font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; font-size: 9px; font-weight: 600; color: #878787; text-transform: uppercase; letter-spacing: 0.18em; margin-top: 4px; line-height: 1;">Eine Marke von BW Partner</div>
+                         <div style="font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; font-size: 24px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px; line-height: 1.1; margin: 0;">AK Kommunal</div>
+                         <div style="font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; font-size: 9px; font-weight: 600; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.18em; margin-top: 4px; line-height: 1;">Eine Marke von BW Partner</div>
                       </td>
                     </tr>
                   </table>
