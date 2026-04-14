@@ -173,17 +173,17 @@ export const POST: APIRoute = async ({ request }) => {
             <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
               <!-- Top-Notch Premium Header: Logo + Typographie -->
               <tr>
-                <td style="background-color: #05183a; padding: 40px 40px 30px 40px; text-align: left;">
-                  <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                <td style="background-color: #05183a; padding: 40px 20px; text-align: center;">
+                  <table border="0" cellspacing="0" cellpadding="0" align="center" style="margin: 0 auto;">
                     <tr>
                       <!-- Lion Logo (Square) -->
-                      <td width="48" style="padding-right: 16px; vertical-align: middle;">
-                        <img src="${new URL(request.url).origin}/email-lion-inverted.svg" alt="AK Kommunal Logo" width="48" height="48" style="display: block; width: 48px; height: 48px; border: none;" />
+                      <td width="36" style="padding-right: 12px; vertical-align: middle;">
+                        <img src="${new URL(request.url).origin}/email-lion-inverted.svg?v=2" alt="AK Kommunal Logo" width="36" height="36" style="display: block; width: 36px; height: 36px; border: none;" />
                       </td>
                       <!-- Brand Typography -->
-                      <td style="vertical-align: middle;">
-                         <div style="font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; font-size: 24px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px; line-height: 1.1; margin: 0;">AK Kommunal</div>
-                         <div style="font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; font-size: 9px; font-weight: 600; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.18em; margin-top: 4px; line-height: 1;">Eine Marke von BW Partner</div>
+                      <td style="vertical-align: middle; text-align: left;">
+                         <div style="font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; font-size: 21px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px; line-height: 1.1; margin: 0;">AK Kommunal</div>
+                         <div style="font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; font-size: 8px; font-weight: 600; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.18em; margin-top: 4px; line-height: 1;">Eine Marke von BW Partner</div>
                       </td>
                     </tr>
                   </table>
