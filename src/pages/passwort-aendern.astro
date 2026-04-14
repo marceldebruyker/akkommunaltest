@@ -1,75 +1,117 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import TopNavBar from '../components/TopNavBar.astro';
+const title = "Neues Passwort setzen | AK Kommunal Plattform";
+import BrandLogo from '../components/BrandLogo.astro';
+import '../styles/global.css';
 
-// Wir laden die Supabase Konfiguration für den Frontend-Client ein,
-// da das Hash-Token (#access_token=...) nur im Browser via JS auslesbar ist.
 const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
 ---
 
-<Layout title="Neues Passwort setzen | AK Kommunal">
-    <TopNavBar />
+<!doctype html>
+<html lang="de" class="antialiased">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <title>{title}</title>
+</head>
+<body class="bg-[#fafafa] font-body text-gray-800 h-screen w-full overflow-hidden flex flex-col md:flex-row">
     
-    <div class="h-screen w-full flex bg-[#f8f9fa] items-center justify-center p-6">
-        <div class="w-full max-w-md bg-white p-8 sm:p-12 rounded-2xl shadow-xl shadow-[#05183a]/5 relative">
+    <!-- Left Panel: Graphic & Brand (Hidden on Mobile) -->
+    <div class="hidden md:flex w-1/2 h-full bg-[#0a152e] relative flex-col justify-center p-16 lg:p-24 xl:p-32 overflow-hidden">
+        
+        <!-- Architectural Background Image -->
+        <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=1400&auto=format&fit=crop" alt="Architecture Background" class="absolute inset-0 w-full h-full object-cover mix-blend-overlay opacity-50 grayscale" />
+        
+        <!-- Dark Blue Gradient Overlay -->
+        <div class="absolute inset-0 bg-gradient-to-br from-[#0a152e]/90 to-[#071026]/95"></div>
+
+        <!-- Content -->
+        <div class="relative z-10 w-full max-w-lg">
             
-            <h1 class="text-3xl font-extrabold text-[#0a152e] font-headline mb-3 tracking-tight">Neues Passwort</h1>
-            <p class="text-gray-500 text-[14px] leading-relaxed mb-10 border-b border-gray-100 pb-10">
-                Bitte vergeben Sie Ihr neues, sicheres Passwort. Sie werden nach der erfolgreichen Änderung automatisch in Ihr Dashboard weitergeleitet.
+            <div class="mb-14">
+                <BrandLogo variant="light" />
+            </div>
+
+            <h1 class="text-5xl lg:text-6xl font-extrabold font-headline text-white leading-[1.05] tracking-tight pb-2 mb-8 mt-4">
+                Letzter<br/>Schritt.
+            </h1>
+
+            <p class="text-[17px] text-white/70 font-light leading-relaxed max-w-md mb-16">
+                Ein starkes Passwort schützt die sensiblen Live-Aufzeichnungen und Seminardaten Ihres Fachportals.
             </p>
-
-            <div id="alert-error" class="hidden bg-red-50 text-red-600 p-4 border-l-4 border-red-600 rounded-r-lg text-sm mb-6 items-start gap-3 shadow-sm">
-                <span class="material-symbols-outlined shrink-0 mt-0.5">error</span>
-                <span id="error-msg"></span>
-            </div>
-
-            <div id="alert-success" class="hidden bg-emerald-50 text-emerald-700 p-4 border-l-4 border-emerald-500 rounded-r-lg text-sm mb-6 items-start gap-3 shadow-sm">
-                <span class="material-symbols-outlined shrink-0 mt-0.5 text-emerald-500">check_circle</span>
-                Passwort erfolgreich geändert! Leite weiter...
-            </div>
-
-            <form id="reset-password-form" class="flex flex-col gap-6">
-                <!-- New Password -->
-                <div>
-                    <label class="block text-[10px] font-bold text-gray-600 uppercase tracking-[0.1em] mb-2.5">
-                        NEUES PASSWORT
-                    </label>
-                    <input 
-                        type="password" 
-                        id="new-password"
-                        placeholder="Mindestens 8 Zeichen" 
-                        class="w-full bg-[#f4f4f5] border-none px-4 py-3.5 rounded-lg text-sm text-[#0a152e] font-medium outline-none focus:ring-2 focus:ring-[#0a152e]/10 transition-shadow placeholder:text-gray-400 placeholder:font-light"
-                        required
-                        minlength="8"
-                    />
-                </div>
-
-                <button type="submit" id="submit-btn" class="w-full mt-4 bg-[#0a152e] hover:bg-[#112147] text-white py-4 px-6 rounded-lg text-[11px] font-bold uppercase tracking-[0.15em] transition-colors flex items-center justify-center gap-3 group shadow-md shadow-[#0a152e]/10">
-                    <span>PASSWORT SPEICHERN</span>
-                    <span class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">lock_reset</span>
-                </button>
-            </form>
             
         </div>
     </div>
-</Layout>
 
-<script is:inline type="module">
-    // Mache Supabase clientseitig verfügbar (wir holen die offizielle Bibliothek via CDN für maximale Astro-Kompatibilität auf rein statischen Pages)
-    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+    <!-- Right Panel: Reset Form -->
+    <div class="w-full md:w-1/2 h-full bg-[#fafafa] flex flex-col justify-center items-center relative p-6">
+        
+        <!-- Scrollable/Centered wrapper -->
+        <div class="w-full max-w-[400px] flex flex-col">
 
-    document.addEventListener('DOMContentLoaded', () => {
-        // Die Env-Variablen sind zur Buildzeit vom Astro Compiler injiziert worden (Vercel Build Prozess)
-        // Aber `is:inline` kann import.meta.env nicht auflösen.
-        // Wait, inline scripts can't resolve meta env. We need standard non-inline module format!
-    });
-</script>
+            <!-- Header Texts -->
+            <div class="mb-10 w-full">
+                <h2 class="text-[32px] font-extrabold font-headline text-[#0a152e] tracking-tight mb-3">Neues Passwort</h2>
+                <p class="text-[15px] font-light text-gray-600 leading-relaxed pr-8">
+                    Bitte vergeben Sie Ihr neues Passwort. Danach leiten wir Sie sicher in Ihr Dashboard weiter.
+                </p>
+            </div>
+
+            <!-- Form Card -->
+            <div class="bg-white p-8 lg:p-10 rounded-[20px] shadow-[0_8px_30px_rgb(0,0,0,0.03)] border border-gray-100 mb-8 w-full">
+
+                <!-- Alert Elements -->
+                <div id="alert-error" class="hidden bg-red-50 text-red-600 border border-red-200 p-4 rounded-lg text-[13px] font-medium mb-6 w-full text-left flex items-start gap-2">
+                    <span class="material-symbols-outlined text-[18px] shrink-0 mt-0.5">error</span>
+                    <span id="error-msg"></span>
+                </div>
+
+                <div id="alert-success" class="hidden bg-emerald-50 text-emerald-700 border border-emerald-200 p-4 rounded-lg text-[13px] font-medium mb-6 w-full text-left flex items-start gap-2">
+                    <span class="material-symbols-outlined text-[18px] mt-0.5 shrink-0 text-emerald-500">check_circle</span>
+                    <span>Passwort erfolgreich genädert. Sie werden nun weitergeleitet...</span>
+                </div>
+
+                <form id="reset-password-form" class="flex flex-col gap-6">
+                    
+                    <!-- New Password -->
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-600 uppercase tracking-[0.1em] mb-2.5">
+                            NEUES PASSWORT
+                        </label>
+                        <input 
+                            type="password" 
+                            id="new-password"
+                            placeholder="Mindestens 8 Zeichen" 
+                            class="w-full bg-[#f4f4f5] border-none px-4 py-3.5 rounded-lg text-sm text-[#0a152e] font-medium outline-none focus:ring-2 focus:ring-[#0a152e]/10 transition-shadow placeholder:text-gray-400 placeholder:font-light"
+                            required
+                            minlength="8"
+                        />
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" id="submit-btn" class="w-full mt-2 bg-[#0a152e] hover:bg-[#112147] text-white py-4 px-6 rounded-lg text-[11px] font-bold uppercase tracking-[0.15em] transition-colors flex items-center justify-center gap-3 group">
+                        <span>PASSWORT SPEICHERN</span>
+                        <span class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">lock_reset</span>
+                    </button>
+
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+    
+</body>
+</html>
 
 <script>
     import { createBrowserClient } from '@supabase/ssr';
     
-    // Using standard Astro Client script block to get env variables properly bundled.
     const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
     const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
     const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey);
@@ -85,31 +127,25 @@ const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            // UI Update
             btn.classList.add('opacity-50', 'pointer-events-none');
             const btnSpan = btn.querySelector('span');
-            if (btnSpan) btnSpan.textContent = 'WIRD GESPEICHERT...';
+            if (btnSpan) btnSpan.textContent = 'SPEICHERT...';
             if (alertError) alertError.classList.add('hidden');
 
             const newPassword = (input as HTMLInputElement).value;
 
             try {
-                // Supabase Browser-Client hat im Hintergrund automatisch das Token aus der URL extrahiert und die lokale Session validiert.
-                const { error, data } = await supabase.auth.updateUser({
+                const { error } = await supabase.auth.updateUser({
                     password: newPassword
                 });
 
-                if (error) {
-                    throw error;
-                }
+                if (error) throw error;
 
-                // Success
                 if (alertSuccess) {
                     alertSuccess.classList.remove('hidden');
                     alertSuccess.classList.add('flex');
                 }
                 
-                // Kurze Verzögerung für visuelles Feedback, dann redirect ins Zentrum der Macht
                 setTimeout(() => {
                     window.location.href = '/app/dashboard';
                 }, 1500);
@@ -118,10 +154,9 @@ const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
                 if (alertError && errorMsg) {
                     alertError.classList.remove('hidden');
                     alertError.classList.add('flex');
-                    errorMsg.textContent = err.message || 'Ein unbekannter Fehler ist aufgetreten. Token vielleicht abgelaufen?';
+                    errorMsg.textContent = err.message || 'Ein Fehler ist aufgetreten. Token abgelaufen?';
                 }
                 
-                // Reset Button
                 btn.classList.remove('opacity-50', 'pointer-events-none');
                 if (btnSpan) btnSpan.textContent = 'PASSWORT SPEICHERN';
             }
