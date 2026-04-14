@@ -53,7 +53,10 @@ if (!hasMembership && !hasGesamtpaket) {
 
 const recentSeminar = userSeminars.length > 0 ? userSeminars[0] : null;
 const newSeminars = userSeminars.slice(1, 4);
----
+    // Check if user has specific packages to change banner logic
+    const hasModuleAccess = purchasedSlugs.some(slug => ['grundlagen', 'grundlagen-modul', 'spezial', 'spezialthemen', 'spezialthemen-modul', 'praktiker', 'praktiker-modul'].includes(slug.toLowerCase()));
+    const ownsEverything = hasGesamtpaket || hasMembership;
+    ---
 
 <AppLayout title="Dashboard - AK Kommunal App" currentPath="/app/dashboard">
   <div class="p-8 max-w-6xl mx-auto">
@@ -64,8 +67,8 @@ const newSeminars = userSeminars.slice(1, 4);
       <p class="text-gray-500">Willkommen zurück in Ihrer Zentrale.</p>
     </div>
 
-    <!-- Upsell Banner (only for Freemium users without active Abo) -->
-    {!hasMembership && (
+    <!-- Upsell Banner (only for users without full access) -->
+    {!ownsEverything && (
       <div class="mb-10 bg-white rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-gray-200 relative overflow-hidden group">
         <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-[#f8981d] transition-all group-hover:w-2"></div>
         
@@ -78,10 +81,15 @@ const newSeminars = userSeminars.slice(1, 4);
             )}
           </div>
           <div>
-            {purchasedSlugs.length > 0 ? (
+            {hasModuleAccess ? (
+              <>
+                <h3 class="text-[#05183a] font-bold text-lg mb-1">Upgrade auf das Gesamtpaket</h3>
+                <p class="text-gray-500 text-sm">Sie besitzen bereits ein Fach-Modul. Erweitern Sie Ihren Account um das gesamte Portal für unbeschränkten Zugriff.</p>
+              </>
+            ) : purchasedSlugs.length > 0 ? (
               <>
                 <h3 class="text-[#05183a] font-bold text-lg mb-1">Upgrade auf ein Fach-Modul</h3>
-                <p class="text-gray-500 text-sm">Sie besitzen derzeit Einzel-Seminare. Schalten Sie sich mit einem Modul-Abo den gesamten Weiterbildungskatalog bedingungslos frei.</p>
+                <p class="text-gray-500 text-sm">Sie besitzen derzeit Einzel-Seminare. Schalten Sie sich mit einem Modul-Abo den gesamten Themenbereich frei.</p>
               </>
             ) : (
               <>
