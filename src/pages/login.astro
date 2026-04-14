@@ -118,12 +118,12 @@ const redirectUrl = Astro.url.searchParams.get('redirect') || '';
                     </div>
 
                     <!-- Remember Me -->
-                    <label class="flex items-center gap-3 mt-2 cursor-pointer group w-fit">
-                        <div class="w-4 h-4 rounded border border-gray-300 flex items-center justify-center bg-white group-hover:border-gray-400 transition-colors">
-                            <input type="checkbox" class="opacity-0 absolute w-0 h-0" />
-                            <!-- Custom checkmark fake -->
+                    <label class="flex items-center gap-3 mt-2 cursor-pointer group w-fit relative">
+                        <input type="checkbox" name="remember" class="peer opacity-0 absolute w-0 h-0" />
+                        <div class="w-4 h-4 rounded border border-gray-300 flex items-center justify-center bg-white peer-checked:bg-[#0a152e] peer-checked:border-[#0a152e] group-hover:border-gray-400 peer-focus-visible:ring-2 peer-focus-visible:ring-[#0a152e]/30 transition-all">
+                            <span class="material-symbols-outlined text-[12px] text-white opacity-0 peer-checked:opacity-100 font-bold transition-opacity">check</span>
                         </div>
-                        <span class="text-[13px] text-gray-500 font-medium group-hover:text-gray-700 transition-colors">
+                        <span class="text-[13px] text-gray-500 font-medium group-hover:text-gray-700 transition-colors select-none">
                             Für 30 Tage angemeldet bleiben
                         </span>
                     </label>
