@@ -8,7 +8,8 @@ const { data: { user } } = await supabase.auth.getUser();
 
 const firstName = user?.user_metadata?.first_name || '';
 const lastName = user?.user_metadata?.last_name || '';
-const greetingName = lastName ? `Herr/Frau ${lastName}` : (firstName || 'lieber Nutzer');
+const salutationString = user?.user_metadata?.salutation_string || '';
+const greetingName = salutationString || (lastName ? `Herr/Frau ${lastName}` : (firstName || 'lieber Nutzer'));
 
 // Check membership status for upsell logic
 let hasMembership = false;
