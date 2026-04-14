@@ -1,7 +1,16 @@
 ---
 const title = "Login - AK Kommunal Plattform";
 import BrandLogo from '../components/BrandLogo.astro';
+import { getSupabaseServer } from '../lib/supabase';
 import '../styles/global.css';
+
+const supabase = getSupabaseServer(Astro.request, Astro.cookies);
+const { data: { user } } = await supabase.auth.getUser();
+
+// If user is already authenticated (e.g. valid cookie), skip login and go to dashboard
+if (user) {
+    return Astro.redirect('/app/dashboard');
+}
 
 const error = Astro.url.searchParams.get('error');
 const message = Astro.url.searchParams.get('message');

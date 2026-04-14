@@ -5,12 +5,13 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
   const formData = await request.formData();
   const email = formData.get('email')?.toString();
   const password = formData.get('password')?.toString();
+  const remember = formData.get('remember') === 'on';
 
   if (!email || !password) {
     return redirect('/login?error=Missing credentials');
   }
 
-  const supabase = getSupabaseServer(request, cookies);
+  const supabase = getSupabaseServer(request, cookies, remember);
 
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
