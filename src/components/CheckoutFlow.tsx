@@ -214,28 +214,28 @@ export default function CheckoutFlow({ user = null }: { user?: any }) {
 
           <div className="space-y-1.5 mb-4">
              <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wide">Behörde / Kommune / Firma</label>
-             <input name="behorde" required={!isLoggedIn} type="text" className="w-full bg-surface border border-outline-variant/40 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-outline-variant/60" placeholder="Stadtverwaltung Musterstadt" />
+             <input name="behorde" required={!isLoggedIn} defaultValue={user?.user_metadata?.behorde || ''} type="text" className="w-full bg-surface border border-outline-variant/40 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-outline-variant/60" placeholder="Stadtverwaltung Musterstadt" />
           </div>
 
           <div className="space-y-1.5 mb-4">
             <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wide">Straße & Hausnummer</label>
-            <input name="strasse" required type="text" className="w-full bg-surface border border-outline-variant/40 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-outline-variant/60" placeholder="Rathausplatz 1" />
+            <input name="strasse" required defaultValue={user?.user_metadata?.strasse || ''} type="text" className="w-full bg-surface border border-outline-variant/40 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-outline-variant/60" placeholder="Rathausplatz 1" />
           </div>
 
           <div className="grid grid-cols-3 gap-4 mb-4">
             <div className="space-y-1.5 col-span-1">
               <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wide">PLZ</label>
-              <input name="plz" required type="text" className="w-full bg-surface border border-outline-variant/40 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-outline-variant/60" placeholder="12345" />
+              <input name="plz" required defaultValue={user?.user_metadata?.plz || ''} type="text" className="w-full bg-surface border border-outline-variant/40 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-outline-variant/60" placeholder="12345" />
             </div>
             <div className="space-y-1.5 col-span-2">
               <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wide">Ort</label>
-              <input name="ort" required type="text" className="w-full bg-surface border border-outline-variant/40 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-outline-variant/60" placeholder="Musterstadt" />
+              <input name="ort" required defaultValue={user?.user_metadata?.ort || ''} type="text" className="w-full bg-surface border border-outline-variant/40 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-outline-variant/60" placeholder="Musterstadt" />
             </div>
           </div>
           
           <div className="space-y-1.5 mb-8">
              <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wide">Leitweg-ID <span className="text-outline-variant font-normal normal-case tracking-normal">(optional für E-Rechnung)</span></label>
-             <input name="leitwegId" type="text" className="w-full bg-surface border border-outline-variant/40 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-outline-variant/60" placeholder="04011000-12345-67" />
+             <input name="leitwegId" type="text" defaultValue={user?.user_metadata?.leitwegId || user?.user_metadata?.leitweg_id || ''} className="w-full bg-surface border border-outline-variant/40 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all placeholder:text-outline-variant/60" placeholder="04011000-12345-67" />
           </div>
 
           {!isLoggedIn && (

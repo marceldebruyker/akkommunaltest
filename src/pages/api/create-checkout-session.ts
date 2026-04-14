@@ -1,6 +1,6 @@
 import type { APIRoute } from 'astro';
 import Stripe from 'stripe';
-import { getSupabaseServer } from '../../lib/supabase';
+import { getSupabaseServer, getSupabaseAdmin } from '../../lib/supabase';
 import { sanityClient } from '../../lib/sanity';
 
 export const POST: APIRoute = async ({ request, cookies }) => {
@@ -73,7 +73,23 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       }
     }
 
-    // 4. Checkout Session generieren
+    // 4. Update Profile with Billing Info using Admin Role
+    try {
+      const supabaseAdmin = getSupabaseAdmin();
+      await supabaseAdmin.auth.admin.updateUserById(authUser.id, {
+        user_metadata: { 
+          behorde: userData.behorde,
+          strasse: userData.strasse,
+          plz: userData.plz,
+          ort: userData.ort,
+          leitwegId: userData.leitwegId
+        }
+      });
+    } catch (updateErr) {
+      console.warn("Could not save billing profile data, continuing checkout.", updateErr);
+    }
+
+    // 5. Checkout Session generieren
     const sessionConfig: any = {
       mode: isSubscription ? 'subscription' : 'payment',
       payment_method_types: ['card', 'paypal', 'sepa_debit'],

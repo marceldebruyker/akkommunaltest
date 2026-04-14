@@ -126,15 +126,26 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     // Sofort Finalisieren und E-Mail Senden erzwingen
     await stripe.invoices.sendInvoice(invoice.id);
 
-    // 4. Zugriff sofort erteilen (Service Role DB Insert)
+    // 4. Zugriff & Profil-Updates (Service Role)
     const supabaseAdmin = createClient(
       import.meta.env.PUBLIC_SUPABASE_URL,
       import.meta.env.SUPABASE_SERVICE_ROLE_KEY,
       { auth: { autoRefreshToken: false, persistSession: false } }
     );
 
-    // Profile exist check
+    // Profil in DB sicherstellen
     await supabaseAdmin.from('profiles').upsert({ id: authUser.id }, { onConflict: 'id' });
+
+    // Billing Daten für automatisiertes Ausfüllen beim nächsten Kauf cachen
+    await supabaseAdmin.auth.admin.updateUserById(authUser.id, {
+      user_metadata: {
+        behorde: userData.behorde,
+        strasse: userData.strasse,
+        plz: userData.plz,
+        ort: userData.ort,
+        leitwegId: userData.leitwegId
+      }
+    });
 
     const purchasesToInsert = items.map((item: any) => ({
       user_id: authUser?.id,
