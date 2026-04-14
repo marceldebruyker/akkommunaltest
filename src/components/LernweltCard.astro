@@ -68,7 +68,7 @@ const { video } = Astro.props;
     </div>
 
     <!-- Lock Overlay Hover Effect -->
-    <a href={`/mediathek/${video.slug}`} class="absolute inset-0 bg-white/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-center p-6 border border-blue-200 rounded-2xl cursor-pointer">
+    <a href={video.status === 'live' ? `/termine/${video.slug}` : `/mediathek/${video.slug}`} class="absolute inset-0 bg-white/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center text-center p-6 border border-blue-200 rounded-2xl cursor-pointer">
       <div class="w-12 h-12 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center mb-3 shadow-sm">
         <span class="material-symbols-outlined text-[24px]">info</span>
       </div>
