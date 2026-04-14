@@ -164,6 +164,17 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       }
       const customerNamePart = salutationString ? ` ${salutationString},` : ',';
 
+      // Re-fetch the invoice to ensure we have the live hosted_invoice_url
+      let invoiceUrlHtml = '';
+      try {
+        const finalizedInvoice = await stripe.invoices.retrieve(invoice.id);
+        if (finalizedInvoice.hosted_invoice_url) {
+          invoiceUrlHtml = `<div style="margin-top: 25px; padding: 15px; border-left: 3px solid #05183a; background-color: #f1f5f9;"><p style="margin: 0; font-size: 15px; color: #4b5563;">Rechnungsdokument (PDF): <br><a href="${finalizedInvoice.hosted_invoice_url}" style="color: #05183a; font-weight: 600; text-decoration: underline;">📄 Hier können Sie Ihre offizielle Stripe-Rechnung herunterladen</a></p></div>`;
+        }
+      } catch (err) {
+        console.warn('Could not retrieve hosted_invoice_url for email.', err);
+      }
+
       try {
         await resend.emails.send({
            from: `AK Kommunal Plattform <${senderEmail}>`,
@@ -211,6 +222,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
                               <ul style="margin: 0; color: #475569; padding-left: 20px; line-height: 1.6; font-size: 15px;">
                                 ${itemListHtml}
                               </ul>
+                              ${invoiceUrlHtml}
                             </td>
                           </tr>
                         </table>

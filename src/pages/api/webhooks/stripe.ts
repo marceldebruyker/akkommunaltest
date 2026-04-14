@@ -76,6 +76,19 @@ export const POST: APIRoute = async ({ request }) => {
             }
 
             const customerNamePart = salutationString ? ` ${salutationString},` : ',';
+            
+            // Re-fetch the invoice to ensure we have the live hosted_invoice_url
+            let invoiceUrlHtml = '';
+            if (session.invoice) {
+              try {
+                const finalizedInvoice = await stripe.invoices.retrieve(session.invoice as string);
+                if (finalizedInvoice.hosted_invoice_url) {
+                  invoiceUrlHtml = `<div style="margin-top: 25px; padding: 15px; border-left: 3px solid #05183a; background-color: #f1f5f9;"><p style="margin: 0; font-size: 15px; color: #4b5563;">Rechnungsdokument (PDF): <br><a href="${finalizedInvoice.hosted_invoice_url}" style="color: #05183a; font-weight: 600; text-decoration: underline;">📄 Hier können Sie Ihre offizielle Stripe-Rechnung herunterladen</a></p></div>`;
+                }
+              } catch (err) {
+                console.warn('Could not retrieve hosted_invoice_url for email.', err);
+              }
+            }
 
             await resend.emails.send({
               from: `AK Kommunal Plattform <${senderEmail}>`,
@@ -113,7 +126,7 @@ export const POST: APIRoute = async ({ request }) => {
                     <tr>
                       <td style="padding: 40px;">
                         <h2 style="color: #05183a; margin-top: 0; margin-bottom: 20px; font-size: 20px; font-weight: 700;">Vielen Dank für Ihre Buchung!</h2>
-                        <p style="color: #4b5563; line-height: 1.6; margin: 0 0 24px 0; font-size: 16px;">Guten Tag${customerNamePart}<br><br>herzlichen Glückwunsch! Ihre Buchung über Stripe (${session.payment_status === 'paid' ? 'Kreditkarte/Direktzahlung' : 'Überweisung'}) war erfolgreich. Ihre Rechnung wurde von unserem Rechnungssystem (Stripe) soeben separat an Sie versendet.</p>
+                        <p style="color: #4b5563; line-height: 1.6; margin: 0 0 24px 0; font-size: 16px;">Guten Tag${customerNamePart}<br><br>herzlichen Glückwunsch! Ihre Buchung über Stripe (${session.payment_status === 'paid' ? 'Kreditkarte/Direktzahlung' : 'Überweisung'}) war erfolgreich. Ihre Rechnung wurde von unserem System soeben separat für Sie generiert.</p>
                         
                         <!-- Order Summary Box -->
                         <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 30px;">
@@ -123,6 +136,7 @@ export const POST: APIRoute = async ({ request }) => {
                               <ul style="margin: 0; color: #475569; padding-left: 20px; line-height: 1.6; font-size: 15px;">
                                 ${itemListHtml}
                               </ul>
+                              ${invoiceUrlHtml}
                             </td>
                           </tr>
                         </table>
