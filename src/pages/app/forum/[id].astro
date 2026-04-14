@@ -64,8 +64,19 @@ const { data: profile } = await supabase
   .eq('id', user.id)
   .maybeSingle();
 
+// Check purchases for module memberships
+const { data: purchases } = await supabase
+  .from('purchases')
+  .select('video_slug')
+  .eq('user_id', user.id);
+
+const purchasedSlugs = purchases?.map(p => p.video_slug) || [];
+const hasModuleMembership = purchasedSlugs.some(slug => 
+  ['gesamtpaket', 'gesamt', 'spezial', 'spezialthemen-modul', 'grundlagen', 'grundlagen-modul', 'praktiker', 'praktiker-modul'].includes(slug)
+);
+
 const isAdmin = profile?.role === 'admin';
-const hasAccess = isAdmin || profile?.has_membership;
+const hasAccess = isAdmin || profile?.has_membership || hasModuleMembership;
 
 // Wenn kein Zugriff, hart zur Hauptseite werfen (wo dann die große Paywall auftaucht)
 if (!hasAccess) {
