@@ -8,8 +8,16 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
   const firstName = formData.get("first_name")?.toString();
   const lastName = formData.get("last_name")?.toString();
 
-  if (!email || !password || !firstName || !lastName) {
+  const anrede = formData.get("anrede")?.toString() || "Keine";
+
+  if (!email || !password || !firstName || !lastName || !anrede) {
     return redirect("/register?error=Bitte füllen Sie alle Felder aus.");
+  }
+
+  // Pre-compute the exact salutation line for Supabase's template limits
+  let salutationString = `${firstName} ${lastName}`;
+  if (anrede === "Frau" || anrede === "Herr") {
+    salutationString = `${anrede} ${lastName}`;
   }
 
   const supabase = getSupabaseServer(request, cookies);
@@ -19,8 +27,10 @@ export const POST: APIRoute = async ({ request, cookies, redirect }) => {
     password,
     options: {
       data: {
+        anrede: anrede,
         first_name: firstName,
         last_name: lastName,
+        salutation_string: salutationString
       },
     },
   });
