@@ -27,14 +27,16 @@ const sanitySeminars = await sanityClient.fetch(`*[_type == "seminar"] | order(e
 }`);
 
 // Determine which seminars the user has access to
-const hasGesamtpaket = purchasedSlugs.includes('gesamtpaket');
+const hasGesamtpaket = purchasedSlugs.includes('gesamtpaket') || purchasedSlugs.includes('gesamt');
 
 const videos = sanitySeminars.map((video: any) => {
   let hasAccess = purchasedSlugs.includes(video.slug) || hasGesamtpaket;
   
   if (!hasAccess && video.moduleName) {
-    const moduleSlug = video.moduleName.toLowerCase().replace(/ü/g, 'ue').replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/\s+/g, '-');
-    hasAccess = purchasedSlugs.includes(moduleSlug);
+    const lowerName = video.moduleName.toLowerCase();
+    if (lowerName.includes('spezial') && (purchasedSlugs.includes('spezial') || purchasedSlugs.includes('spezialthemen-modul'))) hasAccess = true;
+    if (lowerName.includes('grundlagen') && (purchasedSlugs.includes('grundlagen') || purchasedSlugs.includes('grundlagen-modul'))) hasAccess = true;
+    if (lowerName.includes('praktiker') && (purchasedSlugs.includes('praktiker') || purchasedSlugs.includes('praktiker-modul'))) hasAccess = true;
   }
 
   return {

@@ -34,15 +34,17 @@ if (user) {
 // Fetch real data from Sanity
 const allSeminars = await sanityClient.fetch(`*[_type == "seminar" && status == "aufzeichnung"] | order(_createdAt desc) { "id": slug.current, "slug": slug.current, title, description, moduleName, duration, "image": image.asset->url }`);
 
-const hasGesamtpaket = purchasedSlugs.includes('gesamtpaket');
+const hasGesamtpaket = purchasedSlugs.includes('gesamtpaket') || purchasedSlugs.includes('gesamt');
 let userSeminars = allSeminars;
 
 if (!hasMembership && !hasGesamtpaket) {
   userSeminars = allSeminars.filter((video: any) => {
     if (purchasedSlugs.includes(video.slug)) return true;
     if (video.moduleName) {
-      const moduleSlug = video.moduleName.toLowerCase().replace(/ü/g, 'ue').replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/\s+/g, '-');
-      if (purchasedSlugs.includes(moduleSlug)) return true;
+      const lowerName = video.moduleName.toLowerCase();
+      if (lowerName.includes('spezial') && (purchasedSlugs.includes('spezial') || purchasedSlugs.includes('spezialthemen-modul'))) return true;
+      if (lowerName.includes('grundlagen') && (purchasedSlugs.includes('grundlagen') || purchasedSlugs.includes('grundlagen-modul'))) return true;
+      if (lowerName.includes('praktiker') && (purchasedSlugs.includes('praktiker') || purchasedSlugs.includes('praktiker-modul'))) return true;
     }
     return false;
   });
