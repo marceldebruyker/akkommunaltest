@@ -84,85 +84,87 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(JSON.stringify({ error: 'Konnte keine E-Mail Adressen zu den Berechtigten finden.' }), { status: 400 });
     }
 
-    // 5. E-Mail Massenversand (Broadcast) formatieren
-    const resend = new Resend(resendKey);
+    // 5. E-Mail Massenversand (Broadcast) form    const resend = new Resend(resendKey);
     const senderEmail = 'noreply@debruyker.de';
 
     // Formatted Date
     const formattedDate = seminar.eventDate ? new Intl.DateTimeFormat('de-DE', { dateStyle: 'full', timeStyle: 'short' }).format(new Date(seminar.eventDate)) : 'Datum noch festzulegen';
 
-    // Bestimme den E-Mail Inhalt anhand des Typs
-    let subject = '';
-    let emailContent = '';
+    const getEmailPayload = (user: any, emailType: string) => {
+        let salutationString = '';
+        if (user?.user_metadata?.salutation_string) {
+            salutationString = ` ${user.user_metadata.salutation_string},`;
+        } else if (user?.user_metadata?.first_name) {
+            salutationString = ` ${user.user_metadata.first_name} ${user.user_metadata.last_name || ''},`.trim();
+        } else {
+            salutationString = ' Sehr geehrte Damen und Herren,'; // Fallback for very old users without names
+        }
 
-    if (emailType === 'ticket_invitation') {
-      subject = `Einladung: Webinar „${seminar.title}“`;
-      emailContent = `
-        <h2 style="color: #05183a; margin-top: 0; margin-bottom: 20px; font-size: 20px;">Einladung zum Webinar</h2>
-        <p style="color: #4b5563; line-height: 1.6; margin: 0 0 24px 0; font-size: 16px;">Sehr geehrte Damen und Herren,<br><br>herzlich möchten wir Sie zu unserem nächsten Webinar <strong>„${seminar.title}“</strong> einladen.</p>
+        let subject = '';
+        let emailContent = '';
 
-        <!-- Dynamic Sanity Content (Thema / Inhalte) -->
-        ${seminar.description ? `<div style="color: #4b5563; line-height: 1.6; margin: 0 0 24px 0; font-size: 15px;">${seminar.description.replace(/\\n/g, '<br>')}</div>` : ''}
+        if (emailType === 'ticket_invitation') {
+            subject = `Einladung: Webinar „${seminar.title}“`;
+            emailContent = `
+              <h2 style="color: #05183a; margin-top: 0; margin-bottom: 20px; font-size: 20px;">Einladung zum Webinar</h2>
+              <p style="color: #4b5563; line-height: 1.6; margin: 0 0 24px 0; font-size: 16px;">Guten Tag${salutationString}<br><br>herzlich möchten wir Sie zu unserem nächsten Webinar <strong>„${seminar.title}“</strong> einladen.</p>
 
-        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 30px;">
-          <tr>
-             <td style="padding: 20px;">
-               <p style="margin: 0; color: #0f172a; font-weight: 700; font-size: 16px;">🗓️ Termin: ${formattedDate} Uhr</p>
-              </td>
-            </tr>
-        </table>
-        
-        <p style="color: #4b5563; line-height: 1.6; margin: 0 0 24px 0; font-size: 15px;">Die Teilnahmegebühr für das Webinar beträgt <strong>${seminar.price ? seminar.price : '260'} Euro</strong> zuzüglich Umsatzsteuer.</p>
-        
-        <p style="color: #4b5563; line-height: 1.6; margin: 0 0 16px 0; font-size: 15px;">Die Anmeldung für das Webinar können Sie gerne unter dem folgenden Link vornehmen:</p>
-        
-        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 30px;">
-          <tr>
-            <td align="left">
-              <a href="${new URL(request.url).origin}/termine/${seminar.slug}" style="display: inline-block; background-color: #f8981d; color: #ffffff; padding: 14px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 15px; box-shadow: 0 2px 4px rgba(248, 152, 29, 0.2);">ANMELDUNG: ${seminar.title}</a>
-            </td>
-          </tr>
-        </table>
-        
-        <p style="color: #4b5563; line-height: 1.6; margin: 0 0 30px 0; font-size: 14px; background-color: #f1f5f9; padding: 15px; border-radius: 8px;">Für Mitglieder des Arbeitskreises Kommunal ist die Teilnahme in der Jahresgebühr bereits enthalten (Spezialthemen-Modul oder Modul Gesamtpaket). Eine Anmeldung über den Link ist nicht erforderlich.</p>
-        
-        <p style="color: #4b5563; line-height: 1.6; margin: 0; font-size: 15px;">Wir freuen uns auf Ihre Anmeldung und Ihre Teilnahme an unserem Webinar.<br><br>Freundliche Grüße aus Stuttgart<br><br>i. A. Freya Marx<br>Assistentin<br><br><strong>BW PARTNER</strong><br>Telefon +49 711 1640 1650<br>E-Mail <a href="mailto:seminare@bw-partner.com" style="color: #3b82f6;">seminare@bw-partner.com</a></p>
-      `;
-    } else {
-      // DEFAULT: teams_link
-      subject = `Ihre Einwahldaten: ${seminar.title}`;
-      emailContent = `
-        <h2 style="color: #05183a; margin-top: 0; margin-bottom: 20px; font-size: 20px;">Ihre Einwahldaten für das Live-Seminar</h2>
-        <p style="color: #4b5563; line-height: 1.6; margin: 0 0 24px 0; font-size: 16px;">Guten Tag, <br><br>hiermit erhalten Sie offiziell den Einladungs-Link für Ihr folgendes Live-Seminar. Bitte treten Sie dem MS-Teams-Raum rechtzeitig am folgenden Termin bei:</p>
-                  
-        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 30px;">
-          <tr>
-            <td style="padding: 20px;">
-               <p style="margin: 0 0 10px 0; color: #0f172a; font-weight: 700; font-size: 16px;">${seminar.title}</p>
-               <p style="margin: 0; color: #f8981d; font-weight: 600; font-size: 15px;">🗓️ ${formattedDate} Uhr</p>
-            </td>
-          </tr>
-        </table>
+              <!-- Dynamic Sanity Content (Thema / Inhalte) -->
+              ${seminar.description ? `<div style="color: #4b5563; line-height: 1.6; margin: 0 0 24px 0; font-size: 15px;">${seminar.description.replace(/\n/g, '<br>')}</div>` : ''}
 
-        <table width="100%" border="0" cellspacing="0" cellpadding="0">
-          <tr>
-            <td align="center">
-              <a href="${seminar.teamsLink}" style="display: inline-block; background-color: #f8981d; color: #ffffff; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 2px 4px rgba(248, 152, 29, 0.2);">Jetzt MS-Teams Raum beitreten</a>
-            </td>
-          </tr>
-        </table>
-                  
-        <p style="color: #4b5563; line-height: 1.6; margin: 30px 0 0 0; font-size: 14px;"><strong>Alternativ-Link:</strong> Falls der Button nicht funktioniert, kopieren Sie bitte folgenden Link:<br><br><span style="word-break: break-all; color: #94a3b8;">${seminar.teamsLink}</span></p>
-      `;
-    }
+              <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 30px;">
+                <tr>
+                   <td style="padding: 20px;">
+                     <p style="margin: 0; color: #0f172a; font-weight: 700; font-size: 16px;">🗓️ Termin: ${formattedDate} Uhr</p>
+                    </td>
+                  </tr>
+              </table>
+              
+              <p style="color: #4b5563; line-height: 1.6; margin: 0 0 24px 0; font-size: 15px;">Die Teilnahmegebühr für das Webinar beträgt <strong>${seminar.price ? seminar.price : '260'} Euro</strong> zuzüglich Umsatzsteuer.</p>
+              
+              <p style="color: #4b5563; line-height: 1.6; margin: 0 0 16px 0; font-size: 15px;">Die Anmeldung für das Webinar können Sie gerne unter dem folgenden Link vornehmen:</p>
+              
+              <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 30px;">
+                <tr>
+                  <td align="left">
+                    <a href="${new URL(request.url).origin}/termine/${seminar.slug}" style="display: inline-block; background-color: #f8981d; color: #ffffff; padding: 14px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 15px; box-shadow: 0 2px 4px rgba(248, 152, 29, 0.2);">ANMELDUNG: ${seminar.title}</a>
+                  </td>
+                </tr>
+              </table>
+              
+              <p style="color: #4b5563; line-height: 1.6; margin: 0 0 30px 0; font-size: 14px; background-color: #f1f5f9; padding: 15px; border-radius: 8px;">Für Mitglieder des Arbeitskreises Kommunal ist die Teilnahme in der Jahresgebühr bereits enthalten (Spezialthemen-Modul oder Modul Gesamtpaket). Eine Anmeldung über den Link ist nicht erforderlich.</p>
+              
+              <p style="color: #4b5563; line-height: 1.6; margin: 0; font-size: 15px;">Wir freuen uns auf Ihre Anmeldung und Ihre Teilnahme an unserem Webinar.<br><br>Freundliche Grüße aus Stuttgart<br><br>i. A. Freya Marx<br>Assistentin<br><br><strong>BW PARTNER</strong><br>Telefon +49 711 1640 1650<br>E-Mail <a href="mailto:seminare@bw-partner.com" style="color: #3b82f6;">seminare@bw-partner.com</a></p>
+            `;
+        } else {
+            // DEFAULT: teams_link
+            subject = `Ihre Einwahldaten: ${seminar.title}`;
+            emailContent = `
+              <h2 style="color: #05183a; margin-top: 0; margin-bottom: 20px; font-size: 20px;">Ihre Einwahldaten für das Live-Seminar</h2>
+              <p style="color: #4b5563; line-height: 1.6; margin: 0 0 24px 0; font-size: 16px;">Guten Tag${salutationString} <br><br>hiermit erhalten Sie offiziell den Einladungs-Link für Ihr folgendes Live-Seminar. Bitte treten Sie dem MS-Teams-Raum rechtzeitig am folgenden Termin bei:</p>
+                        
+              <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 30px;">
+                <tr>
+                  <td style="padding: 20px;">
+                     <p style="margin: 0 0 10px 0; color: #0f172a; font-weight: 700; font-size: 16px;">${seminar.title}</p>
+                     <p style="margin: 0; color: #f8981d; font-weight: 600; font-size: 15px;">🗓️ ${formattedDate} Uhr</p>
+                  </td>
+                </tr>
+              </table>
+      
+              <table width="100%" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td align="center">
+                    <a href="${seminar.teamsLink}" style="display: inline-block; background-color: #f8981d; color: #ffffff; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 2px 4px rgba(248, 152, 29, 0.2);">Jetzt MS-Teams Raum beitreten</a>
+                  </td>
+                </tr>
+              </table>
+                        
+              <p style="color: #4b5563; line-height: 1.6; margin: 30px 0 0 0; font-size: 14px;"><strong>Alternativ-Link:</strong> Falls der Button nicht funktioniert, kopieren Sie bitte folgenden Link:<br><br><span style="word-break: break-all; color: #94a3b8;">${seminar.teamsLink}</span></p>
+            `;
+        }
 
-    const sendBatch = async (batch: string[]) => {
-      await resend.emails.send({
-        from: `AK Kommunal Plattform <${senderEmail}>`,
-        to: ['noreply@bw-partner.de'], // Sichtbarer "To" Header
-        bcc: batch,                   // Versteckte Serienbrief-Empfänger
-        subject: subject,
-        html: `
+        const htmlTemplate = `
           <!DOCTYPE html>
           <html>
           <head><meta charset="utf-8"></head>
@@ -181,16 +183,28 @@ export const POST: APIRoute = async ({ request }) => {
             </table>
           </body>
           </html>
-        `
-      });
+        `;
+        return { subject, html: htmlTemplate };
     };
 
-    // Bulk Send in 50-Mail Batches to heavily respect Resend API rate limits
-    // https://resend.com/docs/api-reference/emails/send-email (limit max 50 for bcc usually)
-    const chunkSize = 50;
-    for (let i = 0; i < toEmails.length; i += chunkSize) {
-      const batch = toEmails.slice(i, i + chunkSize);
-      await sendBatch(batch);
+    // Bulk Send in batches of 50 using Resend BATCH api for personalized emails
+    const chunkSize = 50; 
+    for (let i = 0; i < validUsers.length; i += chunkSize) {
+      const batchUsers = validUsers.slice(i, i + chunkSize);
+      
+      const emailPayloads = batchUsers.filter(u => u.email).map(u => {
+         const { subject, html } = getEmailPayload(u, emailType);
+         return {
+            from: \`AK Kommunal Plattform <\${senderEmail}>\`,
+            to: [u.email!],
+            subject: subject,
+            html: html
+         };
+      });
+
+      if (emailPayloads.length > 0) {
+         await resend.batch.send(emailPayloads);
+      }
     }
 
     return new Response(JSON.stringify({ 
