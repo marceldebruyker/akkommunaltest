@@ -127,8 +127,8 @@ export const POST: APIRoute = async ({ request }) => {
               
               <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 30px;">
                 <tr>
-                  <td align="left">
-                    <a href="${new URL(request.url).origin}/termine/${seminar.slug}" style="display: inline-block; background-color: #05183a; color: #ffffff; padding: 14px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 15px; box-shadow: 0 2px 4px rgba(5, 24, 58, 0.2);">ANMELDUNG: ${seminar.title}</a>
+                  <td align="center">
+                    <a href="${new URL(request.url).origin}/termine/${seminar.slug}" style="display: inline-block; background-color: #05183a; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 14px; box-shadow: 0 2px 4px rgba(5, 24, 58, 0.2);">Zur Anmeldung</a>
                   </td>
                 </tr>
               </table>
@@ -156,7 +156,7 @@ export const POST: APIRoute = async ({ request }) => {
               <table width="100%" border="0" cellspacing="0" cellpadding="0">
                 <tr>
                   <td align="center">
-                    <a href="${seminar.teamsLink}" style="display: inline-block; background-color: #05183a; color: #ffffff; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 2px 4px rgba(5, 24, 58, 0.2);">Jetzt MS-Teams Raum beitreten</a>
+                    <a href="${seminar.teamsLink}" style="display: inline-block; background-color: #05183a; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 14px; box-shadow: 0 2px 4px rgba(5, 24, 58, 0.2);">MS-Teams beitreten</a>
                   </td>
                 </tr>
               </table>
