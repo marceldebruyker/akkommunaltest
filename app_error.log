@@ -1301,3 +1301,442 @@ AstroError [ResponseSentError]: The response has already been sent to the browse
 09:06:45 [200] / 30ms
 09:06:45 [200] /termine 221ms
 09:06:46 [200] /app/dashboard 647ms
+10:48:22 [200] /mitglied-werden 31ms
+10:48:22 [200] / 14ms
+10:48:22 [200] /termine 271ms
+10:48:23 [200] /app/dashboard 864ms
+Warning: Astro.cookies.set() was called after the cookies had already been sent to the browser.
+This may have happened if this method was called in an imported component.
+Please make sure that Astro.cookies.set() is only called in the frontmatter of the main page.
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:118:23)
+    at eval (/Users/marcel.debruyker/ak-kommunal-plattform/src/lib/supabase.ts:28:19)
+    at Array.forEach (<anonymous>)
+    at setAll (/Users/marcel.debruyker/ak-kommunal-plattform/src/lib/supabase.ts:27:22)
+    at applyServerStorage (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/ssr/src/cookies.ts:471:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Object.callback (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/ssr/src/createServerClient.ts:224:7)
+    at async <anonymous> (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4653:11)
+    at async Promise.all (index 1)
+    at async SupabaseAuthClient._notifyAllSubscribers (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4659:7)
+    at async SupabaseAuthClient._callRefreshToken (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4607:7)
+    at async SupabaseAuthClient.__loadSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:2828:40)
+    at async SupabaseAuthClient._useSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:2720:22)
+    at async SupabaseAuthClient._emitInitialSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:3997:12)
+AstroError [ResponseSentError]: The response has already been sent to the browser and cannot be altered.
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:145:13)
+    at eval (/Users/marcel.debruyker/ak-kommunal-plattform/src/lib/supabase.ts:28:19)
+    at Array.forEach (<anonymous>)
+    at setAll (/Users/marcel.debruyker/ak-kommunal-plattform/src/lib/supabase.ts:27:22)
+    at applyServerStorage (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/ssr/src/cookies.ts:471:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Object.callback (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/ssr/src/createServerClient.ts:224:7)
+    at async <anonymous> (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4653:11)
+    at async Promise.all (index 1)
+    at async SupabaseAuthClient._notifyAllSubscribers (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4659:7)
+    at async SupabaseAuthClient._callRefreshToken (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4607:7)
+    at async SupabaseAuthClient.__loadSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:2828:40)
+    at async SupabaseAuthClient._useSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:2720:22)
+    at async SupabaseAuthClient._emitInitialSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:3997:12) {
+  loc: undefined,
+  title: 'Unable to set response.',
+  hint: undefined,
+  frame: undefined,
+  type: 'AstroError'
+}
+10:48:23 [ERROR] [ResponseSentError] The response has already been sent to the browser and cannot be altered.
+  Error reference:
+    https://docs.astro.build/en/reference/errors/response-sent-error/
+  Stack trace:
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:140:7)
+    at Array.forEach (<anonymous>)
+    [...] See full stack trace in the browser, or rerun with --verbose.
+10:48:23 [ERROR] [ResponseSentError] The response has already been sent to the browser and cannot be altered.
+  Error reference:
+    https://docs.astro.build/en/reference/errors/response-sent-error/
+  Stack trace:
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:140:7)
+    at Array.forEach (<anonymous>)
+    [...] See full stack trace in the browser, or rerun with --verbose.
+10:48:23 [ERROR] [ResponseSentError] The response has already been sent to the browser and cannot be altered.
+  Error reference:
+    https://docs.astro.build/en/reference/errors/response-sent-error/
+  Stack trace:
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:140:7)
+    at Array.forEach (<anonymous>)
+    [...] See full stack trace in the browser, or rerun with --verbose.
+11:47:31 [200] / 33ms
+13:52:32 [200] / 248ms
+13:52:34 [200] /app/dashboard 2147ms
+Warning: Astro.cookies.set() was called after the cookies had already been sent to the browser.
+This may have happened if this method was called in an imported component.
+Please make sure that Astro.cookies.set() is only called in the frontmatter of the main page.
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:118:23)
+    at eval (/Users/marcel.debruyker/ak-kommunal-plattform/src/lib/supabase.ts:28:19)
+    at Array.forEach (<anonymous>)
+    at setAll (/Users/marcel.debruyker/ak-kommunal-plattform/src/lib/supabase.ts:27:22)
+    at applyServerStorage (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/ssr/src/cookies.ts:471:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Object.callback (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/ssr/src/createServerClient.ts:224:7)
+    at async <anonymous> (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4653:11)
+    at async Promise.all (index 1)
+    at async SupabaseAuthClient._notifyAllSubscribers (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4659:7)
+    at async SupabaseAuthClient._callRefreshToken (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4607:7)
+    at async SupabaseAuthClient.__loadSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:2828:40)
+    at async SupabaseAuthClient._useSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:2720:22)
+    at async SupabaseAuthClient._emitInitialSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:3997:12)
+AstroError [ResponseSentError]: The response has already been sent to the browser and cannot be altered.
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:145:13)
+    at eval (/Users/marcel.debruyker/ak-kommunal-plattform/src/lib/supabase.ts:28:19)
+    at Array.forEach (<anonymous>)
+    at setAll (/Users/marcel.debruyker/ak-kommunal-plattform/src/lib/supabase.ts:27:22)
+    at applyServerStorage (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/ssr/src/cookies.ts:471:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Object.callback (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/ssr/src/createServerClient.ts:224:7)
+    at async <anonymous> (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4653:11)
+    at async Promise.all (index 1)
+    at async SupabaseAuthClient._notifyAllSubscribers (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4659:7)
+    at async SupabaseAuthClient._callRefreshToken (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4607:7)
+    at async SupabaseAuthClient.__loadSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:2828:40)
+    at async SupabaseAuthClient._useSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:2720:22)
+    at async SupabaseAuthClient._emitInitialSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:3997:12) {
+  loc: undefined,
+  title: 'Unable to set response.',
+  hint: undefined,
+  frame: undefined,
+  type: 'AstroError'
+}
+13:52:34 [ERROR] [ResponseSentError] The response has already been sent to the browser and cannot be altered.
+  Error reference:
+    https://docs.astro.build/en/reference/errors/response-sent-error/
+  Stack trace:
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:140:7)
+    at Array.forEach (<anonymous>)
+    [...] See full stack trace in the browser, or rerun with --verbose.
+13:52:34 [ERROR] [ResponseSentError] The response has already been sent to the browser and cannot be altered.
+  Error reference:
+    https://docs.astro.build/en/reference/errors/response-sent-error/
+  Stack trace:
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:140:7)
+    at Array.forEach (<anonymous>)
+    [...] See full stack trace in the browser, or rerun with --verbose.
+13:52:34 [ERROR] [ResponseSentError] The response has already been sent to the browser and cannot be altered.
+  Error reference:
+    https://docs.astro.build/en/reference/errors/response-sent-error/
+  Stack trace:
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:140:7)
+    at Array.forEach (<anonymous>)
+    [...] See full stack trace in the browser, or rerun with --verbose.
+15:45:23 [200] / 110ms
+15:45:24 [200] /app/dashboard 1136ms
+Warning: Astro.cookies.set() was called after the cookies had already been sent to the browser.
+This may have happened if this method was called in an imported component.
+Please make sure that Astro.cookies.set() is only called in the frontmatter of the main page.
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:118:23)
+    at eval (/Users/marcel.debruyker/ak-kommunal-plattform/src/lib/supabase.ts:28:19)
+    at Array.forEach (<anonymous>)
+    at setAll (/Users/marcel.debruyker/ak-kommunal-plattform/src/lib/supabase.ts:27:22)
+    at applyServerStorage (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/ssr/src/cookies.ts:471:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Object.callback (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/ssr/src/createServerClient.ts:224:7)
+    at async <anonymous> (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4653:11)
+    at async Promise.all (index 1)
+    at async SupabaseAuthClient._notifyAllSubscribers (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4659:7)
+    at async SupabaseAuthClient._callRefreshToken (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4607:7)
+    at async SupabaseAuthClient.__loadSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:2828:40)
+    at async SupabaseAuthClient._useSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:2720:22)
+    at async SupabaseAuthClient._emitInitialSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:3997:12)
+AstroError [ResponseSentError]: The response has already been sent to the browser and cannot be altered.
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:145:13)
+    at eval (/Users/marcel.debruyker/ak-kommunal-plattform/src/lib/supabase.ts:28:19)
+    at Array.forEach (<anonymous>)
+    at setAll (/Users/marcel.debruyker/ak-kommunal-plattform/src/lib/supabase.ts:27:22)
+    at applyServerStorage (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/ssr/src/cookies.ts:471:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Object.callback (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/ssr/src/createServerClient.ts:224:7)
+    at async <anonymous> (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4653:11)
+    at async Promise.all (index 1)
+    at async SupabaseAuthClient._notifyAllSubscribers (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4659:7)
+    at async SupabaseAuthClient._callRefreshToken (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4607:7)
+    at async SupabaseAuthClient.__loadSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:2828:40)
+    at async SupabaseAuthClient._useSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:2720:22)
+    at async SupabaseAuthClient._emitInitialSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:3997:12) {
+  loc: undefined,
+  title: 'Unable to set response.',
+  hint: undefined,
+  frame: undefined,
+  type: 'AstroError'
+}
+15:45:24 [ERROR] [ResponseSentError] The response has already been sent to the browser and cannot be altered.
+  Error reference:
+    https://docs.astro.build/en/reference/errors/response-sent-error/
+  Stack trace:
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:140:7)
+    at Array.forEach (<anonymous>)
+    [...] See full stack trace in the browser, or rerun with --verbose.
+15:45:24 [ERROR] [ResponseSentError] The response has already been sent to the browser and cannot be altered.
+  Error reference:
+    https://docs.astro.build/en/reference/errors/response-sent-error/
+  Stack trace:
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:140:7)
+    at Array.forEach (<anonymous>)
+    [...] See full stack trace in the browser, or rerun with --verbose.
+15:45:24 [ERROR] [ResponseSentError] The response has already been sent to the browser and cannot be altered.
+  Error reference:
+    https://docs.astro.build/en/reference/errors/response-sent-error/
+  Stack trace:
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:140:7)
+    at Array.forEach (<anonymous>)
+    [...] See full stack trace in the browser, or rerun with --verbose.
+18:11:55 [200] / 193ms
+18:11:56 [200] /app/dashboard 1294ms
+Warning: Astro.cookies.set() was called after the cookies had already been sent to the browser.
+This may have happened if this method was called in an imported component.
+Please make sure that Astro.cookies.set() is only called in the frontmatter of the main page.
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:118:23)
+    at eval (/Users/marcel.debruyker/ak-kommunal-plattform/src/lib/supabase.ts:28:19)
+    at Array.forEach (<anonymous>)
+    at setAll (/Users/marcel.debruyker/ak-kommunal-plattform/src/lib/supabase.ts:27:22)
+    at applyServerStorage (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/ssr/src/cookies.ts:471:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Object.callback (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/ssr/src/createServerClient.ts:224:7)
+    at async <anonymous> (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4653:11)
+    at async Promise.all (index 1)
+    at async SupabaseAuthClient._notifyAllSubscribers (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4659:7)
+    at async SupabaseAuthClient._callRefreshToken (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4607:7)
+    at async SupabaseAuthClient.__loadSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:2828:40)
+    at async SupabaseAuthClient._useSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:2720:22)
+    at async SupabaseAuthClient._emitInitialSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:3997:12)
+AstroError [ResponseSentError]: The response has already been sent to the browser and cannot be altered.
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:145:13)
+    at eval (/Users/marcel.debruyker/ak-kommunal-plattform/src/lib/supabase.ts:28:19)
+    at Array.forEach (<anonymous>)
+    at setAll (/Users/marcel.debruyker/ak-kommunal-plattform/src/lib/supabase.ts:27:22)
+    at applyServerStorage (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/ssr/src/cookies.ts:471:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Object.callback (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/ssr/src/createServerClient.ts:224:7)
+    at async <anonymous> (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4653:11)
+    at async Promise.all (index 1)
+    at async SupabaseAuthClient._notifyAllSubscribers (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4659:7)
+    at async SupabaseAuthClient._callRefreshToken (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4607:7)
+    at async SupabaseAuthClient.__loadSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:2828:40)
+    at async SupabaseAuthClient._useSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:2720:22)
+    at async SupabaseAuthClient._emitInitialSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:3997:12) {
+  loc: undefined,
+  title: 'Unable to set response.',
+  hint: undefined,
+  frame: undefined,
+  type: 'AstroError'
+}
+18:11:57 [ERROR] [ResponseSentError] The response has already been sent to the browser and cannot be altered.
+  Error reference:
+    https://docs.astro.build/en/reference/errors/response-sent-error/
+  Stack trace:
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:140:7)
+    at Array.forEach (<anonymous>)
+    [...] See full stack trace in the browser, or rerun with --verbose.
+18:11:57 [ERROR] [ResponseSentError] The response has already been sent to the browser and cannot be altered.
+  Error reference:
+    https://docs.astro.build/en/reference/errors/response-sent-error/
+  Stack trace:
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:140:7)
+    at Array.forEach (<anonymous>)
+    [...] See full stack trace in the browser, or rerun with --verbose.
+18:11:57 [ERROR] [ResponseSentError] The response has already been sent to the browser and cannot be altered.
+  Error reference:
+    https://docs.astro.build/en/reference/errors/response-sent-error/
+  Stack trace:
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:140:7)
+    at Array.forEach (<anonymous>)
+    [...] See full stack trace in the browser, or rerun with --verbose.
+19:35:39 [200] / 319ms
+19:35:40 [200] /app/dashboard 865ms
+Warning: Astro.cookies.set() was called after the cookies had already been sent to the browser.
+This may have happened if this method was called in an imported component.
+Please make sure that Astro.cookies.set() is only called in the frontmatter of the main page.
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:118:23)
+    at eval (/Users/marcel.debruyker/ak-kommunal-plattform/src/lib/supabase.ts:28:19)
+    at Array.forEach (<anonymous>)
+    at setAll (/Users/marcel.debruyker/ak-kommunal-plattform/src/lib/supabase.ts:27:22)
+    at applyServerStorage (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/ssr/src/cookies.ts:471:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Object.callback (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/ssr/src/createServerClient.ts:224:7)
+    at async <anonymous> (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4653:11)
+    at async Promise.all (index 1)
+    at async SupabaseAuthClient._notifyAllSubscribers (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4659:7)
+    at async SupabaseAuthClient._callRefreshToken (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4607:7)
+    at async SupabaseAuthClient.__loadSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:2828:40)
+    at async SupabaseAuthClient._useSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:2720:22)
+    at async SupabaseAuthClient._emitInitialSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:3997:12)
+AstroError [ResponseSentError]: The response has already been sent to the browser and cannot be altered.
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:145:13)
+    at eval (/Users/marcel.debruyker/ak-kommunal-plattform/src/lib/supabase.ts:28:19)
+    at Array.forEach (<anonymous>)
+    at setAll (/Users/marcel.debruyker/ak-kommunal-plattform/src/lib/supabase.ts:27:22)
+    at applyServerStorage (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/ssr/src/cookies.ts:471:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Object.callback (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/ssr/src/createServerClient.ts:224:7)
+    at async <anonymous> (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4653:11)
+    at async Promise.all (index 1)
+    at async SupabaseAuthClient._notifyAllSubscribers (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4659:7)
+    at async SupabaseAuthClient._callRefreshToken (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4607:7)
+    at async SupabaseAuthClient.__loadSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:2828:40)
+    at async SupabaseAuthClient._useSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:2720:22)
+    at async SupabaseAuthClient._emitInitialSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:3997:12) {
+  loc: undefined,
+  title: 'Unable to set response.',
+  hint: undefined,
+  frame: undefined,
+  type: 'AstroError'
+}
+19:35:40 [ERROR] [ResponseSentError] The response has already been sent to the browser and cannot be altered.
+  Error reference:
+    https://docs.astro.build/en/reference/errors/response-sent-error/
+  Stack trace:
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:140:7)
+    at Array.forEach (<anonymous>)
+    [...] See full stack trace in the browser, or rerun with --verbose.
+19:35:40 [ERROR] [ResponseSentError] The response has already been sent to the browser and cannot be altered.
+  Error reference:
+    https://docs.astro.build/en/reference/errors/response-sent-error/
+  Stack trace:
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:140:7)
+    at Array.forEach (<anonymous>)
+    [...] See full stack trace in the browser, or rerun with --verbose.
+19:35:40 [ERROR] [ResponseSentError] The response has already been sent to the browser and cannot be altered.
+  Error reference:
+    https://docs.astro.build/en/reference/errors/response-sent-error/
+  Stack trace:
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:140:7)
+    at Array.forEach (<anonymous>)
+    [...] See full stack trace in the browser, or rerun with --verbose.
+23:38:43 [200] / 79ms
+23:52:21 [200] / 62ms
+23:52:22 [200] /app/dashboard 1792ms
+Warning: Astro.cookies.set() was called after the cookies had already been sent to the browser.
+This may have happened if this method was called in an imported component.
+Please make sure that Astro.cookies.set() is only called in the frontmatter of the main page.
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:118:23)
+    at eval (/Users/marcel.debruyker/ak-kommunal-plattform/src/lib/supabase.ts:28:19)
+    at Array.forEach (<anonymous>)
+    at setAll (/Users/marcel.debruyker/ak-kommunal-plattform/src/lib/supabase.ts:27:22)
+    at applyServerStorage (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/ssr/src/cookies.ts:471:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Object.callback (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/ssr/src/createServerClient.ts:224:7)
+    at async <anonymous> (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4653:11)
+    at async Promise.all (index 1)
+    at async SupabaseAuthClient._notifyAllSubscribers (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4659:7)
+    at async SupabaseAuthClient._callRefreshToken (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4607:7)
+    at async SupabaseAuthClient.__loadSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:2828:40)
+    at async SupabaseAuthClient._useSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:2720:22)
+    at async SupabaseAuthClient._emitInitialSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:3997:12)
+AstroError [ResponseSentError]: The response has already been sent to the browser and cannot be altered.
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:145:13)
+    at eval (/Users/marcel.debruyker/ak-kommunal-plattform/src/lib/supabase.ts:28:19)
+    at Array.forEach (<anonymous>)
+    at setAll (/Users/marcel.debruyker/ak-kommunal-plattform/src/lib/supabase.ts:27:22)
+    at applyServerStorage (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/ssr/src/cookies.ts:471:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Object.callback (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/ssr/src/createServerClient.ts:224:7)
+    at async <anonymous> (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4653:11)
+    at async Promise.all (index 1)
+    at async SupabaseAuthClient._notifyAllSubscribers (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4659:7)
+    at async SupabaseAuthClient._callRefreshToken (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4607:7)
+    at async SupabaseAuthClient.__loadSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:2828:40)
+    at async SupabaseAuthClient._useSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:2720:22)
+    at async SupabaseAuthClient._emitInitialSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:3997:12) {
+  loc: undefined,
+  title: 'Unable to set response.',
+  hint: undefined,
+  frame: undefined,
+  type: 'AstroError'
+}
+23:52:23 [ERROR] [ResponseSentError] The response has already been sent to the browser and cannot be altered.
+  Error reference:
+    https://docs.astro.build/en/reference/errors/response-sent-error/
+  Stack trace:
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:140:7)
+    at Array.forEach (<anonymous>)
+    [...] See full stack trace in the browser, or rerun with --verbose.
+23:52:23 [ERROR] [ResponseSentError] The response has already been sent to the browser and cannot be altered.
+  Error reference:
+    https://docs.astro.build/en/reference/errors/response-sent-error/
+  Stack trace:
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:140:7)
+    at Array.forEach (<anonymous>)
+    [...] See full stack trace in the browser, or rerun with --verbose.
+23:52:23 [ERROR] [ResponseSentError] The response has already been sent to the browser and cannot be altered.
+  Error reference:
+    https://docs.astro.build/en/reference/errors/response-sent-error/
+  Stack trace:
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:140:7)
+    at Array.forEach (<anonymous>)
+    [...] See full stack trace in the browser, or rerun with --verbose.
+11:18:11 [200] / 466ms
+11:18:13 [200] /app/dashboard 2326ms
+Warning: Astro.cookies.set() was called after the cookies had already been sent to the browser.
+This may have happened if this method was called in an imported component.
+Please make sure that Astro.cookies.set() is only called in the frontmatter of the main page.
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:118:23)
+    at eval (/Users/marcel.debruyker/ak-kommunal-plattform/src/lib/supabase.ts:28:19)
+    at Array.forEach (<anonymous>)
+    at setAll (/Users/marcel.debruyker/ak-kommunal-plattform/src/lib/supabase.ts:27:22)
+    at applyServerStorage (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/ssr/src/cookies.ts:471:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Object.callback (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/ssr/src/createServerClient.ts:224:7)
+    at async <anonymous> (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4653:11)
+    at async Promise.all (index 1)
+    at async SupabaseAuthClient._notifyAllSubscribers (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4659:7)
+    at async SupabaseAuthClient._callRefreshToken (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4607:7)
+    at async SupabaseAuthClient.__loadSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:2828:40)
+    at async SupabaseAuthClient._useSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:2720:22)
+    at async SupabaseAuthClient._emitInitialSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:3997:12)
+AstroError [ResponseSentError]: The response has already been sent to the browser and cannot be altered.
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:145:13)
+    at eval (/Users/marcel.debruyker/ak-kommunal-plattform/src/lib/supabase.ts:28:19)
+    at Array.forEach (<anonymous>)
+    at setAll (/Users/marcel.debruyker/ak-kommunal-plattform/src/lib/supabase.ts:27:22)
+    at applyServerStorage (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/ssr/src/cookies.ts:471:9)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async Object.callback (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/ssr/src/createServerClient.ts:224:7)
+    at async <anonymous> (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4653:11)
+    at async Promise.all (index 1)
+    at async SupabaseAuthClient._notifyAllSubscribers (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4659:7)
+    at async SupabaseAuthClient._callRefreshToken (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:4607:7)
+    at async SupabaseAuthClient.__loadSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:2828:40)
+    at async SupabaseAuthClient._useSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:2720:22)
+    at async SupabaseAuthClient._emitInitialSession (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/@supabase/auth-js/src/GoTrueClient.ts:3997:12) {
+  loc: undefined,
+  title: 'Unable to set response.',
+  hint: undefined,
+  frame: undefined,
+  type: 'AstroError'
+}
+11:18:13 [ERROR] [ResponseSentError] The response has already been sent to the browser and cannot be altered.
+  Error reference:
+    https://docs.astro.build/en/reference/errors/response-sent-error/
+  Stack trace:
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:140:7)
+    at Array.forEach (<anonymous>)
+    [...] See full stack trace in the browser, or rerun with --verbose.
+11:18:13 [ERROR] [ResponseSentError] The response has already been sent to the browser and cannot be altered.
+  Error reference:
+    https://docs.astro.build/en/reference/errors/response-sent-error/
+  Stack trace:
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:140:7)
+    at Array.forEach (<anonymous>)
+    [...] See full stack trace in the browser, or rerun with --verbose.
+11:18:13 [ERROR] [ResponseSentError] The response has already been sent to the browser and cannot be altered.
+  Error reference:
+    https://docs.astro.build/en/reference/errors/response-sent-error/
+  Stack trace:
+    at AstroCookies.set (/Users/marcel.debruyker/ak-kommunal-plattform/node_modules/astro/dist/core/cookies/cookies.js:140:7)
+    at Array.forEach (<anonymous>)
+    [...] See full stack trace in the browser, or rerun with --verbose.
+08:12:11 [200] / 89ms
+08:15:17 [200] / 23ms
+08:43:29 [200] / 45ms
+08:58:35 [200] / 84ms
+08:58:35 [200] / 25ms
+10:06:32 [200] / 418ms
+10:06:32 [200] / 11ms
+08:50:48 [watch] /src/styles/global.css

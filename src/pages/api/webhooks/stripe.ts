@@ -65,9 +65,7 @@ export const POST: APIRoute = async ({ request }) => {
               .map(i => `<li><strong>${i.description}</strong></li>`)
               .join('');
             
-            const senderEmail = process.env.RESEND_API_KEY.includes('re_') && process.env.VERCEL_ENV !== 'production' 
-              ? 'onboarding@resend.dev' 
-              : 'noreply@bw-partner.de'; 
+            const senderEmail = 'noreply@debruyker.de';
 
             const customerNamePart = session.customer_details?.name ? ` ${session.customer_details.name},` : ',';
 

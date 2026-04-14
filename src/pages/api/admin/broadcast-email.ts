@@ -79,9 +79,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     // 5. E-Mail Massenversand (Broadcast) formatieren
     const resend = new Resend(resendKey);
-    const senderEmail = resendKey.includes('re_') && import.meta.env.VERCEL_ENV !== 'production' 
-        ? 'onboarding@resend.dev' 
-        : 'noreply@bw-partner.de'; 
+    const senderEmail = 'noreply@debruyker.de';
 
     // Formatted Date
     const formattedDate = seminar.eventDate ? new Intl.DateTimeFormat('de-DE', { dateStyle: 'full', timeStyle: 'short' }).format(new Date(seminar.eventDate)) : 'Datum noch festzulegen';

@@ -152,9 +152,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     // 5. Send Confirmation Email via Resend
     if (process.env.RESEND_API_KEY) {
       const resend = new Resend(process.env.RESEND_API_KEY);
-      const senderEmail = process.env.RESEND_API_KEY.includes('re_') && process.env.VERCEL_ENV !== 'production' 
-        ? 'onboarding@resend.dev' 
-        : 'noreply@bw-partner.de'; // Later set to noreply@bw-partner.de or verified domain
+      const senderEmail = 'noreply@debruyker.de';
 
       const itemListHtml = items.map((i: any) => `<li><strong>${i.title}</strong></li>`).join('');
 
