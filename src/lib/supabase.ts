@@ -34,3 +34,15 @@ export const getSupabaseServer = (request: Request, cookies: AstroCookies) => {
     },
   });
 };
+
+// 3. Admin Client (used exclusively in secure Server / API endpoints for bypassing RLS / sending emails)
+export const getSupabaseAdmin = () => {
+  const serviceKey = import.meta.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!serviceKey) throw new Error('SUPABASE_SERVICE_ROLE_KEY missing');
+  return createClient(supabaseUrl, serviceKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  });
+};
