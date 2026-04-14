@@ -32,11 +32,21 @@ if (user) {
 }
 
 // Fetch real data from Sanity
-let sanityQuery = '*[_type == "seminar" && status == "aufzeichnung"] | order(_createdAt desc) { "id": slug.current, title, description, moduleName, duration, "image": image.asset->url }';
-if (!hasMembership) {
-  sanityQuery = `*[_type == "seminar" && status == "aufzeichnung" && slug.current in $slugs] | order(_createdAt desc) { "id": slug.current, title, description, moduleName, duration, "image": image.asset->url }`;
+const allSeminars = await sanityClient.fetch(`*[_type == "seminar" && status == "aufzeichnung"] | order(_createdAt desc) { "id": slug.current, "slug": slug.current, title, description, moduleName, duration, "image": image.asset->url }`);
+
+const hasGesamtpaket = purchasedSlugs.includes('gesamtpaket');
+let userSeminars = allSeminars;
+
+if (!hasMembership && !hasGesamtpaket) {
+  userSeminars = allSeminars.filter((video: any) => {
+    if (purchasedSlugs.includes(video.slug)) return true;
+    if (video.moduleName) {
+      const moduleSlug = video.moduleName.toLowerCase().replace(/ü/g, 'ue').replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/\s+/g, '-');
+      if (purchasedSlugs.includes(moduleSlug)) return true;
+    }
+    return false;
+  });
 }
-const userSeminars = await sanityClient.fetch(sanityQuery, !hasMembership ? { slugs: purchasedSlugs } : {});
 
 const recentSeminar = userSeminars.length > 0 ? userSeminars[0] : null;
 const newSeminars = userSeminars.slice(1, 4);

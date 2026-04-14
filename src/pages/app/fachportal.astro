@@ -27,11 +27,22 @@ const sanitySeminars = await sanityClient.fetch(`*[_type == "seminar"] | order(e
 }`);
 
 // Determine which seminars the user has access to
-const videos = sanitySeminars.map((video: any) => ({
-  ...video,
-  image: video.imageUrl || "https://images.unsplash.com/photo-1544531586-fde5298cdd40?auto=format&fit=crop&q=80&w=800", // Sanity Image or Fallback
-  hasAccess: purchasedSlugs.includes(video.slug)
-}));
+const hasGesamtpaket = purchasedSlugs.includes('gesamtpaket');
+
+const videos = sanitySeminars.map((video: any) => {
+  let hasAccess = purchasedSlugs.includes(video.slug) || hasGesamtpaket;
+  
+  if (!hasAccess && video.moduleName) {
+    const moduleSlug = video.moduleName.toLowerCase().replace(/ü/g, 'ue').replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/\s+/g, '-');
+    hasAccess = purchasedSlugs.includes(moduleSlug);
+  }
+
+  return {
+    ...video,
+    image: video.imageUrl || "https://images.unsplash.com/photo-1544531586-fde5298cdd40?auto=format&fit=crop&q=80&w=800", // Sanity Image or Fallback
+    hasAccess
+  };
+});
 
 ---
 
