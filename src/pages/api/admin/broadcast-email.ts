@@ -209,7 +209,7 @@ export const POST: APIRoute = async ({ request }) => {
       const emailPayloads = batchUsers.filter(u => u.email).map(u => {
          const { subject, html } = getEmailPayload(u, emailType);
          return {
-            from: \`AK Kommunal Plattform <\${senderEmail}>\`,
+            from: `AK Kommunal Plattform <${senderEmail}>`,
             to: [u.email!],
             subject: subject,
             html: html
