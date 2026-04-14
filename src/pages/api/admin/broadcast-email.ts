@@ -89,7 +89,7 @@ export const POST: APIRoute = async ({ request }) => {
     const senderEmail = 'noreply@debruyker.de';
 
     // Formatted Date
-    const formattedDate = seminar.eventDate ? new Intl.DateTimeFormat('de-DE', { dateStyle: 'full', timeStyle: 'short' }).format(new Date(seminar.eventDate)) : 'Datum noch festzulegen';
+    const formattedDate = seminar.eventDate ? new Intl.DateTimeFormat('de-DE', { dateStyle: 'full', timeStyle: 'short', timeZone: 'Europe/Berlin' }).format(new Date(seminar.eventDate)) : 'Datum noch festzulegen';
 
     const getEmailPayload = (user: any, emailType: string) => {
         let salutationString = '';
