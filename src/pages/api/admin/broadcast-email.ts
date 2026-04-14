@@ -44,12 +44,18 @@ export const POST: APIRoute = async ({ request }) => {
     const supabaseAdmin = createClient(supabaseUrl, supabaseKey, { auth: { autoRefreshToken: false, persistSession: false } });
 
     // 4. Zielgruppe (Kohorte) identifizieren: Abo-Kunden UND Einzelkäufer dieses Videos
-    // - Abo Kunden:
+    // - Abo Kunden (Alte Methode über Profil-Flag):
     const { data: abonnementProfiles } = await supabaseAdmin
       .from('user_profiles')
       .select('id')
       .eq('has_membership', true);
       
+    // - Abo Kunden (Neue Methode über Käufe der Module):
+    const { data: abonnementPurchases } = await supabaseAdmin
+      .from('purchases')
+      .select('user_id')
+      .in('video_slug', ['grundlagen', 'spezial', 'praktiker', 'gesamt', 'grundlagen-modul', 'spezialthemen-modul', 'praktiker-modul', 'gesamtpaket']);
+
     // - Einzelkäufer (Video-Slug basiert)
     const { data: expressPurchases } = await supabaseAdmin
       .from('purchases')
@@ -57,10 +63,11 @@ export const POST: APIRoute = async ({ request }) => {
       .eq('video_slug', seminar.slug);
 
     const aboIds = (abonnementProfiles || []).map(p => p.id);
+    const modulePurchaserIds = (abonnementPurchases || []).map(p => p.user_id);
     const purchaseIds = (expressPurchases || []).map(p => p.user_id);
     
     // Kombinieren & doppelte IDs filtern
-    const uniqueUserIds = Array.from(new Set([...aboIds, ...purchaseIds]));
+    const uniqueUserIds = Array.from(new Set([...aboIds, ...modulePurchaserIds, ...purchaseIds]));
 
     if (uniqueUserIds.length === 0) {
       return new Response(JSON.stringify({ error: 'Dieses Seminar hat noch gar keine berechtigten Käufer.' }), { status: 400 });
