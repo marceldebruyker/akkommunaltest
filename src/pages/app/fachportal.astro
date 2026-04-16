@@ -4,6 +4,7 @@ import LernweltCard from '../../components/LernweltCard.astro';
 
 import { getSupabaseServer } from '../../lib/supabase';
 import { sanityClient } from '../../lib/sanity';
+import { buildPermissions } from '../../lib/permissions';
 
 const supabase = getSupabaseServer(Astro.request, Astro.cookies);
 const { data: authData } = await supabase.auth.getUser();
@@ -12,12 +13,18 @@ if (!authData?.user) {
   return Astro.redirect('/login');
 }
 
+const { data: profile } = await supabase
+  .from('user_profiles')
+  .select('*')
+  .eq('id', authData.user.id)
+  .single();
+
 const { data: purchases } = await supabase
   .from('purchases')
   .select('video_slug')
   .eq('user_id', authData.user.id);
 
-const purchasedSlugs = purchases ? purchases.map(p => p.video_slug) : [];
+const permissions = buildPermissions(profile, purchases || []);
 
 const sanitySeminars = await sanityClient.fetch(`*[_type == "seminar"] | order(eventDate asc) {
   "slug": slug.current,
@@ -26,25 +33,16 @@ const sanitySeminars = await sanityClient.fetch(`*[_type == "seminar"] | order(e
   "materials": materials[].asset->{url, originalFilename}
 }`);
 
-// Determine which seminars the user has access to
-const hasGesamtpaket = purchasedSlugs.includes('gesamtpaket') || purchasedSlugs.includes('gesamt');
-
 const videos = sanitySeminars.map((video: any) => {
-  let hasAccess = purchasedSlugs.includes(video.slug) || hasGesamtpaket;
-  
-  if (!hasAccess && video.moduleName) {
-    const lowerName = video.moduleName.toLowerCase();
-    if (lowerName.includes('spezial') && (purchasedSlugs.includes('spezial') || purchasedSlugs.includes('spezialthemen-modul'))) hasAccess = true;
-    if (lowerName.includes('grundlagen') && (purchasedSlugs.includes('grundlagen') || purchasedSlugs.includes('grundlagen-modul'))) hasAccess = true;
-    if (lowerName.includes('praktiker') && (purchasedSlugs.includes('praktiker') || purchasedSlugs.includes('praktiker-modul'))) hasAccess = true;
-  }
+  const hasAccess = permissions.canAccessVideo(video.slug, video.moduleName);
 
   return {
     ...video,
-    image: video.imageUrl || "https://images.unsplash.com/photo-1544531586-fde5298cdd40?auto=format&fit=crop&q=80&w=800", // Sanity Image or Fallback
+    image: video.imageUrl || "https://images.unsplash.com/photo-1544531586-fde5298cdd40?auto=format&fit=crop&q=80&w=800",
     hasAccess
   };
 });
+
 
 ---
 

@@ -1,6 +1,7 @@
 ---
 import AppLayout from '../../layouts/AppLayout.astro';
 import { getSupabaseServer } from '../../lib/supabase';
+import { buildPermissions } from '../../lib/permissions';
 
 const supabase = getSupabaseServer(Astro.request, Astro.cookies);
 const { data: { user } } = await supabase.auth.getUser();
@@ -36,7 +37,6 @@ if (Astro.request.method === 'POST') {
       if (insertError) {
         notification = `Fehler beim Erstellen: ${insertError.message}`;
       } else {
-        // Erfolgreich! Wir leiten um, damit F5 (Neuladen) das Formular nicht nochmal sendet
         return Astro.redirect('/app/forum');
       }
     }
@@ -46,29 +46,21 @@ if (Astro.request.method === 'POST') {
 }
 
 // Profil abrufen für Berechtigungs-Check
-const { data: profile, error: profileError } = await supabase
+const { data: profile } = await supabase
   .from('user_profiles')
-  .select('role, has_membership')
+  .select('*')
   .eq('id', user.id)
   .maybeSingle();
 
-if (profileError) {
-  console.error("Supabase Profile Fetch Error:", profileError);
-}
-
-// Check purchases for module memberships
 const { data: purchases } = await supabase
   .from('purchases')
   .select('video_slug')
   .eq('user_id', user.id);
 
-const purchasedSlugs = purchases?.map(p => p.video_slug) || [];
-const hasModuleMembership = purchasedSlugs.some(slug => 
-  ['gesamtpaket', 'gesamt', 'spezial', 'spezialthemen-modul', 'grundlagen', 'grundlagen-modul', 'praktiker', 'praktiker-modul'].includes(slug)
-);
+const permissions = buildPermissions(profile, purchases || []);
 
-const isAdmin = profile?.role === 'admin';
-const hasAccess = isAdmin || profile?.has_membership || hasModuleMembership;
+const isAdmin = permissions.hasFullAccess() || profile?.is_admin;
+const hasAccess = permissions.isMember();
 
 let forumTopics: any[] = [];
 let topPinnedTopic: any = null;

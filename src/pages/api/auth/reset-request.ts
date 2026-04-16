@@ -45,7 +45,7 @@ export const POST: APIRoute = async ({ request, redirect, url }) => {
             .header h1 { color: #ffffff; margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; }
             .content { padding: 40px; color: #4b5563; line-height: 1.6; }
             .content h2 { margin-top: 0; color: #05183a; font-size: 22px; font-weight: 800; mb-4; }
-            .button { display: inline-block; background-color: #f59e0b; color: #ffffff !important; text-decoration: none; padding: 16px 32px; border-radius: 8px; font-weight: 700; font-size: 16px; margin: 30px 0; }
+            .button { display: inline-block; background-color: #05183a; color: #ffffff !important; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 700; font-size: 16px; margin: 30px 0; border: none; }
             .footer { background-color: #f8fafc; padding: 30px 40px; font-size: 13px; color: #94a3b8; text-align: center; border-top: 1px solid #f1f5f9; }
             .copy-link { font-size: 13px; margin-top: 30px; line-height: 1.5; color: #64748b; }
             .copy-link a { color: #3b82f6; text-decoration: underline; word-break: break-all; }

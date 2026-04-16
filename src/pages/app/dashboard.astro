@@ -2,6 +2,7 @@
 import AppLayout from '../../layouts/AppLayout.astro';
 import { getSupabaseServer } from '../../lib/supabase';
 import { sanityClient, extractPlainTextFromPortableText } from '../../lib/sanity';
+import { buildPermissions } from '../../lib/permissions';
 
 const supabase = getSupabaseServer(Astro.request, Astro.cookies);
 const { data: { user } } = await supabase.auth.getUser();
@@ -11,51 +12,39 @@ const lastName = user?.user_metadata?.last_name || '';
 const salutationString = user?.user_metadata?.salutation_string || '';
 const greetingName = salutationString || (lastName ? `Herr/Frau ${lastName}` : (firstName || 'lieber Nutzer'));
 
-// Check membership status for upsell logic
-let hasMembership = false;
-let purchasedSlugs: string[] = [];
+// Fetch real data from Sanity
+const allSeminars = await sanityClient.fetch(`*[_type == "seminar" && status == "aufzeichnung"] | order(_createdAt desc) { "id": slug.current, "slug": slug.current, title, description, moduleName, duration, "image": image.asset->url }`);
+
+let permissions = buildPermissions(null, []);
 
 if (user) {
   const { data: profile } = await supabase
     .from('user_profiles')
-    .select('has_membership')
+    .select('has_membership, is_admin, is_partner')
     .eq('id', user.id)
     .single();
-  hasMembership = profile?.has_membership === true;
 
-  // Fetch individual purchases
   const { data: purchases } = await supabase
     .from('purchases')
     .select('video_slug')
     .eq('user_id', user.id);
   
-  if (purchases) purchasedSlugs = purchases.map(p => p.video_slug);
+  permissions = buildPermissions(profile, purchases || []);
 }
 
-// Fetch real data from Sanity
-const allSeminars = await sanityClient.fetch(`*[_type == "seminar" && status == "aufzeichnung"] | order(_createdAt desc) { "id": slug.current, "slug": slug.current, title, description, moduleName, duration, "image": image.asset->url }`);
-
-const hasGesamtpaket = purchasedSlugs.includes('gesamtpaket') || purchasedSlugs.includes('gesamt');
 let userSeminars = allSeminars;
 
-if (!hasMembership && !hasGesamtpaket) {
-  userSeminars = allSeminars.filter((video: any) => {
-    if (purchasedSlugs.includes(video.slug)) return true;
-    if (video.moduleName) {
-      const lowerName = video.moduleName.toLowerCase();
-      if (lowerName.includes('spezial') && (purchasedSlugs.includes('spezial') || purchasedSlugs.includes('spezialthemen-modul'))) return true;
-      if (lowerName.includes('grundlagen') && (purchasedSlugs.includes('grundlagen') || purchasedSlugs.includes('grundlagen-modul'))) return true;
-      if (lowerName.includes('praktiker') && (purchasedSlugs.includes('praktiker') || purchasedSlugs.includes('praktiker-modul'))) return true;
-    }
-    return false;
-  });
+if (!permissions.hasFullAccess()) {
+  userSeminars = allSeminars.filter((video: any) => permissions.canAccessVideo(video.slug, video.moduleName));
 }
 
 const recentSeminar = userSeminars.length > 0 ? userSeminars[0] : null;
 const newSeminars = userSeminars.slice(1, 4);
-    // Check if user has specific packages to change banner logic
-    const hasModuleAccess = purchasedSlugs.some(slug => ['grundlagen', 'grundlagen-modul', 'spezial', 'spezialthemen', 'spezialthemen-modul', 'praktiker', 'praktiker-modul'].includes(slug.toLowerCase()));
-    const ownsEverything = hasGesamtpaket || hasMembership;
+
+const hasModuleAccess = permissions.isMember();
+const ownsEverything = permissions.hasFullAccess();
+const hasAnyPurchases = permissions.isMember() || userSeminars.length > 0;
+
     ---
 
 <AppLayout title="Dashboard - AK Kommunal App" currentPath="/app/dashboard">
@@ -74,7 +63,7 @@ const newSeminars = userSeminars.slice(1, 4);
         
         <div class="flex items-center gap-5 relative z-10 pl-2">
           <div class="w-12 h-12 rounded-xl bg-[#05183a]/5 flex items-center justify-center flex-shrink-0 text-[#05183a]">
-            {purchasedSlugs.length > 0 ? (
+            {hasAnyPurchases ? (
               <span class="material-symbols-outlined text-[24px]">workspace_premium</span>
             ) : (
               <span class="material-symbols-outlined text-[24px]">lock_open</span>
@@ -86,7 +75,7 @@ const newSeminars = userSeminars.slice(1, 4);
                 <h3 class="text-[#05183a] font-bold text-lg mb-1">Upgrade auf das Gesamtpaket</h3>
                 <p class="text-gray-500 text-sm">Sie besitzen bereits ein Fach-Modul. Erweitern Sie Ihren Account um das gesamte Portal für unbeschränkten Zugriff.</p>
               </>
-            ) : purchasedSlugs.length > 0 ? (
+            ) : hasAnyPurchases ? (
               <>
                 <h3 class="text-[#05183a] font-bold text-lg mb-1">Upgrade auf ein Fach-Modul</h3>
                 <p class="text-gray-500 text-sm">Sie besitzen derzeit Einzel-Seminare. Schalten Sie sich mit einem Modul-Abo den gesamten Themenbereich frei.</p>
