@@ -2,7 +2,6 @@
 import Layout from '../layouts/Layout.astro';
 import TopNavBar from '../components/TopNavBar.astro';
 import FooterSection from '../components/FooterSection.astro';
-import BuyVideoButton from '../components/BuyVideoButton.tsx';
 import { sanityClient, extractPlainTextFromPortableText } from '../lib/sanity';
 
 export const prerender = false;
@@ -145,41 +144,45 @@ function formatDate(iso: string) {
               </h2>
               <div class="space-y-4">
                 {(module.seminars as any[]).map((seminar: any) => (
-                    <div class="seminar-card relative flex flex-col items-start md:flex-row md:items-stretch gap-5 p-6 md:p-8 bg-surface-container-lowest border border-outline-variant/30 rounded-2xl hover:border-primary/30 hover:shadow-md transition-all group" data-module-id={module.moduleId} data-topic-id={getEventTopic(seminar.title)}>
+                    <a href={`/termine/${seminar.slug}`} class="seminar-card block group" data-module-id={module.moduleId} data-topic-id={getEventTopic(seminar.title)}>
+                      <div class="relative flex flex-col items-start md:flex-row md:items-stretch gap-6 p-6 md:p-8 bg-white border border-slate-200 rounded-[24px] hover:border-[#05183a]/20 hover:shadow-[0_12px_40px_-15px_rgba(5,24,58,0.15)] transition-all duration-300">
                       
-                      <!-- Events Block -->
-                      <div class="md:w-56 shrink-0 relative flex flex-col justify-center border-b md:border-b-0 md:border-r border-outline-variant/15 pb-4 md:pb-0 md:pr-6">
-                        <span class="text-[10px] text-on-surface-variant/70 uppercase tracking-widest font-black mb-3 block">Datum</span>
-                        <div class="text-xl md:text-2xl font-black text-primary font-headline tracking-tight group-hover:text-primary-fixed-dim transition-colors">
-                          {formatDate(seminar.eventDate)}
+                        <!-- Events Block -->
+                        <div class="md:w-52 shrink-0 relative flex flex-col justify-center border-b md:border-b-0 md:border-r border-slate-100 pb-5 md:pb-0 md:pr-6">
+                          <span class="text-[10px] text-slate-400 uppercase tracking-[0.2em] font-black mb-3 block">Datum</span>
+                          <div class="text-2xl md:text-3xl font-black text-[#05183a] font-headline tracking-tighter group-hover:text-[#3b82f6] transition-colors">
+                            {formatDate(seminar.eventDate)}
+                          </div>
                         </div>
+                        
+                        <!-- Context & Topic -->
+                        <div class="flex-grow flex flex-col justify-center py-2 md:pl-2">
+                           <h3 class="text-xl md:text-2xl font-black font-headline text-[#05183a] leading-snug mb-2 group-hover:text-[#3b82f6] transition-colors">
+                             {seminar.title}
+                           </h3>
+                           <div class="text-[13px] font-bold text-[#3b82f6] mb-3">{seminar.moduleName}</div>
+                           {seminar.description && (
+                             <p class="text-[15px] text-slate-500 font-light leading-relaxed line-clamp-2">
+                               {extractPlainTextFromPortableText(seminar.description)}
+                             </p>
+                           )}
+                        </div>
+                        
+                        <!-- Meta & Action -->
+                        <div class="w-full md:w-auto md:text-right shrink-0 mt-6 md:mt-0 flex flex-row md:flex-col items-center justify-between md:justify-center gap-5 md:pl-8 md:min-w-[180px] relative z-20">
+                           <div class="text-[12px] font-bold text-slate-500 flex items-center gap-1.5 uppercase tracking-widest bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-100">
+                             <span class="material-symbols-outlined text-[15px]">schedule</span> 
+                             {seminar.duration || '90 Min.'}
+                           </div>
+                           <div class="w-full md:w-auto">
+                              <span class="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#05183a] text-white text-[15px] font-bold rounded-xl shadow-[0_4px_14px_rgba(5,24,58,0.25)] group-hover:bg-[#0a2350] group-hover:shadow-[0_6px_20px_rgba(5,24,58,0.3)] group-hover:-translate-y-0.5 transition-all duration-300">
+                                Mehr Infos <span class="material-symbols-outlined text-[18px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                              </span>
+                           </div>
+                        </div>
+                        
                       </div>
-                      
-                      <!-- Context & Topic -->
-                      <div class="flex-grow flex flex-col justify-center py-2 md:pl-2">
-                         <h3 class="text-lg md:text-xl font-bold text-primary leading-snug mb-1">
-                           <a href={`/termine/${seminar.slug}`} class="after:absolute after:inset-0 hover:underline">{seminar.title}</a>
-                         </h3>
-                         <div class="text-[13px] font-bold text-primary-fixed-dim mb-2">{seminar.moduleName}</div>
-                         {seminar.description && (
-                           <p class="text-[14px] text-on-surface-variant font-light leading-relaxed line-clamp-3">
-                             {extractPlainTextFromPortableText(seminar.description)}
-                           </p>
-                         )}
-                      </div>
-                      
-                      <!-- Meta & Action -->
-                      <div class="w-full md:w-auto md:text-right shrink-0 mt-4 md:mt-0 flex flex-row md:flex-col items-center justify-between md:justify-center gap-4 md:pl-6 md:min-w-[140px] relative z-20">
-                         <div class="text-[11px] font-bold text-secondary flex items-center gap-1.5 uppercase tracking-widest bg-secondary/5 px-2.5 py-1 rounded-md">
-                           <span class="material-symbols-outlined text-[14px]">schedule</span> 
-                           {seminar.duration || '90 Min.'}
-                         </div>
-                         <div class="w-full md:w-auto">
-                            <BuyVideoButton client:load video={{ id: seminar.slug, title: seminar.title, price: seminar.price || 0 }} />
-                         </div>
-                      </div>
-                      
-                    </div>
+                    </a>
                 ))}
               </div>
             </div>
