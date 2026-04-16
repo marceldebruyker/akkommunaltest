@@ -93,7 +93,7 @@ export const POST: APIRoute = async ({ request }) => {
             await resend.emails.send({
               from: `AK Kommunal Plattform <${senderEmail}>`,
               to: [session.customer_details.email],
-              subject: 'Erfolgreiche Anmeldung / Bestellung',
+              subject: 'Erfolgreiche Buchung',
               html: `
                 <!DOCTYPE html>
                 <html>
