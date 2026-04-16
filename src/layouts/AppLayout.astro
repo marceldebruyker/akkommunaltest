@@ -15,6 +15,16 @@ const salutationString = user?.user_metadata?.salutation_string || '';
 const displayName = salutationString || (lastName ? `Herr/Frau ${lastName}` : (firstName ? `${firstName} ${lastName}` : email));
 const initials = firstName ? `${firstName.charAt(0)}${lastName?.charAt(0) || ''}` : email.charAt(0).toUpperCase();
 
+let isAdmin = false;
+if (user) {
+  const { data: profile } = await supabase
+    .from('user_profiles')
+    .select('is_admin')
+    .eq('id', user.id)
+    .single();
+  isAdmin = profile?.is_admin === true;
+}
+
 let timeGreeting = "Guten Tag";
 try {
   const hourString = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Berlin', hour: 'numeric', hour12: false }).format(new Date());
@@ -60,6 +70,15 @@ try {
         <a href="/app/profil" class={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors ${currentPath === '/app/profil' ? 'bg-[#05183a]/5 text-[#05183a]' : 'text-gray-500 hover:bg-gray-50 hover:text-[#05183a]'}`}>
           <span class="material-symbols-outlined text-[20px]">person</span> Profil & Rechnungen
         </a>
+        
+        {isAdmin && (
+          <>
+            <div class="my-2 border-t border-gray-100"></div>
+            <a href="/app/admin" class={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-colors border ${currentPath === '/app/admin' ? 'bg-[#05183a] text-white border-[#05183a]' : 'bg-blue-50 text-blue-700 hover:bg-[#05183a] hover:text-white border-blue-200'}`}>
+              <span class="material-symbols-outlined text-[20px]">admin_panel_settings</span> Administrator
+            </a>
+          </>
+        )}
       </div>
 
       <div class="p-4 border-t border-[#e5e7eb]">
