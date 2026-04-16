@@ -115,7 +115,7 @@ function getModuleId(moduleName: string) {
 
         </aside>
 
-        <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6" id="video-list">
+        <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6 auto-rows-max items-start content-start" id="video-list">
           {rawVideos.map((video: any) => (
             <a href={`/mediathek/${video.slug}`} class="video-card group relative flex flex-col p-7 bg-white border border-slate-200 rounded-3xl hover:border-primary/20 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1" data-module={getModuleId(video.moduleName)} data-topics={(video.topics || ['umsatzsteuer']).join(',')}>
               <!-- Content without Image Banner -->
@@ -221,11 +221,13 @@ function getModuleId(moduleName: string) {
         const topicMatch = (currentTopic === 'all' || cardTopicsList.includes(currentTopic));
         
         if (moduleMatch && topicMatch) {
-          card.setAttribute('style', 'display: flex;');
+          card.classList.remove('hidden');
+          card.classList.add('flex');
           card.classList.add('is-visible');
           visibleCount++;
         } else {
-          card.setAttribute('style', 'display: none;');
+          card.classList.add('hidden');
+          card.classList.remove('flex');
           card.classList.remove('is-visible');
         }
       });

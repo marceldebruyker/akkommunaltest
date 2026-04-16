@@ -263,11 +263,13 @@ function formatDate(iso: string) {
         const topicMatch = (currentTopic === 'all' || cardTopicsList.includes(currentTopic));
         
         if (moduleMatch && topicMatch) {
-          card.setAttribute('style', 'display: flex;');
+          card.classList.remove('hidden');
+          card.classList.add('flex');
           card.classList.add('is-visible');
           visibleCount++;
         } else {
-          card.setAttribute('style', 'display: none;');
+          card.classList.add('hidden');
+          card.classList.remove('flex');
           card.classList.remove('is-visible');
         }
       });
@@ -276,9 +278,9 @@ function formatDate(iso: string) {
       document.querySelectorAll('.module-group').forEach(group => {
         const visibleCardsInGroup = group.querySelectorAll('.seminar-card.is-visible');
         if (visibleCardsInGroup.length === 0) {
-          group.setAttribute('style', 'display: none;');
+          group.classList.add('hidden');
         } else {
-          group.setAttribute('style', 'display: block;');
+          group.classList.remove('hidden');
         }
       });
       
