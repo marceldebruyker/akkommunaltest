@@ -52,9 +52,9 @@ const formattedDate = dateObj.toLocaleDateString("de-DE", { day: "2-digit", mont
           {post.title}
         </h1>
         
-        <p class="text-xl md:text-2xl text-on-surface-variant font-light font-body max-w-3xl mx-auto leading-relaxed">
-          {post.excerpt}
-        </p>
+        <div class="text-xl md:text-2xl text-on-surface-variant font-light font-body max-w-3xl mx-auto leading-relaxed [&>p]:inline">
+          {typeof post.excerpt === 'string' ? post.excerpt : (post.excerpt && <SanityPortableText value={post.excerpt} />)}
+        </div>
       </div>
 
       {post.imageUrl && (

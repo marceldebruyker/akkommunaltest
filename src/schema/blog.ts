@@ -37,7 +37,21 @@ export const blog = defineType({
     defineField({
       name: 'excerpt',
       title: 'Zusammenfassung (Kurz)',
-      type: 'text',
+      type: 'array',
+      of: [
+        {
+          type: 'block',
+          styles: [{ title: 'Normal', value: 'normal' }],
+          lists: [],
+          marks: {
+            decorators: [
+              { title: 'Fett', value: 'strong' },
+              { title: 'Kursiv', value: 'em' },
+            ],
+            annotations: [],
+          },
+        },
+      ],
     }),
     defineField({
       name: 'mainImage',

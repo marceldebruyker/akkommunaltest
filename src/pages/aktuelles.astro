@@ -2,6 +2,7 @@
 import Layout from '../layouts/Layout.astro';
 import TopNavBar from '../components/TopNavBar.astro';
 import FooterSection from '../components/FooterSection.astro';
+import SanityPortableText from '../components/SanityPortableText.tsx';
 
 import { sanityClient } from '../lib/sanity';
 
@@ -90,9 +91,9 @@ if (!sanityPosts || sanityPosts.length === 0) {
             <h3 class={`text-2xl font-extrabold font-headline text-primary mb-4 transition-colors line-clamp-2 ${!isMock ? 'group-hover:text-primary-fixed-dim' : ''}`}>
               {item.title}
             </h3>
-            <p class="text-on-surface-variant leading-relaxed text-[15px] font-light mb-8 flex-grow">
-              {item.excerpt}
-            </p>
+            <div class="text-on-surface-variant leading-relaxed text-[15px] font-light mb-8 flex-grow [&>p]:inline">
+              {typeof item.excerpt === 'string' ? item.excerpt : (item.excerpt && <SanityPortableText value={item.excerpt} />)}
+            </div>
             <div class={`mt-auto pt-6 border-t border-outline-variant/20 flex items-center text-primary font-bold text-sm transition-all ${!isMock ? 'group-hover:gap-2' : ''}`}>
               Artikel lesen <span class={`material-symbols-outlined text-[18px] ml-1 transition-transform ${!isMock ? 'group-hover:translate-x-1' : ''}`}>arrow_forward</span>
             </div>
