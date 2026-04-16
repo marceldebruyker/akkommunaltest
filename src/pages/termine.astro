@@ -39,7 +39,7 @@ function formatDate(iso: string) {
 }
 ---
 
-<Layout title="Termine & Live-Webinare | AK Kommunal">
+<Layout title="Termine & Fach-Webinare | AK Kommunal">
   <TopNavBar />
   
   <main class="w-full bg-surface pt-32 pb-24 min-h-screen relative overflow-hidden">
@@ -56,7 +56,7 @@ function formatDate(iso: string) {
         </h2>
       </div>
       <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold font-headline text-primary tracking-tight leading-[1.1] pb-2 mb-6 max-w-3xl">
-        Alle Live-Webinare <br/>
+        Alle Fach-Webinare <br/>
         <span class="text-primary-fixed-dim">im Überblick.</span>
       </h1>
       <p class="text-on-surface-variant text-lg font-body leading-relaxed font-light max-w-2xl">
@@ -150,6 +150,11 @@ function formatDate(iso: string) {
                         <!-- Top Meta Header -->
                         <div class="flex flex-wrap items-center gap-3 mb-5">
                           <span class="text-[11px] font-bold text-primary bg-primary/5 border border-primary/10 px-3 py-1 rounded-md tracking-wider uppercase">{seminar.moduleName}</span>
+                          {seminar.topics && seminar.topics.length > 0 && seminar.topics[0] && (
+                             <span class="text-[11px] font-bold text-slate-600 bg-slate-100 border border-slate-200 px-3 py-1 rounded-md tracking-wider uppercase">
+                               {seminar.topics.map((t: string) => t === 'umsatzsteuer' ? 'Umsatzsteuer & § 2b UStG' : t === 'ertragsteuern' ? 'Ertragsteuern' : t === 'tax-cms' ? 'Tax CMS' : t === 'rechnungswesen' ? 'Jahresabs. & Rechnungsw.' : t === 'energie' ? 'Energie & Nachhaltigkeit' : t === 'it-security' ? 'IT & Datensicherheit' : t === 'aktuelles' ? 'Aktuelles & Updates' : t).join(', ')}
+                             </span>
+                          )}
                           <span class="text-[13px] font-semibold text-slate-500 flex items-center gap-1.5 ml-2">
                             <span class="material-symbols-outlined text-[16px] text-slate-400">calendar_month</span> {formatDate(seminar.eventDate)}
                           </span>

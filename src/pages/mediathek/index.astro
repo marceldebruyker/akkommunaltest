@@ -119,6 +119,14 @@ function getModuleId(moduleName: string) {
           {rawVideos.map((video: any) => (
             <a href={`/mediathek/${video.slug}`} class="video-card group relative flex flex-col p-7 bg-white border border-slate-200 rounded-3xl hover:border-primary/20 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1" data-module={getModuleId(video.moduleName)} data-topics={(video.topics || ['umsatzsteuer']).join(',')}>
               <!-- Content without Image Banner -->
+              <div class="flex flex-wrap items-center gap-2 mb-4">
+                 <span class="text-[10px] font-bold text-primary bg-primary/5 border border-primary/10 px-2.5 py-1 rounded-md tracking-wider uppercase">{video.moduleName || 'Weitere Formate'}</span>
+                 {video.topics && video.topics.length > 0 && video.topics[0] && (
+                   <span class="text-[10px] font-bold text-slate-600 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-md tracking-wider uppercase">
+                     {video.topics.map((t: string) => t === 'umsatzsteuer' ? 'Umsatzsteuer & § 2b UStG' : t === 'ertragsteuern' ? 'Ertragsteuern' : t === 'tax-cms' ? 'Tax CMS' : t === 'rechnungswesen' ? 'Jahresabs. & Rechnungsw.' : t === 'energie' ? 'Energie & Nachhaltigkeit' : t === 'it-security' ? 'IT & Datensicherheit' : t === 'aktuelles' ? 'Aktuelles & Updates' : t).join(', ')}
+                   </span>
+                 )}
+              </div>
               <h3 class="text-lg font-bold font-headline text-[#05183a] mb-5 leading-tight group-hover:text-primary-fixed-dim transition-colors">{video.title}</h3>
               
               {video.referenten && video.referenten.length > 0 && (
