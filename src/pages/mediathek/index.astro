@@ -9,7 +9,7 @@ const rawVideos = await sanityClient.fetch(`*[_type == "seminar" && status == "a
   "slug": slug.current,
   title, duration, price, badges, moduleName,
   "topics": coalesce(topics, [topic]),
-  "image": image.asset->url
+  "referenten": referenten[]->{ name, role, "imageUrl": image.asset->url }
 }`);
 
 function getModuleId(moduleName: string) {
@@ -118,26 +118,37 @@ function getModuleId(moduleName: string) {
         <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-16" id="video-list">
           {rawVideos.map((video: any) => (
             <a href={`/mediathek/${video.slug}`} class="video-card group flex flex-col bg-transparent" data-module={getModuleId(video.moduleName)} data-topics={(video.topics || ['umsatzsteuer']).join(',')}>
-              <!-- Image with Badges -->
-              <div class="relative w-full aspect-[16/9] rounded-xl overflow-hidden mb-5 bg-[#05183a]/5">
-                {video.image ? (
-                  <img src={video.image} alt={video.title} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" />
-                ) : (
-                  <div class="w-full h-full bg-[#05183a]/10 flex items-center justify-center">
-                    <span class="material-symbols-outlined text-4xl text-[#05183a]/20">movie</span>
-                  </div>
-                )}
-                <div class="absolute top-3 left-3 flex flex-wrap gap-1.5">
-                  {(video.badges || []).map((badge: string) => (
-                    <span class="bg-white/95 backdrop-blur-md text-[#05183a] border border-white/50 text-[8px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-sm shadow-sm">{badge}</span>
+              <!-- Content without Image Banner -->
+              <div class="flex items-center gap-3 mb-4">
+                {(video.badges || []).map((badge: string) => (
+                  <span class="bg-primary/5 text-primary border border-primary/10 text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-md">{badge}</span>
+                ))}
+              </div>
+              <h3 class="text-xl font-extrabold font-headline text-[#05183a] mb-5 leading-tight group-hover:text-primary-fixed-dim transition-colors">{video.title}</h3>
+              
+              {video.referenten && video.referenten.length > 0 && (
+                <div class="flex flex-col gap-3 mb-6">
+                  {video.referenten.map((speaker: any) => (
+                    <div class="flex items-center gap-3">
+                      <div class="w-10 h-10 rounded-full overflow-hidden bg-slate-200 border border-slate-100 shrink-0">
+                        {speaker.imageUrl ? (
+                           <img src={speaker.imageUrl} alt={speaker.name} class="w-full h-full object-cover grayscale opacity-90 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500" />
+                        ) : (
+                           <div class="w-full h-full flex items-center justify-center text-slate-400">
+                             <span class="material-symbols-outlined text-[20px]">person</span>
+                           </div>
+                        )}
+                      </div>
+                      <div class="flex flex-col">
+                        <span class="text-[13px] font-bold text-[#05183a] leading-tight">{speaker.name}</span>
+                        <span class="text-[11px] font-medium text-slate-500 leading-tight mt-0.5">{speaker.role}</span>
+                      </div>
+                    </div>
                   ))}
                 </div>
-              </div>
+              )}
               
-              <!-- Content -->
-              <h3 class="text-xl font-extrabold font-headline text-[#05183a] mb-2.5 leading-tight group-hover:text-primary-fixed-dim transition-colors">{video.title}</h3>
-              
-              <div class="flex items-center gap-5 text-[11px] font-medium text-[#05183a]/70 mb-8 border-b border-outline-variant/15 pb-6">
+              <div class="flex items-center gap-5 text-[11px] font-medium text-[#05183a]/70 mb-6 border-b border-outline-variant/15 pb-6">
                 <div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px]">schedule</span> {video.duration ? `${video.duration} Min.` : '90 Min.'}</div>
                 <div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px]">videocam</span> Aufzeichnung</div>
               </div>

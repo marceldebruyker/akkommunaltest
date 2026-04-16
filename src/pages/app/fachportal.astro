@@ -29,8 +29,8 @@ const permissions = buildPermissions(profile, purchases || []);
 const sanitySeminars = await sanityClient.fetch(`*[_type == "seminar"] | order(eventDate asc) {
   "slug": slug.current,
   title, status, eventDate, teamsLink, vimeoId, moduleName, duration, price,
-  "imageUrl": image.asset->url,
-  "materials": materials[].asset->{url, originalFilename}
+  "materials": materials[].asset->{url, originalFilename},
+  "referenten": referenten[]->{ name, role, "imageUrl": image.asset->url }
 }`);
 
 const videos = sanitySeminars.map((video: any) => {
