@@ -158,6 +158,15 @@ export const POST: APIRoute = async ({ request }) => {
                     <tr>
                       <td style="background-color: #f8fafc; padding: 24px 40px; text-align: center; border-top: 1px solid #f1f5f9;">
                         <p style="color: #94a3b8; font-size: 13px; margin: 0; line-height: 1.5;">Sie haben Fragen zu Ihrer Buchung?<br>Antworten Sie einfach auf diese E-Mail oder kontaktieren Sie unseren Support.</p>
+                        
+                        <!-- Legal Impressum -->
+                        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e2e8f0; color: #94a3b8; font-size: 11px; line-height: 1.6;">
+                          <strong>AK Kommunal – Eine Marke der BW Partner Gruppe</strong><br>
+                          BW PARTNER Bauer Schätz Hasenclever Partnerschaft mbB<br>
+                          Hauptstraße 41, 70563 Stuttgart<br>
+                          Amtsgericht Stuttgart PR 720097 | USt-IdNr.: DE257068936<br>
+                          <a href="https://www.ak-kommunal.de/impressum" style="color: #94a3b8; text-decoration: underline;">Impressum</a> | <a href="https://www.ak-kommunal.de/datenschutz" style="color: #94a3b8; text-decoration: underline;">Datenschutz</a>
+                        </div>
                       </td>
                     </tr>
                   </table>

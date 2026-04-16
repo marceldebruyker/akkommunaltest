@@ -209,6 +209,24 @@ export const POST: APIRoute = async ({ request }) => {
                   ${emailContent}
                 </td>
               </tr>
+              <!-- Footer Area -->
+              <tr>
+                <td style="background-color: #f8fafc; padding: 24px 40px; text-align: center; border-top: 1px solid #f1f5f9;">
+                  <p style="color: #64748b; font-size: 13px; margin: 0 0 16px 0; line-height: 1.5;">
+                    Sie erhalten diese E-Mail als Mitglied des Fachportals AK Kommunal. Wenn Sie keine weiteren Seminar-Einladungen mehr erhalten möchten, klicken Sie bitte 
+                    <a href="mailto:seminare@bw-partner.com?subject=Abmelden%20-%20Keine%20Einladungen" style="color: #3b82f6; text-decoration: underline;">hier zum Abmelden</a>.
+                  </p>
+                  
+                  <!-- Legal Impressum -->
+                  <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e2e8f0; color: #94a3b8; font-size: 11px; line-height: 1.6;">
+                    <strong>AK Kommunal – Eine Marke der BW Partner Gruppe</strong><br>
+                    BW PARTNER Bauer Schätz Hasenclever Partnerschaft mbB<br>
+                    Hauptstraße 41, 70563 Stuttgart<br>
+                    Amtsgericht Stuttgart PR 720097 | USt-IdNr.: DE257068936<br>
+                    <a href="${new URL(request.url).origin}/impressum" style="color: #94a3b8; text-decoration: underline;">Impressum</a> | <a href="${new URL(request.url).origin}/datenschutz" style="color: #94a3b8; text-decoration: underline;">Datenschutz</a>
+                  </div>
+                </td>
+              </tr>
             </table>
           </body>
           </html>

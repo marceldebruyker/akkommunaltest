@@ -1,0 +1,40 @@
+---
+import AppLayout from '../../../layouts/AppLayout.astro';
+import { getSupabaseServer } from '../../../lib/supabase';
+import AdminDashboard from '../../../components/admin/AdminDashboard'; // We'll create this React component
+
+const supabase = getSupabaseServer(Astro.request, Astro.cookies);
+const { data: { user } } = await supabase.auth.getUser();
+
+if (!user) {
+  return Astro.redirect('/login');
+}
+
+// Security Check: Is the user an admin?
+const { data: profile } = await supabase
+  .from('user_profiles')
+  .select('is_admin')
+  .eq('id', user.id)
+  .single();
+
+// Strict Gate
+if (profile?.is_admin !== true) {
+  return Astro.redirect('/app/dashboard');
+}
+---
+
+<AppLayout title="Admin Dashboard - AK Kommunal App" currentPath="/app/admin">
+  <div class="p-8 max-w-7xl mx-auto">
+    <div class="mb-8">
+      <h1 class="text-3xl font-extrabold font-headline text-[#05183a] tracking-tight mb-2 flex items-center gap-2">
+        <span class="material-symbols-outlined text-3xl text-[#f5981d]">shield_person</span>
+        Admin Bereich
+      </h1>
+      <p class="text-gray-500">Kunden, Freischaltungen und Foren-Rechte verwalten (Zugriff auf autorisiertes Personal beschränkt).</p>
+    </div>
+
+    <!-- Client-side React Dashboard Application -->
+    <AdminDashboard client:load />
+    
+  </div>
+</AppLayout>

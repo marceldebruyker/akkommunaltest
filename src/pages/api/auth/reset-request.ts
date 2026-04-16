@@ -71,7 +71,15 @@ export const POST: APIRoute = async ({ request, redirect, url }) => {
             </div>
             <div class="footer">
               Sie haben diese Passwort-Änderung nicht in die Wege geleitet?<br>
-              Dann können Sie diese E-Mail einfach ignorieren. Ihr aktuelles Passwort bleibt weiterhin gültig.
+              Dann können Sie diese E-Mail einfach ignorieren. Ihr aktuelles Passwort bleibt weiterhin gültig.<br>
+              
+              <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e2e8f0; color: #94a3b8; font-size: 11px; line-height: 1.6;">
+                <strong>AK Kommunal – Eine Marke der BW Partner Gruppe</strong><br>
+                BW PARTNER Bauer Schätz Hasenclever Partnerschaft mbB<br>
+                Hauptstraße 41, 70563 Stuttgart<br>
+                Amtsgericht Stuttgart PR 720097 | USt-IdNr.: DE257068936<br>
+                <a href="${baseUrl}/impressum" style="color: #94a3b8; text-decoration: underline;">Impressum</a> | <a href="${baseUrl}/datenschutz" style="color: #94a3b8; text-decoration: underline;">Datenschutz</a>
+              </div>
             </div>
           </div>
         </body>
