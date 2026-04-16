@@ -7,25 +7,10 @@ import { sanityClient } from '../../lib/sanity';
 
 const rawVideos = await sanityClient.fetch(`*[_type == "seminar" && status == "aufzeichnung"]{
   "slug": slug.current,
-  title, duration, price, badges, topic, moduleName,
+  title, duration, price, badges, moduleName,
+  "topics": coalesce(topics, [topic]),
   "image": image.asset->url
 }`);
-
-function getDurationBucket(durationStr: string) {
-  if (!durationStr) return 'short';
-  const hrs = durationStr.match(/(\d+)\s*(h|Std|Stunden)/i);
-  const mins = durationStr.match(/(\d+)\s*(min|Minuten)/i);
-  let totalMins = 0;
-  if (hrs) totalMins += parseInt(hrs[1]) * 60;
-  if (mins) totalMins += parseInt(mins[1]);
-  else if (!hrs) {
-    const rawNum = durationStr.match(/(\d+)/);
-    if (rawNum) totalMins = parseInt(rawNum[1]);
-  }
-  if (totalMins < 90) return 'short';
-  if (totalMins <= 120) return 'medium';
-  return 'long';
-}
 
 function getModuleId(moduleName: string) {
   const name = (moduleName || '').toLowerCase();
@@ -127,34 +112,12 @@ function getModuleId(moduleName: string) {
             </div>
           </div>
 
-          <!-- Dauer -->
-          <div>
-            <h3 class="text-[9px] font-bold text-on-surface-variant uppercase tracking-[0.2em] mb-5">Dauer</h3>
-            <div class="space-y-4">
-              <label class="flex items-center gap-3 cursor-pointer group">
-                <input type="radio" name="dauer" value="all" class="filter-radio duration-radio w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" checked />
-                <span class="text-[13px] font-medium text-[#05183a] group-hover:text-primary transition-colors">Alle</span>
-              </label>
-              <label class="flex items-center gap-3 cursor-pointer group">
-                <input type="radio" name="dauer" value="short" class="filter-radio duration-radio w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
-                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">&lt; 90 Min.</span>
-              </label>
-              <label class="flex items-center gap-3 cursor-pointer group">
-                <input type="radio" name="dauer" value="medium" class="filter-radio duration-radio w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
-                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">90 - 120 Min.</span>
-              </label>
-              <label class="flex items-center gap-3 cursor-pointer group">
-                <input type="radio" name="dauer" value="long" class="filter-radio duration-radio w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
-                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">&gt; 120 Min.</span>
-              </label>
-            </div>
-          </div>
+
         </aside>
 
-        <!-- Video Grid -->
         <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-16" id="video-list">
           {rawVideos.map((video: any) => (
-            <a href={`/mediathek/${video.slug}`} class="video-card group flex flex-col bg-transparent" data-module={getModuleId(video.moduleName)} data-topic={video.topic ?? 'umsatzsteuer'} data-duration={getDurationBucket(video.duration)}>
+            <a href={`/mediathek/${video.slug}`} class="video-card group flex flex-col bg-transparent" data-module={getModuleId(video.moduleName)} data-topics={(video.topics || ['umsatzsteuer']).join(',')}>
               <!-- Image with Badges -->
               <div class="relative w-full aspect-[16/9] rounded-xl overflow-hidden mb-5 bg-[#05183a]/5">
                 {video.image ? (
@@ -175,7 +138,7 @@ function getModuleId(moduleName: string) {
               <h3 class="text-xl font-extrabold font-headline text-[#05183a] mb-2.5 leading-tight group-hover:text-primary-fixed-dim transition-colors">{video.title}</h3>
               
               <div class="flex items-center gap-5 text-[11px] font-medium text-[#05183a]/70 mb-8 border-b border-outline-variant/15 pb-6">
-                <div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px]">schedule</span> {video.duration || '60 Min.'}</div>
+                <div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px]">schedule</span> {video.duration ? `${video.duration} Min.` : '90 Min.'}</div>
                 <div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[14px]">videocam</span> Aufzeichnung</div>
               </div>
 
@@ -222,7 +185,6 @@ function getModuleId(moduleName: string) {
     function updateFilters() {
       let currentModule = 'all';
       let currentTopic = 'all';
-      let currentDuration = 'all';
       
       const activeModuleRadio = document.querySelector('input.module-radio:checked');
       if (activeModuleRadio) currentModule = activeModuleRadio.getAttribute('value') || 'all';
@@ -230,9 +192,6 @@ function getModuleId(moduleName: string) {
       const activeTopicRadio = document.querySelector('input.topic-radio:checked');
       if (activeTopicRadio) currentTopic = activeTopicRadio.getAttribute('value') || 'all';
       
-      const activeDurationRadio = document.querySelector('input.duration-radio:checked');
-      if (activeDurationRadio) currentDuration = activeDurationRadio.getAttribute('value') || 'all';
-
       // Update styling tags for active/inactive text
       document.querySelectorAll<HTMLInputElement>('input.filter-radio').forEach((r) => {
         const textSpan = r.nextElementSibling;
@@ -250,14 +209,12 @@ function getModuleId(moduleName: string) {
       let visibleCount = 0;
       videoCards.forEach(card => {
         const cardModule = card.getAttribute('data-module');
-        const cardTopic = card.getAttribute('data-topic');
-        const cardDuration = card.getAttribute('data-duration');
+        const cardTopicsList = card.getAttribute('data-topics') || '';
         
         const moduleMatch = (currentModule === 'all' || cardModule === currentModule);
-        const topicMatch = (currentTopic === 'all' || cardTopic === currentTopic);
-        const durationMatch = (currentDuration === 'all' || cardDuration === currentDuration);
+        const topicMatch = (currentTopic === 'all' || cardTopicsList.includes(currentTopic));
         
-        if (moduleMatch && topicMatch && durationMatch) {
+        if (moduleMatch && topicMatch) {
           card.setAttribute('style', 'display: flex;');
           card.classList.add('is-visible');
           visibleCount++;

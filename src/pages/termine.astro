@@ -9,7 +9,8 @@ export const prerender = false;
 // Fetch Live-Events from Sanity
 const rawSeminars = await sanityClient.fetch(`*[_type == "seminar" && status == "live"] | order(eventDate asc) {
   "slug": slug.current,
-  title, description, moduleName, duration, price, eventDate, badges, topic
+  title, description, moduleName, duration, price, eventDate, badges,
+  "topics": coalesce(topics, [topic])
 }`);
 
 // Group by moduleName and generate IDs for filtering
@@ -142,7 +143,7 @@ function formatDate(iso: string) {
               </h2>
               <div class="space-y-4">
                 {(module.seminars as any[]).map((seminar: any) => (
-                    <a href={`/termine/${seminar.slug}`} class="seminar-card block group" data-module-id={module.moduleId} data-topic-id={seminar.topic ?? 'umsatzsteuer'}>
+                    <a href={`/termine/${seminar.slug}`} class="seminar-card block group" data-module-id={module.moduleId} data-topics={(seminar.topics || ['umsatzsteuer']).join(',')}>
                       <div class="relative flex flex-col p-7 md:p-9 bg-white border border-slate-200 rounded-3xl hover:border-primary/20 hover:shadow-xl transition-all duration-300 transform group-hover:-translate-y-1">
                         
                         <!-- Top Meta Header -->
@@ -152,7 +153,7 @@ function formatDate(iso: string) {
                             <span class="material-symbols-outlined text-[16px] text-slate-400">calendar_month</span> {formatDate(seminar.eventDate)}
                           </span>
                           <span class="text-[13px] font-semibold text-slate-500 flex items-center gap-1.5">
-                            <span class="material-symbols-outlined text-[16px] text-slate-400">schedule</span> {seminar.duration || '90 Min.'}
+                            <span class="material-symbols-outlined text-[16px] text-slate-400">schedule</span> {seminar.duration ? `${seminar.duration} Min.` : '90 Min.'}
                           </span>
                         </div>
                         
@@ -239,10 +240,10 @@ function formatDate(iso: string) {
       let visibleCount = 0;
       seminarCards.forEach(card => {
         const cardModule = card.getAttribute('data-module-id');
-        const cardTopic = card.getAttribute('data-topic-id');
+        const cardTopicsList = card.getAttribute('data-topics') || '';
         
         const moduleMatch = (currentModule === 'all' || cardModule === currentModule);
-        const topicMatch = (currentTopic === 'all' || cardTopic === currentTopic);
+        const topicMatch = (currentTopic === 'all' || cardTopicsList.includes(currentTopic));
         
         if (moduleMatch && topicMatch) {
           card.setAttribute('style', 'display: flex;');

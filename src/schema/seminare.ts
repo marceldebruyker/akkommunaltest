@@ -42,9 +42,10 @@ export const seminar = defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
-      name: 'topic',
-      title: 'Fachgebiet / Thema (Dropdown)',
-      type: 'string',
+      name: 'topics',
+      title: 'Fachgebiet / Themen',
+      type: 'array',
+      of: [{ type: 'string' }],
       options: {
         list: [
           { title: 'Umsatzsteuer & § 2b UStG', value: 'umsatzsteuer' },
@@ -54,8 +55,7 @@ export const seminar = defineType({
           { title: 'Energie & Nachhaltigkeit', value: 'energie' },
           { title: 'IT & Datensicherheit', value: 'it-security' },
           { title: 'Aktuelles & Updates', value: 'aktuelles' },
-        ],
-        layout: 'dropdown',
+        ]
       },
       validation: (Rule) => Rule.required(),
     }),
@@ -68,8 +68,8 @@ export const seminar = defineType({
     }),
     defineField({
       name: 'duration',
-      title: 'Dauer (z.B. 120 Min.)',
-      type: 'string',
+      title: 'Dauer (in Minuten)',
+      type: 'number',
     }),
     defineField({
       name: 'price',

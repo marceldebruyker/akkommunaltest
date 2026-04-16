@@ -72,7 +72,7 @@ if (user) {
         <div class="flex flex-wrap items-center gap-3 mb-6">
           <span class="bg-primary/5 text-primary text-[10px] font-extrabold uppercase tracking-widest px-4 py-1.5 rounded-md border border-primary/10">{video.moduleName}</span>
           <span class="bg-slate-50 text-slate-500 text-[10px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-md border border-slate-200 flex items-center gap-1">
-            <span class="material-symbols-outlined text-[14px]">timer</span> {video.duration}
+            <span class="material-symbols-outlined text-[14px]">timer</span> {video.duration ? `${video.duration} Min.` : '90 Min.'}
           </span>
           <span class="bg-slate-50 text-slate-500 text-[10px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-md border border-slate-200 flex items-center gap-1">
             <span class="material-symbols-outlined text-[14px]">play_circle</span> Online-Aufzeichnung

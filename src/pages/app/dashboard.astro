@@ -150,7 +150,7 @@ const hasAnyPurchases = permissions.isMember() || userSeminars.length > 0;
                   </div>
                   <div class="p-6">
                     <h4 class="font-bold font-headline text-[#05183a] group-hover:text-blue-600 leading-tight mb-2 line-clamp-2 transition-colors">{seminar.title}</h4>
-                    <div class="text-xs text-gray-400 font-semibold">{seminar.moduleName} • {seminar.duration || '90 Min.'}</div>
+                    <div class="text-xs text-gray-400 font-semibold">{seminar.moduleName} • {seminar.duration ? `${seminar.duration} Min.` : '90 Min.'}</div>
                   </div>
                 </a>
               ))}

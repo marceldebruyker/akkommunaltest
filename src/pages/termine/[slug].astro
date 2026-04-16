@@ -89,6 +89,9 @@ if (user) {
             <span class="material-symbols-outlined text-[14px]">calendar_month</span> {dateString}
           </span>
           <span class="bg-slate-50 text-slate-500 text-[10px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-md border border-slate-200 flex items-center gap-1">
+            <span class="material-symbols-outlined text-[14px]">timer</span> {seminar.duration ? `${seminar.duration} Min.` : '90 Min.'}
+          </span>
+          <span class="bg-slate-50 text-slate-500 text-[10px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-md border border-slate-200 flex items-center gap-1">
             <span class="material-symbols-outlined text-[14px]">videocam</span> Live-Event
           </span>
         </div>
