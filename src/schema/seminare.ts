@@ -42,6 +42,24 @@ export const seminar = defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: 'topic',
+      title: 'Fachgebiet / Thema (Dropdown)',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Umsatzsteuer & § 2b UStG', value: 'umsatzsteuer' },
+          { title: 'Ertragsteuern', value: 'ertragsteuern' },
+          { title: 'Tax CMS', value: 'tax-cms' },
+          { title: 'Jahresabschluss & Rechnungswesen', value: 'rechnungswesen' },
+          { title: 'Energie & Nachhaltigkeit', value: 'energie' },
+          { title: 'IT & Datensicherheit', value: 'it-security' },
+          { title: 'Aktuelles & Updates', value: 'aktuelles' },
+        ],
+        layout: 'dropdown',
+      },
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
       name: 'duration',
       title: 'Dauer (z.B. 120 Min.)',
       type: 'string',

@@ -9,7 +9,7 @@ export const prerender = false;
 // Fetch Live-Events from Sanity
 const rawSeminars = await sanityClient.fetch(`*[_type == "seminar" && status == "live"] | order(eventDate asc) {
   "slug": slug.current,
-  title, description, moduleName, duration, price, eventDate, badges
+  title, description, moduleName, duration, price, eventDate, badges, topic
 }`);
 
 // Group by moduleName and generate IDs for filtering
@@ -29,16 +29,6 @@ const groupedModules = Object.entries(
     seminars
   };
 });
-
-function getEventTopic(title: string) {
-  const t = (title || '').toLowerCase();
-  if (t.includes('tax cms')) return 'tax-cms';
-  if (t.includes('umsatzsteuer')) return 'umsatzsteuer';
-  if (t.includes('ertragsteuern')) return 'ertragsteuern';
-  if (t.includes('2b ustg') || t.includes('2b')) return '2b-ustg';
-  if (t.includes('aktuelles') || t.includes('jahresabschluss')) return 'aktuelles';
-  return 'sonstiges';
-}
 
 function formatDate(iso: string) {
   if (!iso) return 'TBA';
@@ -111,20 +101,28 @@ function formatDate(iso: string) {
                 <span class="text-[13px] font-medium text-[#05183a] group-hover:text-primary transition-colors">Alle Themen</span>
               </label>
               <label class="flex items-center gap-3 cursor-pointer group">
-                <input type="radio" name="thema" value="tax-cms" class="filter-radio topic-radio w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
-                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">Tax CMS</span>
-              </label>
-              <label class="flex items-center gap-3 cursor-pointer group">
                 <input type="radio" name="thema" value="umsatzsteuer" class="filter-radio topic-radio w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
-                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">Umsatzsteuer</span>
+                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">Umsatzsteuer & § 2b UStG</span>
               </label>
               <label class="flex items-center gap-3 cursor-pointer group">
                 <input type="radio" name="thema" value="ertragsteuern" class="filter-radio topic-radio w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
                 <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">Ertragsteuern</span>
               </label>
               <label class="flex items-center gap-3 cursor-pointer group">
-                <input type="radio" name="thema" value="2b-ustg" class="filter-radio topic-radio w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
-                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">§ 2b UStG</span>
+                <input type="radio" name="thema" value="tax-cms" class="filter-radio topic-radio w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
+                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">Tax CMS</span>
+              </label>
+              <label class="flex items-center gap-3 cursor-pointer group">
+                <input type="radio" name="thema" value="rechnungswesen" class="filter-radio topic-radio w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
+                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">Jahresabschluss & Rechnungswesen</span>
+              </label>
+              <label class="flex items-center gap-3 cursor-pointer group">
+                <input type="radio" name="thema" value="energie" class="filter-radio topic-radio w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
+                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">Energie & Nachhaltigkeit</span>
+              </label>
+              <label class="flex items-center gap-3 cursor-pointer group">
+                <input type="radio" name="thema" value="it-security" class="filter-radio topic-radio w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
+                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">IT & Datensicherheit</span>
               </label>
               <label class="flex items-center gap-3 cursor-pointer group">
                 <input type="radio" name="thema" value="aktuelles" class="filter-radio topic-radio w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
@@ -144,7 +142,7 @@ function formatDate(iso: string) {
               </h2>
               <div class="space-y-4">
                 {(module.seminars as any[]).map((seminar: any) => (
-                    <a href={`/termine/${seminar.slug}`} class="seminar-card block group" data-module-id={module.moduleId} data-topic-id={getEventTopic(seminar.title)}>
+                    <a href={`/termine/${seminar.slug}`} class="seminar-card block group" data-module-id={module.moduleId} data-topic-id={seminar.topic ?? 'umsatzsteuer'}>
                       <div class="relative flex flex-col items-start md:flex-row md:items-stretch gap-6 p-6 md:p-8 bg-white border border-slate-200 rounded-[24px] hover:border-[#05183a]/20 hover:shadow-[0_12px_40px_-15px_rgba(5,24,58,0.15)] transition-all duration-300">
                       
                         <!-- Events Block -->

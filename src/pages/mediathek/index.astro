@@ -7,9 +7,33 @@ import { sanityClient } from '../../lib/sanity';
 
 const rawVideos = await sanityClient.fetch(`*[_type == "seminar" && status == "aufzeichnung"]{
   "slug": slug.current,
-  title, duration, price, badges,
+  title, duration, price, badges, topic, moduleName,
   "image": image.asset->url
 }`);
+
+function getDurationBucket(durationStr: string) {
+  if (!durationStr) return 'short';
+  const hrs = durationStr.match(/(\d+)\s*(h|Std|Stunden)/i);
+  const mins = durationStr.match(/(\d+)\s*(min|Minuten)/i);
+  let totalMins = 0;
+  if (hrs) totalMins += parseInt(hrs[1]) * 60;
+  if (mins) totalMins += parseInt(mins[1]);
+  else if (!hrs) {
+    const rawNum = durationStr.match(/(\d+)/);
+    if (rawNum) totalMins = parseInt(rawNum[1]);
+  }
+  if (totalMins < 90) return 'short';
+  if (totalMins <= 120) return 'medium';
+  return 'long';
+}
+
+function getModuleId(moduleName: string) {
+  const name = (moduleName || '').toLowerCase();
+  if (name.includes('grundlagen')) return 'grundlagen';
+  if (name.includes('spezialthemen')) return 'spezialthemen';
+  if (name.includes('praktiker')) return 'praktiker';
+  return 'all';
+}
 ---
 
 <Layout title="Videothek - AK Kommunal">
@@ -41,40 +65,64 @@ const rawVideos = await sanityClient.fetch(`*[_type == "seminar" && status == "a
         
         <!-- Sidebar Filters -->
         <aside class="w-full lg:w-48 flex-shrink-0">
-          <!-- Kategorie -->
+          <!-- Modul Filter -->
           <div class="mb-10">
-            <h3 class="text-[9px] font-bold text-on-surface-variant uppercase tracking-[0.2em] mb-5">Kategorie</h3>
+            <h3 class="text-[9px] font-bold text-on-surface-variant uppercase tracking-[0.2em] mb-5">Nach Modul</h3>
             <div class="space-y-4">
               <label class="flex items-center gap-3 cursor-pointer group">
-                <input type="checkbox" class="w-3.5 h-3.5 rounded-sm border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
-                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">Finanzwesen</span>
+                <input type="radio" name="modul" value="all" class="filter-radio module-radio w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" checked />
+                <span class="text-[13px] font-medium text-[#05183a] group-hover:text-primary transition-colors">Alle Module</span>
               </label>
               <label class="flex items-center gap-3 cursor-pointer group">
-                <input type="checkbox" class="w-3.5 h-3.5 rounded-sm border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
-                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">Steuerrecht</span>
+                <input type="radio" name="modul" value="grundlagen" class="filter-radio module-radio w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
+                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">Grundlagen</span>
               </label>
               <label class="flex items-center gap-3 cursor-pointer group">
-                <input type="checkbox" class="w-3.5 h-3.5 rounded-sm border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
-                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">Verwaltungsrecht</span>
+                <input type="radio" name="modul" value="spezialthemen" class="filter-radio module-radio w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
+                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">Spezialthemen</span>
               </label>
               <label class="flex items-center gap-3 cursor-pointer group">
-                <input type="checkbox" class="w-3.5 h-3.5 rounded-sm border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
-                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">IT & Digitalisierung</span>
+                <input type="radio" name="modul" value="praktiker" class="filter-radio module-radio w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
+                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">Praktiker</span>
               </label>
             </div>
           </div>
           
-          <!-- Format -->
+          <!-- Themen Filter -->
           <div class="mb-10">
-            <h3 class="text-[9px] font-bold text-on-surface-variant uppercase tracking-[0.2em] mb-5">Format</h3>
+            <h3 class="text-[9px] font-bold text-on-surface-variant uppercase tracking-[0.2em] mb-5">Nach Thema</h3>
             <div class="space-y-4">
               <label class="flex items-center gap-3 cursor-pointer group">
-                <input type="checkbox" class="w-3.5 h-3.5 rounded-sm border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
-                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">Aufzeichnung</span>
+                <input type="radio" name="thema" value="all" class="filter-radio topic-radio w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" checked />
+                <span class="text-[13px] font-medium text-[#05183a] group-hover:text-primary transition-colors">Alle Themen</span>
               </label>
               <label class="flex items-center gap-3 cursor-pointer group">
-                <input type="checkbox" class="w-3.5 h-3.5 rounded-sm border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
-                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">Live-Webinar</span>
+                <input type="radio" name="thema" value="umsatzsteuer" class="filter-radio topic-radio w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
+                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">Umsatzsteuer & § 2b UStG</span>
+              </label>
+              <label class="flex items-center gap-3 cursor-pointer group">
+                <input type="radio" name="thema" value="ertragsteuern" class="filter-radio topic-radio w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
+                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">Ertragsteuern</span>
+              </label>
+              <label class="flex items-center gap-3 cursor-pointer group">
+                <input type="radio" name="thema" value="tax-cms" class="filter-radio topic-radio w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
+                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">Tax CMS</span>
+              </label>
+              <label class="flex items-center gap-3 cursor-pointer group">
+                <input type="radio" name="thema" value="rechnungswesen" class="filter-radio topic-radio w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
+                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">Jahresabs. & Rechnungsw.</span>
+              </label>
+              <label class="flex items-center gap-3 cursor-pointer group">
+                <input type="radio" name="thema" value="energie" class="filter-radio topic-radio w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
+                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">Energie & Nachhaltigkeit</span>
+              </label>
+              <label class="flex items-center gap-3 cursor-pointer group">
+                <input type="radio" name="thema" value="it-security" class="filter-radio topic-radio w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
+                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">IT & Datensicherheit</span>
+              </label>
+              <label class="flex items-center gap-3 cursor-pointer group">
+                <input type="radio" name="thema" value="aktuelles" class="filter-radio topic-radio w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
+                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">Aktuelles & Updates</span>
               </label>
             </div>
           </div>
@@ -84,25 +132,29 @@ const rawVideos = await sanityClient.fetch(`*[_type == "seminar" && status == "a
             <h3 class="text-[9px] font-bold text-on-surface-variant uppercase tracking-[0.2em] mb-5">Dauer</h3>
             <div class="space-y-4">
               <label class="flex items-center gap-3 cursor-pointer group">
-                <input type="radio" name="dauer" class="w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
-                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">&lt; 2 Stunden</span>
+                <input type="radio" name="dauer" value="all" class="filter-radio duration-radio w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" checked />
+                <span class="text-[13px] font-medium text-[#05183a] group-hover:text-primary transition-colors">Alle</span>
               </label>
               <label class="flex items-center gap-3 cursor-pointer group">
-                <input type="radio" name="dauer" class="w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
-                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">2 - 5 Stunden</span>
+                <input type="radio" name="dauer" value="short" class="filter-radio duration-radio w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
+                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">&lt; 90 Min.</span>
               </label>
               <label class="flex items-center gap-3 cursor-pointer group">
-                <input type="radio" name="dauer" class="w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
-                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">Ganztägig</span>
+                <input type="radio" name="dauer" value="medium" class="filter-radio duration-radio w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
+                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">90 - 120 Min.</span>
+              </label>
+              <label class="flex items-center gap-3 cursor-pointer group">
+                <input type="radio" name="dauer" value="long" class="filter-radio duration-radio w-3.5 h-3.5 border-outline-variant/40 text-primary focus:ring-primary cursor-pointer accent-[#05183a]" />
+                <span class="text-[13px] font-light text-[#05183a] group-hover:text-primary transition-colors">&gt; 120 Min.</span>
               </label>
             </div>
           </div>
         </aside>
 
         <!-- Video Grid -->
-        <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-16">
+        <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-16" id="video-list">
           {rawVideos.map((video: any) => (
-            <a href={`/mediathek/${video.slug}`} class="group flex flex-col bg-transparent">
+            <a href={`/mediathek/${video.slug}`} class="video-card group flex flex-col bg-transparent" data-module={getModuleId(video.moduleName)} data-topic={video.topic ?? 'umsatzsteuer'} data-duration={getDurationBucket(video.duration)}>
               <!-- Image with Badges -->
               <div class="relative w-full aspect-[16/9] rounded-xl overflow-hidden mb-5 bg-[#05183a]/5">
                 {video.image ? (
@@ -147,6 +199,10 @@ const rawVideos = await sanityClient.fetch(`*[_type == "seminar" && status == "a
                  <p class="font-bold text-lg text-[#05183a]">Bisher keine Aufzeichnungen verfügbar.</p>
              </div>
           )}
+          <div id="empty-state" class="hidden col-span-1 md:col-span-2 text-center py-20 opacity-60">
+               <span class="material-symbols-outlined text-4xl mb-2">filter_list_off</span>
+               <p class="font-bold text-lg text-[#05183a]">Keine Aufzeichnung für diese Filterkombination.</p>
+          </div>
         </div>
 
       </div>
@@ -157,3 +213,71 @@ const rawVideos = await sanityClient.fetch(`*[_type == "seminar" && status == "a
   
   <FooterSection />
 </Layout>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const videoCards = document.querySelectorAll('.video-card');
+    const emptyState = document.getElementById('empty-state');
+
+    function updateFilters() {
+      let currentModule = 'all';
+      let currentTopic = 'all';
+      let currentDuration = 'all';
+      
+      const activeModuleRadio = document.querySelector('input.module-radio:checked');
+      if (activeModuleRadio) currentModule = activeModuleRadio.getAttribute('value') || 'all';
+      
+      const activeTopicRadio = document.querySelector('input.topic-radio:checked');
+      if (activeTopicRadio) currentTopic = activeTopicRadio.getAttribute('value') || 'all';
+      
+      const activeDurationRadio = document.querySelector('input.duration-radio:checked');
+      if (activeDurationRadio) currentDuration = activeDurationRadio.getAttribute('value') || 'all';
+
+      // Update styling tags for active/inactive text
+      document.querySelectorAll<HTMLInputElement>('input.filter-radio').forEach((r) => {
+        const textSpan = r.nextElementSibling;
+        if (!textSpan) return;
+        
+        if (r.checked || r.hasAttribute('checked')) {
+          textSpan.classList.remove('font-light');
+          textSpan.classList.add('font-medium');
+        } else {
+          textSpan.classList.add('font-light');
+          textSpan.classList.remove('font-medium');
+        }
+      });
+
+      let visibleCount = 0;
+      videoCards.forEach(card => {
+        const cardModule = card.getAttribute('data-module');
+        const cardTopic = card.getAttribute('data-topic');
+        const cardDuration = card.getAttribute('data-duration');
+        
+        const moduleMatch = (currentModule === 'all' || cardModule === currentModule);
+        const topicMatch = (currentTopic === 'all' || cardTopic === currentTopic);
+        const durationMatch = (currentDuration === 'all' || cardDuration === currentDuration);
+        
+        if (moduleMatch && topicMatch && durationMatch) {
+          card.setAttribute('style', 'display: flex;');
+          card.classList.add('is-visible');
+          visibleCount++;
+        } else {
+          card.setAttribute('style', 'display: none;');
+          card.classList.remove('is-visible');
+        }
+      });
+      
+      if (emptyState) {
+        if (visibleCount === 0) emptyState.classList.remove('hidden');
+        else emptyState.classList.add('hidden');
+      }
+    }
+
+    document.querySelectorAll('input.filter-radio').forEach(r => {
+      r.addEventListener('change', updateFilters);
+    });
+    
+    // Initial call in case browsers preserve radio state on reload
+    updateFilters();
+  });
+</script>
