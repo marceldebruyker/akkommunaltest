@@ -21,5 +21,20 @@ export const team = defineType({
       type: 'image',
       options: { hotspot: true },
     }),
+    defineField({
+      name: 'sortIndex',
+      title: 'Sortierung (Aufsteigend)',
+      type: 'number',
+      description: 'Zahl für die Reihenfolge auf der Website (z.B. 1 für den ersten, 2 für den zweiten).',
+    }),
   ],
+  orderings: [
+    {
+      title: 'Website Sortierung',
+      name: 'sortIndexAsc',
+      by: [
+        { field: 'sortIndex', direction: 'asc' }
+      ]
+    }
+  ]
 })

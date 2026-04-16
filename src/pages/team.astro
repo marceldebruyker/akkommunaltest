@@ -2,8 +2,18 @@
 import Layout from '../layouts/Layout.astro';
 import TopNavBar from '../components/TopNavBar.astro';
 import FooterSection from '../components/FooterSection.astro';
+import { sanityClient } from '../lib/sanity';
 
-const teamMembers = [
+const rawTeamMembers = await sanityClient.fetch(
+  `*[_type == "team"] | order(sortIndex asc) {
+    name,
+    role,
+    "image": image.asset->url
+  }`
+);
+
+// Fallback to static data for development if Sanity is empty
+const teamMembers = rawTeamMembers.length > 0 ? rawTeamMembers : [
   {
     name: "Marius Henkel",
     role: "Wirtschaftsprüfer, Partner",
