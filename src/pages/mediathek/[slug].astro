@@ -13,7 +13,12 @@ const { slug } = Astro.params;
 const video = await sanityClient.fetch(`*[_type == "seminar" && status == "aufzeichnung" && slug.current == $slug][0]{
   "slug": slug.current,
   title, description, moduleName, duration, price, badges,
-  "image": image.asset->url
+  "image": image.asset->url,
+  "referenten": referenten[]->{
+    name,
+    role,
+    "imageUrl": image.asset->url
+  }
 }`, { slug });
 
 if (!video) {
@@ -94,12 +99,37 @@ if (user) {
           </div>
         </div>
 
-        <div class="prose prose-lg prose-blue max-w-none text-on-surface-variant font-light leading-relaxed">
+        <div class="prose prose-lg prose-blue max-w-none text-on-surface-variant font-light leading-relaxed mb-4">
           <h2 class="text-2xl font-bold font-headline text-primary mt-0 mb-4 tracking-tight">Darum geht es im Seminar</h2>
           <p>Dieses Video ist Teil des <strong>{video.moduleName}s</strong> der Akademie der AK Kommunal. Die Aufzeichnung steht Ihnen samt aller Unterlagen nach dem Kauf in Ihrem persönlichen Kunden-Log-in-Bereich zur Verfügung.</p>
           
           <p class="mt-6">Das Seminar richtet sich primär an Kämmerer, Fachbereichsleiter Finanzen und Spezialisten aus der Verwaltung, die bereits Grundlagenwissen mitbringen und sich gezielt auf neue Gesetzeslagen oder Fachvorgaben vorbereiten müssen.</p>
         </div>
+
+        {video.referenten && video.referenten.length > 0 && (
+          <div class="mb-4">
+            <h2 class="text-xl font-bold font-headline text-primary mb-6 tracking-tight">Ihre Referenten</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {video.referenten.map((speaker: any) => (
+                <div class="flex items-center gap-5 p-5 rounded-2xl bg-surface border border-outline-variant/30 hover:border-primary/20 hover:shadow-sm transition-all duration-300">
+                  <div class="w-16 h-16 rounded-full overflow-hidden bg-primary/5 flex-shrink-0 border border-outline-variant/20 shadow-sm">
+                    {speaker.imageUrl ? (
+                      <img src={speaker.imageUrl} alt={speaker.name} class="w-full h-full object-cover" />
+                    ) : (
+                      <div class="w-full h-full flex items-center justify-center text-primary">
+                        <span class="material-symbols-outlined text-[28px]">person</span>
+                      </div>
+                    )}
+                  </div>
+                  <div class="flex flex-col">
+                    <span class="text-base font-extrabold text-primary font-headline tracking-tight leading-tight">{speaker.name}</span>
+                    <span class="text-xs font-bold text-primary-fixed-dim tracking-wide mt-1">{speaker.role}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <!-- Seminar Materials Callout -->
         <div class="bg-primary/5 border border-primary/10 rounded-3xl p-8 flex flex-col md:flex-row gap-8 items-start">

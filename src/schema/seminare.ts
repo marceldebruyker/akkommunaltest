@@ -60,6 +60,13 @@ export const seminar = defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: 'referenten',
+      title: 'Referent(en)',
+      type: 'array',
+      of: [{ type: 'reference', to: [{ type: 'team' }] }],
+      description: 'Wählen Sie die Referenten / Speaker für dieses Seminar aus.',
+    }),
+    defineField({
       name: 'duration',
       title: 'Dauer (z.B. 120 Min.)',
       type: 'string',
