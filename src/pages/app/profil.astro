@@ -80,12 +80,20 @@ if (Astro.request.method === 'POST') {
     } else {
       const firstname = formData.get('firstname')?.toString() || '';
       const lastname = formData.get('lastname')?.toString() || '';
+      const anrede = formData.get('anrede')?.toString() || '';
       const password = formData.get('password')?.toString();
+
+    let salutationString = `${firstname} ${lastname}`;
+    if (anrede === 'Herr' || anrede === 'Frau') {
+      salutationString = `${anrede} ${lastname}`;
+    }
 
     const updates: any = {
       data: {
+        anrede: anrede,
         first_name: firstname,
         last_name: lastname,
+        salutation_string: salutationString
       }
     };
 
@@ -130,6 +138,7 @@ if (Astro.request.method === 'POST') {
 
 const firstName = user.user_metadata?.first_name || '';
 const lastName = user.user_metadata?.last_name || '';
+const anrede = user.user_metadata?.anrede || '';
 
 // Admin Data Fetching
 let adminSeminars: any[] = [];
@@ -255,7 +264,16 @@ if (rawStripeKey && email) {
             <input type="file" id="avatar-input" name="avatar" accept="image/jpeg, image/png, image/webp" class="hidden" onchange="document.getElementById('profile-submit-btn').click()">
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="space-y-2">
+              <label class="text-xs font-bold text-gray-600 uppercase tracking-widest">Anrede</label>
+              <select name="anrede" class="w-full bg-gray-50 border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 px-4 py-2.5 rounded-lg outline-none text-sm font-medium text-[#05183a]">
+                <option value="">Bitte wählen...</option>
+                <option value="Frau" selected={anrede === 'Frau'}>Frau</option>
+                <option value="Herr" selected={anrede === 'Herr'}>Herr</option>
+                <option value="Divers" selected={anrede === 'Divers'}>Divers / Keine Angabe</option>
+              </select>
+            </div>
             <div class="space-y-2">
               <label class="text-xs font-bold text-gray-600 uppercase tracking-widest">Vorname</label>
               <input type="text" name="firstname" value={firstName} class="w-full bg-gray-50 border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 px-4 py-2.5 rounded-lg outline-none text-sm font-medium text-[#05183a]" />

@@ -7,10 +7,25 @@ import { buildPermissions } from '../../lib/permissions';
 const supabase = getSupabaseServer(Astro.request, Astro.cookies);
 const { data: { user } } = await supabase.auth.getUser();
 
-const firstName = user?.user_metadata?.first_name || '';
-const lastName = user?.user_metadata?.last_name || '';
+const firstName = user?.user_metadata?.first_name || user?.user_metadata?.vorname || '';
+const lastName = user?.user_metadata?.last_name || user?.user_metadata?.nachname || '';
 const salutationString = user?.user_metadata?.salutation_string || '';
-const greetingName = salutationString || (lastName ? `Herr/Frau ${lastName}` : (firstName || 'lieber Nutzer'));
+const anrede = user?.user_metadata?.anrede || '';
+
+let greetingName = "lieber Nutzer";
+if (salutationString) {
+  greetingName = salutationString;
+} else if (anrede === 'Herr') {
+  greetingName = `Herr ${lastName}`;
+} else if (anrede === 'Frau') {
+  greetingName = `Frau ${lastName}`;
+} else if (firstName && lastName) {
+  greetingName = `${firstName} ${lastName}`;
+} else if (firstName) {
+  greetingName = `${firstName}`;
+} else if (lastName) {
+  greetingName = `${lastName}`;
+}
 
 // Fetch real data from Sanity
 const allSeminars = await sanityClient.fetch(`*[_type == "seminar" && status == "aufzeichnung"] | order(_createdAt desc) { "id": slug.current, "slug": slug.current, title, description, moduleName, duration, eventDate, "referenten": referenten[]->{ name, role, "imageUrl": image.asset->url } }`);

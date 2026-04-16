@@ -61,6 +61,7 @@ export default function CheckoutFlow({ user = null }: { user?: any }) {
 
     try {
       const formData = new FormData(e.currentTarget as HTMLFormElement);
+      const anrede = formData.get('anrede') as string || '';
       const email = isLoggedIn ? user.email : formData.get('email') as string;
       const password = formData.get('password') as string || '';
       const vorname = formData.get('vorname') as string || '';
@@ -76,7 +77,7 @@ export default function CheckoutFlow({ user = null }: { user?: any }) {
           ? aboItems.map((item, idx) => ({ id: aboIds![idx], title: item.title, price: item.price }))
           : cart.map(item => ({ id: item.id, title: item.title, price: item.price })),
         isSubscription,
-        user: { email, password, vorname, nachname, leitwegId, behorde, strasse, plz, ort }
+        user: { email, password, anrede, vorname, nachname, leitwegId, behorde, strasse, plz, ort }
       };
 
       const endpoint = paymentType === 'invoice' ? '/api/buy-on-invoice' : '/api/create-checkout-session';
@@ -194,6 +195,16 @@ export default function CheckoutFlow({ user = null }: { user?: any }) {
                   Bereits Kunde? Einloggen
                 </a>
               </div>
+              <div className="space-y-1.5 mb-4">
+                <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wide">Anrede</label>
+                <select name="anrede" required className="w-full bg-surface border border-outline-variant/40 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all text-on-surface">
+                  <option value="">Bitte wählen...</option>
+                  <option value="Frau">Frau</option>
+                  <option value="Herr">Herr</option>
+                  <option value="Divers">Divers / Keine Angabe</option>
+                </select>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-on-surface-variant uppercase tracking-wide">Vorname</label>

@@ -22,8 +22,10 @@ export const POST: APIRoute = async ({ request, cookies }) => {
         password: userData.password,
         options: {
           data: {
+            anrede: userData.anrede,
             first_name: userData.vorname,
             last_name: userData.nachname,
+            salutation_string: ['Herr', 'Frau'].includes(userData.anrede) ? `${userData.anrede} ${userData.nachname}` : `${userData.vorname} ${userData.nachname}`,
             leitwegId: userData.leitwegId,
             behorde: userData.behorde
           }
