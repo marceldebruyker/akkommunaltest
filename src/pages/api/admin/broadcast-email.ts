@@ -91,7 +91,7 @@ export const POST: APIRoute = async ({ request }) => {
     // Formatted Date
     const formattedDate = seminar.eventDate ? new Intl.DateTimeFormat('de-DE', { dateStyle: 'full', timeStyle: 'short', timeZone: 'Europe/Berlin' }).format(new Date(seminar.eventDate)) : 'Datum noch festzulegen';
 
-    const getEmailPayload = (user: any, emailType: string) => {
+    const getEmailPayload = (user: any, emailType: string, isMember: boolean) => {
         let salutationString = '';
         if (user?.user_metadata?.salutation_string) {
             salutationString = ` ${user.user_metadata.salutation_string},`;
@@ -170,7 +170,7 @@ export const POST: APIRoute = async ({ request }) => {
               <table width="100%" border="0" cellspacing="0" cellpadding="0">
                 <tr>
                   <td align="center">
-                    <a href="${seminar.teamsLink}" style="display: inline-block; background-color: #05183a; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 700; font-size: 16px;">MS-Teams beitreten</a>
+                    <a href="${seminar.teamsLink}" style="display: inline-block; background-color: #05183a; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 700; font-size: 16px;">Webinar beitreten</a>
                   </td>
                 </tr>
               </table>
@@ -212,10 +212,16 @@ export const POST: APIRoute = async ({ request }) => {
               <!-- Footer Area -->
               <tr>
                 <td style="background-color: #f8fafc; padding: 24px 40px; text-align: center; border-top: 1px solid #f1f5f9;">
+                  ${!isMember ? `
                   <p style="color: #64748b; font-size: 13px; margin: 0 0 16px 0; line-height: 1.5;">
-                    Sie erhalten diese E-Mail als Mitglied des Fachportals AK Kommunal. Wenn Sie keine weiteren Seminar-Einladungen mehr erhalten möchten, klicken Sie bitte 
-                    <a href="mailto:seminare@bw-partner.com?subject=Abmelden%20-%20Keine%20Einladungen" style="color: #3b82f6; text-decoration: underline;">hier zum Abmelden</a>.
+                    Sie möchten in Zukunft keine Seminarankündigungen von uns erhalten?<br>
+                    Bitte klicken Sie <a href="mailto:seminare@bw-partner.com?subject=Abmelden%20-%20Keine%20Einladungen" style="color: #3b82f6; text-decoration: underline;">hier zum Abmelden</a>.
                   </p>
+                  ` : `
+                  <p style="color: #64748b; font-size: 13px; margin: 0 0 16px 0; line-height: 1.5;">
+                    Sie erhalten diese Nachricht als exklusives Serviceangebot für Mitglieder des Fachportals AK Kommunal.
+                  </p>
+                  `}
                   
                   <!-- Legal Impressum -->
                   <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e2e8f0; color: #94a3b8; font-size: 11px; line-height: 1.6;">
@@ -240,7 +246,8 @@ export const POST: APIRoute = async ({ request }) => {
       const batchUsers = validUsers.slice(i, i + chunkSize);
       
       const emailPayloads = batchUsers.filter(u => u.email).map(u => {
-         const { subject, html } = getEmailPayload(u, emailType);
+         const isMember = aboIds.includes(u.id) || modulePurchaserIds.includes(u.id);
+         const { subject, html } = getEmailPayload(u, emailType, isMember);
          return {
             from: `AK Kommunal Plattform <${senderEmail}>`,
             to: [u.email!],
