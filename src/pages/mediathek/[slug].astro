@@ -58,22 +58,22 @@ if (user) {
 
     <!-- Hero Header Textual Design -->
     <div class="max-w-6xl mx-auto px-6 lg:px-10 mb-16 mt-8 relative z-10 animate-[fadeInUp_1s_ease-out]">
-        <a href="/mediathek" class="text-on-surface-variant hover:text-primary mb-8 inline-flex items-center gap-2 text-sm font-bold uppercase tracking-widest transition-colors">
-          <span class="material-symbols-outlined text-[18px]">arrow_back</span>
-          Zurück zur Mediathek
+        <a href="/mediathek" class="text-slate-400 hover:text-primary mb-10 inline-flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-widest transition-colors">
+          <span class="material-symbols-outlined text-[16px]">arrow_back</span>
+          Zur Mediathek
         </a>
 
         <div class="flex flex-wrap items-center gap-3 mb-6">
-          <span class="bg-primary/5 text-primary text-[10px] font-extrabold uppercase tracking-widest px-4 py-1.5 rounded-full border border-primary/10">{video.moduleName}</span>
-          <span class="bg-surface-variant/20 text-on-surface-variant text-[10px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-full border border-outline-variant/30 flex items-center gap-1">
+          <span class="bg-primary/5 text-primary text-[10px] font-extrabold uppercase tracking-widest px-4 py-1.5 rounded-md border border-primary/10">{video.moduleName}</span>
+          <span class="bg-slate-50 text-slate-500 text-[10px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-md border border-slate-200 flex items-center gap-1">
             <span class="material-symbols-outlined text-[14px]">timer</span> {video.duration}
           </span>
-          <span class="bg-surface-variant/20 text-on-surface-variant text-[10px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-full border border-outline-variant/30 flex items-center gap-1">
+          <span class="bg-slate-50 text-slate-500 text-[10px] font-bold uppercase tracking-widest px-4 py-1.5 rounded-md border border-slate-200 flex items-center gap-1">
             <span class="material-symbols-outlined text-[14px]">play_circle</span> Online-Aufzeichnung
           </span>
         </div>
         
-        <h1 class="text-4xl md:text-5xl lg:text-6xl max-w-4xl font-extrabold font-headline text-primary leading-[1.1] mb-6 tracking-tight">
+        <h1 class="text-4xl md:text-5xl lg:text-7xl max-w-4xl font-black font-headline text-[#05183a] leading-[1.05] mb-6 tracking-tight">
           {video.title}
         </h1>
 
@@ -146,23 +146,23 @@ if (user) {
       <!-- Sidebar / Buy Box -->
       <div class="lg:col-span-4 relative">
         <!-- Sticky Container -->
-        <div class="sticky top-32 bg-white p-8 rounded-3xl border border-outline-variant/30 shadow-[0_20px_40px_-15px_rgba(5,24,58,0.08)] flex flex-col">
-          <h3 class="text-xl font-extrabold font-headline text-primary mb-2">Seminar-Zugang</h3>
-          <p class="text-sm text-on-surface-variant mb-6">Nach dem Erwerb erscheint das Video automatisch in Ihrer persönlichen Lernwelt.</p>
+        <div class="sticky top-32 bg-white p-8 rounded-3xl border border-slate-200 shadow-xl flex flex-col">
+          <h3 class="text-2xl font-black font-headline text-[#05183a] mb-2">Seminar-Zugang</h3>
+          <p class="text-sm text-slate-500 mb-8 font-light">Nach dem Erwerb erscheint das Video automatisch in Ihrer persönlichen Lernwelt.</p>
           
-          <div class="space-y-4 mb-8 bg-surface-container-lowest p-5 rounded-2xl border border-outline-variant/20">
-            <div class="flex items-start gap-3">
-              <span class="material-symbols-outlined text-primary text-[20px] mt-0.5">smart_display</span>
+          <div class="space-y-4 mb-8">
+            <div class="flex items-start gap-4 pb-4 border-b border-slate-100">
+              <span class="material-symbols-outlined text-[#3b82f6] text-[24px] mt-0.5">smart_display</span>
               <div>
-                <strong class="text-sm text-primary block">Video auf Abruf</strong>
-                <span class="text-xs text-on-surface-variant block">Im Kundenbereich streambar</span>
+                <strong class="text-[13px] text-[#05183a] uppercase tracking-wider block mb-1">Video auf Abruf</strong>
+                <span class="text-[15px] font-medium text-slate-600 block">Im Kundenbereich streambar</span>
               </div>
             </div>
-            <div class="flex items-start gap-3">
-              <span class="material-symbols-outlined text-primary text-[20px] mt-0.5">download</span>
+            <div class="flex items-start gap-4 pb-2">
+              <span class="material-symbols-outlined text-[#3b82f6] text-[24px] mt-0.5">download</span>
               <div>
-                <strong class="text-sm text-primary block">Download-Materialien</strong>
-                <span class="text-xs text-on-surface-variant block">Präsentationen & PDFs inklusive</span>
+                <strong class="text-[13px] text-[#05183a] uppercase tracking-wider block mb-1">Download-Materialien</strong>
+                <span class="text-[15px] font-medium text-slate-600 block">Präsentationen & PDFs inklusive</span>
               </div>
             </div>
           </div>
@@ -182,18 +182,16 @@ if (user) {
             </div>
           ) : (
             <div class="flex flex-col">
-              <div class="bg-surface-variant/20 rounded-xl p-4 mb-6 border border-outline-variant/20 flex justify-between items-center">
-                <span class="block text-[10px] uppercase font-bold tracking-widest text-on-surface-variant">Einmaliger Kauf</span>
-                <div class="flex items-end gap-1.5 mt-1">
-                  <span class="text-3xl font-extrabold text-primary leading-none">{video.price} €</span>
-                </div>
+              <div class="flex items-end justify-between mb-8">
+                <span class="block text-[11px] uppercase font-bold tracking-[0.2em] text-slate-400">Preis</span>
+                <span class="text-4xl font-black text-[#05183a] leading-none">{video.price} €</span>
               </div>
 
               <!-- Connecting to SideCart -->
               <BuyVideoButton client:load video={{ id: video.slug, title: video.title, price: video.price || 0 }} />
 
-              <p class="text-center text-[10px] text-on-surface-variant/80 uppercase mt-4 font-bold tracking-widest">
-                Oder <a href={`/login?redirect=/mediathek/${video.slug}`} class="text-primary hover:underline">Einloggen</a>
+              <p class="text-center text-[10px] text-slate-400 uppercase mt-5 font-bold tracking-widest">
+                Oder <a href={`/login?redirect=/mediathek/${video.slug}`} class="text-[#3b82f6] hover:underline">Einloggen</a>
               </p>
             </div>
           )}
