@@ -119,12 +119,7 @@ function getModuleId(moduleName: string) {
           {rawVideos.map((video: any) => (
             <a href={`/mediathek/${video.slug}`} class="video-card group flex flex-col bg-transparent" data-module={getModuleId(video.moduleName)} data-topics={(video.topics || ['umsatzsteuer']).join(',')}>
               <!-- Content without Image Banner -->
-              <div class="flex items-center gap-3 mb-4">
-                {(video.badges || []).map((badge: string) => (
-                  <span class="bg-primary/5 text-primary border border-primary/10 text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-md">{badge}</span>
-                ))}
-              </div>
-              <h3 class="text-xl font-extrabold font-headline text-[#05183a] mb-5 leading-tight group-hover:text-primary-fixed-dim transition-colors">{video.title}</h3>
+              <h3 class="text-lg font-bold font-headline text-[#05183a] mb-5 mt-2 leading-tight group-hover:text-primary-fixed-dim transition-colors">{video.title}</h3>
               
               {video.referenten && video.referenten.length > 0 && (
                 <div class="flex flex-col gap-3 mb-6">

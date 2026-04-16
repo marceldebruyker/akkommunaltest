@@ -37,7 +37,7 @@ const { video } = Astro.props;
         <span class={`text-[9px] uppercase font-bold tracking-widest px-2 py-1 rounded w-fit mb-3 border inline-block ${video.status === 'live' ? 'text-blue-600 bg-blue-50 border-blue-100' : 'text-emerald-600 bg-emerald-50 border-emerald-100'}`}>
            {video.status === 'live' ? 'Live-Webinar' : 'Freigeschaltet'}
         </span>
-        <h3 class="text-lg font-bold text-[#05183a] mb-2 leading-tight">{video.title}</h3>
+        <h3 class="text-base font-bold text-[#05183a] mb-2 leading-tight">{video.title}</h3>
         <div class="text-xs text-gray-500 font-medium flex items-center gap-1.5 mb-5 pb-5 border-b border-gray-100">
            <span class="material-symbols-outlined text-[14px]">videocam</span> {video.moduleName || 'Seminar'}
         </div>
