@@ -6,13 +6,14 @@ import BuyVideoButton from '../../components/BuyVideoButton.tsx';
 import SanityPortableText from '../../components/SanityPortableText.tsx';
 import { sanityClient } from '../../lib/sanity';
 import { getSupabaseServer } from '../../lib/supabase';
+import { buildPermissions } from '../../lib/permissions';
 
 const { slug } = Astro.params;
 
 // Fetch directly from Sanity for Mediathek (only Aufzeichnungen)
 const video = await sanityClient.fetch(`*[_type == "seminar" && status == "aufzeichnung" && slug.current == $slug][0]{
   "slug": slug.current,
-  title, description, moduleName, duration, price, badges,
+  title, description, moduleName, duration, price, badges, eventDate,
   "image": image.asset->url,
   "referenten": referenten[]->{
     name,
@@ -30,19 +31,24 @@ const { data: authData } = await getSupabaseServer(Astro.request, Astro.cookies)
 const user = authData?.user || null;
 
 let hasAccess = false;
-
 if (user) {
-  // 2. Check if the user has purchased this specific video
   const supabase = getSupabaseServer(Astro.request, Astro.cookies);
-  const { data: purchaseData } = await supabase
-    .from('purchases')
-    .select('id')
-    .eq('user_id', user.id)
-    .eq('video_slug', video.slug)
-    .limit(1)
-    .maybeSingle();
+  // Get profile
+  const { data: profile } = await supabase
+    .from('user_profiles')
+    .select('has_membership, is_admin, is_partner')
+    .eq('id', user.id)
+    .single();
 
-  if (purchaseData) {
+  // Get purchases
+  const { data: purchases } = await supabase
+    .from('purchases')
+    .select('video_slug, created_at')
+    .eq('user_id', user.id);
+
+  const permissions = buildPermissions(profile, purchases || []);
+  
+  if (permissions.canAccessVideo(video.slug, video.moduleName, video.eventDate)) {
     hasAccess = true;
   }
 }

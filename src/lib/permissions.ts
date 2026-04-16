@@ -1,8 +1,13 @@
+export interface UserPurchase {
+  slug: string;
+  purchasedAt: Date;
+}
+
 export interface UserPermissionsData {
   hasMembership: boolean;
   isAdmin: boolean;
   isPartner: boolean;
-  purchasedSlugs: string[];
+  purchases: UserPurchase[];
 }
 
 export class PermissionsService {
@@ -13,7 +18,10 @@ export class PermissionsService {
       hasMembership: data.hasMembership || false,
       isAdmin: data.isAdmin || false,
       isPartner: data.isPartner || false,
-      purchasedSlugs: (data.purchasedSlugs || []).map(s => s.toLowerCase()),
+      purchases: (data.purchases || []).map(p => ({
+        slug: p.slug.toLowerCase(),
+        purchasedAt: new Date(p.purchasedAt)
+      })),
     };
   }
 
@@ -23,8 +31,7 @@ export class PermissionsService {
   hasFullAccess(): boolean {
     if (this.data.isAdmin) return true; // Admins see everything
     if (this.data.hasMembership) return true;
-    return this.data.purchasedSlugs.includes('gesamtpaket') || 
-           this.data.purchasedSlugs.includes('gesamt');
+    return this.data.purchases.some(p => p.slug === 'gesamtpaket' || p.slug === 'gesamt');
   }
 
   /**
@@ -37,15 +44,15 @@ export class PermissionsService {
     const lowerName = moduleName.toLowerCase();
     
     if (lowerName.includes('spezial') && 
-       (this.data.purchasedSlugs.includes('spezial') || this.data.purchasedSlugs.includes('spezialthemen-modul'))) {
+       this.data.purchases.some(p => p.slug === 'spezial' || p.slug === 'spezialthemen-modul')) {
       return true;
     }
     if (lowerName.includes('grundlagen') && 
-       (this.data.purchasedSlugs.includes('grundlagen') || this.data.purchasedSlugs.includes('grundlagen-modul'))) {
+       this.data.purchases.some(p => p.slug === 'grundlagen' || p.slug === 'grundlagen-modul')) {
       return true;
     }
     if (lowerName.includes('praktiker') && 
-       (this.data.purchasedSlugs.includes('praktiker') || this.data.purchasedSlugs.includes('praktiker-modul'))) {
+       this.data.purchases.some(p => p.slug === 'praktiker' || p.slug === 'praktiker-modul')) {
       return true;
     }
 
@@ -55,17 +62,37 @@ export class PermissionsService {
   /**
    * Can the user watch a specific video based on its slug or its parent module?
    */
-  canAccessVideo(videoSlug: string, videoModuleName?: string): boolean {
+  canAccessVideo(videoSlug: string, videoModuleName?: string, eventDateStr?: string | Date): boolean {
     if (this.hasFullAccess()) return true;
-    
-    // Explicit single-video purchase check
-    if (videoSlug && this.data.purchasedSlugs.includes(videoSlug.toLowerCase())) {
-      return true;
-    }
 
-    // Module blanket access check
+    // Module blanket access check (Modules don't expire)
     if (videoModuleName && this.hasModuleAccess(videoModuleName)) {
       return true;
+    }
+    
+    // Explicit single-video purchase check
+    if (videoSlug) {
+      const purchase = this.data.purchases.find(p => p.slug === videoSlug.toLowerCase());
+      if (purchase) {
+        // Enforce 14-day validity for external individual video purchases
+        let startDate = purchase.purchasedAt;
+        
+        // If the user bought the ticket BEFORE the live event happened, 
+        // the 14 days begin on the eventDate, not on the purchase date!
+        if (eventDateStr) {
+           const eventD = new Date(eventDateStr);
+           if (startDate < eventD) {
+              startDate = eventD;
+           }
+        }
+        
+        const fourteenDaysAgo = new Date();
+        fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+        
+        if (startDate >= fourteenDaysAgo) {
+          return true; // Still within 14 days from the anchor date
+        }
+      }
     }
 
     return false;
@@ -79,17 +106,33 @@ export class PermissionsService {
   isMember(): boolean {
     if (this.hasFullAccess()) return true;
     
-    return this.data.purchasedSlugs.some(slug => 
-      ['grundlagen', 'grundlagen-modul', 'spezial', 'spezialthemen', 'spezialthemen-modul', 'praktiker', 'praktiker-modul'].includes(slug)
+    return this.data.purchases.some(p => 
+      ['grundlagen', 'grundlagen-modul', 'spezial', 'spezialthemen', 'spezialthemen-modul', 'praktiker', 'praktiker-modul'].includes(p.slug)
     );
   }
 
   /**
    * Quick check for literal slug purchase (useful for UI constraints and specific checks)
    */
-  hasExactSlug(slug: string): boolean {
+  hasExactSlug(slug: string, eventDateStr?: string | Date): boolean {
     if (!slug) return false;
-    return this.data.purchasedSlugs.includes(slug.toLowerCase());
+    
+    const purchase = this.data.purchases.find(p => p.slug === slug.toLowerCase());
+    if (!purchase) return false;
+    
+    let startDate = purchase.purchasedAt;
+    if (eventDateStr) {
+       const eventD = new Date(eventDateStr);
+       if (startDate < eventD) {
+          startDate = eventD;
+       }
+    }
+    
+    const fourteenDaysAgo = new Date();
+    fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+    
+    // Exact slug blocks should be lifted if the purchase is expired, so they can re-buy!
+    return startDate >= fourteenDaysAgo;
   }
 }
 
@@ -101,6 +144,9 @@ export function buildPermissions(profileRow: any, purchasesRows: any[]): Permiss
     hasMembership: profileRow?.has_membership === true,
     isAdmin: profileRow?.is_admin === true,
     isPartner: profileRow?.is_partner === true,
-    purchasedSlugs: purchasesRows ? purchasesRows.map(p => p.video_slug) : []
+    purchases: purchasesRows ? purchasesRows.map(p => ({
+      slug: p.video_slug,
+      purchasedAt: new Date(p.created_at || Date.now())
+    })) : []
   });
 }

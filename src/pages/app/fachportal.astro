@@ -21,7 +21,7 @@ const { data: profile } = await supabase
 
 const { data: purchases } = await supabase
   .from('purchases')
-  .select('video_slug')
+  .select('video_slug, created_at')
   .eq('user_id', authData.user.id);
 
 const permissions = buildPermissions(profile, purchases || []);
@@ -34,7 +34,7 @@ const sanitySeminars = await sanityClient.fetch(`*[_type == "seminar"] | order(e
 }`);
 
 const videos = sanitySeminars.map((video: any) => {
-  const hasAccess = permissions.canAccessVideo(video.slug, video.moduleName);
+  const hasAccess = permissions.canAccessVideo(video.slug, video.moduleName, video.eventDate);
 
   return {
     ...video,

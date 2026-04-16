@@ -6,6 +6,7 @@ import BuyVideoButton from '../../components/BuyVideoButton.tsx';
 import SanityPortableText from '../../components/SanityPortableText.tsx';
 import { sanityClient } from '../../lib/sanity';
 import { getSupabaseServer } from '../../lib/supabase';
+import { buildPermissions } from '../../lib/permissions';
 
 const { slug } = Astro.params;
 
@@ -45,16 +46,24 @@ const user = authData?.user || null;
 
 let hasAccess = false;
 if (user) {
-  // 2. Check if the user has purchased this specific seminar
   const supabase = getSupabaseServer(Astro.request, Astro.cookies);
-  const { data: purchaseData } = await supabase
-    .from('purchases')
-    .select('id')
-    .eq('user_id', user.id)
-    .eq('video_slug', seminar.id)
+  // Get profile
+  const { data: profile } = await supabase
+    .from('user_profiles')
+    .select('has_membership, is_admin, is_partner')
+    .eq('id', user.id)
     .single();
 
-  if (purchaseData) {
+  // Get purchases
+  const { data: purchases } = await supabase
+    .from('purchases')
+    .select('video_slug, created_at')
+    .eq('user_id', user.id);
+
+  const permissions = buildPermissions(profile, purchases || []);
+  
+  // Checking access against 14-day rule via PermissionsService
+  if (permissions.canAccessVideo(seminar.id, seminar.moduleName, seminar.eventDate)) {
     hasAccess = true;
   }
 }

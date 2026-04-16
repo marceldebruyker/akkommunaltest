@@ -13,7 +13,7 @@ const salutationString = user?.user_metadata?.salutation_string || '';
 const greetingName = salutationString || (lastName ? `Herr/Frau ${lastName}` : (firstName || 'lieber Nutzer'));
 
 // Fetch real data from Sanity
-const allSeminars = await sanityClient.fetch(`*[_type == "seminar" && status == "aufzeichnung"] | order(_createdAt desc) { "id": slug.current, "slug": slug.current, title, description, moduleName, duration, "image": image.asset->url }`);
+const allSeminars = await sanityClient.fetch(`*[_type == "seminar" && status == "aufzeichnung"] | order(_createdAt desc) { "id": slug.current, "slug": slug.current, title, description, moduleName, duration, eventDate, "image": image.asset->url }`);
 
 let permissions = buildPermissions(null, []);
 
@@ -35,7 +35,7 @@ if (user) {
 let userSeminars = allSeminars;
 
 if (!permissions.hasFullAccess()) {
-  userSeminars = allSeminars.filter((video: any) => permissions.canAccessVideo(video.slug, video.moduleName));
+  userSeminars = allSeminars.filter((video: any) => permissions.canAccessVideo(video.slug, video.moduleName, video.eventDate));
 }
 
 const recentSeminar = userSeminars.length > 0 ? userSeminars[0] : null;
