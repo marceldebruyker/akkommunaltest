@@ -106,10 +106,7 @@ if (Astro.request.method === 'POST') {
       }
     };
 
-    if (isPartner) {
-      updates.data.job_description = jobDescription;
-    }
-
+    updates.data.job_description = jobDescription;
     const avatarFile = formData.get('avatar');
     if (avatarFile && typeof avatarFile === 'object' && avatarFile.size > 0) {
       const arrayBuffer = await avatarFile.arrayBuffer();
@@ -344,22 +341,15 @@ if (rawStripeKey && email) {
           </div>
           
           <div class="space-y-2">
+            <label class="text-xs font-bold text-gray-600 uppercase tracking-widest">Berufsbezeichnung / Rolle <span class="text-gray-400 normal-case font-medium">(Optional)</span></label>
+            <input type="text" name="job_description" value={jobDesc} placeholder="z.B. Steuerberater, Wirtschaftsprüfer, Bürgermeister" class="w-full bg-gray-50 border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 px-4 py-2.5 rounded-lg outline-none text-sm font-medium text-[#05183a]" />
+            {isPartner && <p class="text-xs text-blue-600 font-bold mt-1.5 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">stars</span>Als registrierter Experte wird dieser Text im Fachportal angezeigt.</p>}
+          </div>
+          
+          <div class="space-y-2">
             <label class="text-xs font-bold text-gray-600 uppercase tracking-widest">E-Mail Adresse (Login)</label>
             <input type="email" name="email" value={email} readonly disabled class="w-full bg-gray-100 border border-gray-200 px-4 py-2.5 rounded-lg outline-none text-sm font-medium text-gray-500 cursor-not-allowed" title="E-Mail kann aktuell nur über den Support geändert werden" />
           </div>
-
-          {isPartner && (
-            <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-6 mt-6">
-              <h3 class="text-[14px] font-bold text-blue-900 mb-4 flex items-center gap-2">
-                <span class="material-symbols-outlined text-blue-600">stars</span> Experte & Referent (Sichtbar im Fachportal)
-              </h3>
-              <div class="space-y-2">
-                <label class="text-xs font-bold text-blue-800 uppercase tracking-widest">Rolle / Job-Beschreibung</label>
-                <input type="text" name="job_description" value={jobDesc} placeholder="z.B. Wirtschaftsprüfer, Steuerberater, Partner" class="w-full bg-white border border-blue-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 px-4 py-2.5 rounded-lg outline-none text-sm font-medium text-[#05183a] shadow-sm" />
-                <p class="text-xs text-blue-600 mt-2">Ihre Daten werden als Profil an das Sanity CMS übertragen und dort als Referenten-Daten gelistet. Änderungen sind nach dem Speichern sofort sichtbar (oder nach Refresh).</p>
-              </div>
-            </div>
-          )}
 
           <div class="space-y-2">
             <label class="text-xs font-bold text-gray-600 uppercase tracking-widest">Neues Passwort setzen</label>
