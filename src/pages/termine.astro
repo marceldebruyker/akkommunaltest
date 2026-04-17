@@ -148,19 +148,13 @@ function formatDate(iso: string) {
                       <div class="relative flex flex-col p-7 md:p-9 bg-white border border-slate-200 rounded-3xl hover:border-primary/20 hover:shadow-xl transition-all duration-300 transform group-hover:-translate-y-1">
                         
                         <!-- Top Meta Header -->
-                        <div class="flex flex-wrap items-center gap-3 mb-5">
-                          <span class="text-[11px] font-bold text-primary bg-primary/5 border border-primary/10 px-3 py-1 rounded-md tracking-wider uppercase">{seminar.moduleName}</span>
+                        <div class="flex flex-wrap items-center gap-2 mb-5">
+                          <span class="text-[10px] font-bold text-primary bg-primary/5 border border-primary/10 px-2.5 py-1 rounded-md tracking-wider uppercase">{seminar.moduleName}</span>
                           {seminar.topics && seminar.topics.length > 0 && seminar.topics[0] && (
-                             <span class="text-[11px] font-bold text-slate-600 bg-slate-100 border border-slate-200 px-3 py-1 rounded-md tracking-wider uppercase">
+                             <span class="text-[10px] font-bold text-slate-600 bg-slate-100 border border-slate-200 px-2.5 py-1 rounded-md tracking-wider uppercase">
                                {seminar.topics.map((t: string) => t === 'umsatzsteuer' ? 'Umsatzsteuer & § 2b UStG' : t === 'ertragsteuern' ? 'Ertragsteuern' : t === 'tax-cms' ? 'Tax CMS' : t === 'rechnungswesen' ? 'Jahresabs. & Rechnungsw.' : t === 'energie' ? 'Energie & Nachhaltigkeit' : t === 'it-security' ? 'IT & Datensicherheit' : t === 'aktuelles' ? 'Aktuelles & Updates' : t).join(', ')}
                              </span>
                           )}
-                          <span class="text-[13px] font-semibold text-slate-500 flex items-center gap-1.5 ml-2">
-                            <span class="material-symbols-outlined text-[16px] text-slate-400">calendar_month</span> {formatDate(seminar.eventDate)}
-                          </span>
-                          <span class="text-[13px] font-semibold text-slate-500 flex items-center gap-1.5">
-                            <span class="material-symbols-outlined text-[16px] text-slate-400">schedule</span> {seminar.duration ? `${seminar.duration} Min.` : '90 Min.'}
-                          </span>
                         </div>
                         
                         <!-- Main Content -->
@@ -194,9 +188,13 @@ function formatDate(iso: string) {
                         
                         <!-- Bottom Action Row -->
                         <div class="mt-auto flex items-center justify-between border-t border-slate-100 pt-5">
-                           <div class="flex items-center gap-2">
-                             <span class="material-symbols-outlined text-primary/40 text-[20px]">videocam</span>
-                             <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Live-Webinar</span>
+                           <div class="flex items-center gap-4 text-[13px] font-extrabold text-[#05183a]">
+                             <span class="flex items-center gap-1.5">
+                               <span class="material-symbols-outlined text-[18px] text-primary">calendar_month</span> {formatDate(seminar.eventDate)}
+                             </span>
+                             <span class="flex items-center gap-1.5 hidden sm:flex">
+                               <span class="material-symbols-outlined text-[18px] text-primary">schedule</span> {seminar.duration ? `${seminar.duration} Min.` : '90 Min.'}
+                             </span>
                            </div>
                            <span class="text-[14px] font-extrabold text-[#05183a] flex items-center gap-1.5 group-hover:text-primary-fixed-dim transition-colors">
                              Mehr Infos <span class="material-symbols-outlined text-[18px] group-hover:translate-x-1.5 transition-transform">arrow_forward</span>
