@@ -108,10 +108,6 @@ export const POST: APIRoute = async ({ request }) => {
                       <td style="background-color: #05183a; padding: 40px 20px; text-align: center;">
                         <table border="0" cellspacing="0" cellpadding="0" align="center" style="margin: 0 auto;">
                           <tr>
-                            <!-- Lion Logo (Square) -->
-                            <td width="36" style="padding-right: 12px; vertical-align: middle;">
-                              <img src="${process.env.PUBLIC_URL || 'https://www.ak-kommunal.de'}/email-lion-inverted.svg?v=2" alt="AK Kommunal Logo" width="36" height="36" style="display: block; width: 36px; height: 36px; border: none;" />
-                            </td>
                             <!-- Brand Typography -->
                             <td style="vertical-align: middle; text-align: left;">
                                <div style="font-family: -apple-system, BlinkMacSystemFont, Arial, sans-serif; font-size: 21px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px; line-height: 1.1; margin: 0;">AK Kommunal</div>
