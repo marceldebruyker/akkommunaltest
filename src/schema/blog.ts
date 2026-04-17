@@ -27,9 +27,14 @@ export const blog = defineType({
       type: 'string',
       options: {
         list: [
-          { title: 'Rechtsprechung', value: 'Rechtsprechung' },
-          { title: 'Event', value: 'Event' },
-          { title: 'Neuigkeit', value: 'Neuigkeit' },
+          { title: 'Umsatzsteuer & § 2b UStG', value: 'Umsatzsteuer & § 2b UStG' },
+          { title: 'Ertragsteuern', value: 'Ertragsteuern' },
+          { title: 'Tax CMS', value: 'Tax CMS' },
+          { title: 'Jahresabschluss & Rechnungswesen', value: 'Jahresabschluss & Rechnungswesen' },
+          { title: 'Energie & Nachhaltigkeit', value: 'Energie & Nachhaltigkeit' },
+          { title: 'IT & Datensicherheit', value: 'IT & Datensicherheit' },
+          { title: 'Rechtsprechung (Allgemein)', value: 'Rechtsprechung (Allgemein)' },
+          { title: 'Event / Event-Rückblick', value: 'Event / Event-Rückblick' },
         ],
       },
       validation: (Rule) => Rule.required(),
