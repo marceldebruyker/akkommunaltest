@@ -76,7 +76,18 @@ const offset = (currentPage - 1) * ITEMS_PER_PAGE;
 let totalCount = 0;
 let totalPages = 1;
 
-let categoryCounts = { total: 0, finanzwesen: 0, praktiker: 0, steuerrecht: 0, offtopic: 0 };
+const FORUM_CATEGORIES = [
+  'Umsatzsteuer & § 2b UStG',
+  'Ertragsteuern',
+  'Tax CMS',
+  'Jahresabschluss & Rechnungswesen',
+  'Energie & Nachhaltigkeit',
+  'IT & Datensicherheit',
+  'Off-Topic'
+];
+
+let categoryCounts: Record<string, number> = { total: 0 };
+FORUM_CATEGORIES.forEach(c => categoryCounts[c] = 0);
 
 if (hasAccess) {
   // --- 1. Zähler für die Sidebar (Parallel) ---
@@ -87,15 +98,15 @@ if (hasAccess) {
     return count || 0;
   };
   
-  const [total, finanzwesen, praktiker, steuerrecht, offtopic] = await Promise.all([
+  const results = await Promise.all([
     fetchCount(null),
-    fetchCount('Finanzwesen'),
-    fetchCount('Praktiker Modul'),
-    fetchCount('Steuerrecht'),
-    fetchCount('Off-Topic')
+    ...FORUM_CATEGORIES.map(cat => fetchCount(cat))
   ]);
   
-  categoryCounts = { total, finanzwesen, praktiker, steuerrecht, offtopic };
+  categoryCounts.total = results[0];
+  FORUM_CATEGORIES.forEach((cat, idx) => {
+    categoryCounts[cat] = results[idx + 1];
+  });
 
   // --- 2. Dynamische Feed-Abfrage aufbauen ---
   let query = supabase
@@ -214,34 +225,22 @@ if (totalPages > 1) {
                 </div>
                 <span class={`${!currentCategory ? 'bg-gray-100 text-gray-500' : 'bg-white border border-gray-200 text-gray-400'} text-[10px] px-2 py-0.5 rounded-full`}>{categoryCounts.total}</span>
               </a>
-              <a href={`?category=Finanzwesen&sort=${currentSort}`} class={`flex items-center justify-between px-3 py-2.5 rounded-xl transition-colors text-sm ${currentCategory === 'Finanzwesen' ? 'font-bold bg-white shadow-sm border border-gray-100 text-[#05183a]' : 'font-medium text-gray-600 hover:bg-gray-100'}`}>
-                <div class="flex items-center gap-3">
-                  <span class={`w-2.5 h-2.5 rounded-full border-2 ${currentCategory === 'Finanzwesen' ? 'border-orange-400 bg-orange-400' : 'border-orange-400'}`}></span>
-                  Finanzwesen
-                </div>
-                <span class={`${currentCategory === 'Finanzwesen' ? 'bg-gray-100 text-gray-500' : 'bg-white border border-gray-200 text-gray-400'} text-[10px] px-2 py-0.5 rounded-full`}>{categoryCounts.finanzwesen}</span>
-              </a>
-              <a href={`?category=Praktiker Modul&sort=${currentSort}`} class={`flex items-center justify-between px-3 py-2.5 rounded-xl transition-colors text-sm ${currentCategory === 'Praktiker Modul' ? 'font-bold bg-white shadow-sm border border-gray-100 text-[#05183a]' : 'font-medium text-gray-600 hover:bg-gray-100'}`}>
-                <div class="flex items-center gap-3">
-                  <span class={`w-2.5 h-2.5 rounded-full border-2 ${currentCategory === 'Praktiker Modul' ? 'border-emerald-500 bg-emerald-500' : 'border-emerald-500'}`}></span>
-                  Praktiker Modul
-                </div>
-                <span class={`${currentCategory === 'Praktiker Modul' ? 'bg-gray-100 text-gray-500' : 'bg-white border border-gray-200 text-gray-400'} text-[10px] px-2 py-0.5 rounded-full`}>{categoryCounts.praktiker}</span>
-              </a>
-              <a href={`?category=Steuerrecht&sort=${currentSort}`} class={`flex items-center justify-between px-3 py-2.5 rounded-xl transition-colors text-sm ${currentCategory === 'Steuerrecht' ? 'font-bold bg-white shadow-sm border border-gray-100 text-[#05183a]' : 'font-medium text-gray-600 hover:bg-gray-100'}`}>
-                <div class="flex items-center gap-3">
-                  <span class={`w-2.5 h-2.5 rounded-full border-2 ${currentCategory === 'Steuerrecht' ? 'border-purple-500 bg-purple-500' : 'border-purple-500'}`}></span>
-                  Steuerrecht
-                </div>
-                <span class={`${currentCategory === 'Steuerrecht' ? 'bg-gray-100 text-gray-500' : 'bg-white border border-gray-200 text-gray-400'} text-[10px] px-2 py-0.5 rounded-full`}>{categoryCounts.steuerrecht}</span>
-              </a>
-              <a href={`?category=Off-Topic&sort=${currentSort}`} class={`flex items-center justify-between px-3 py-2.5 rounded-xl transition-colors text-sm ${currentCategory === 'Off-Topic' ? 'font-bold bg-white shadow-sm border border-gray-100 text-[#05183a]' : 'font-medium text-gray-600 hover:bg-gray-100'}`}>
-                <div class="flex items-center gap-3">
-                  <span class={`w-2.5 h-2.5 rounded-full border-2 ${currentCategory === 'Off-Topic' ? 'border-gray-400 bg-gray-400' : 'border-gray-400'}`}></span>
-                  Off-Topic
-                </div>
-                <span class={`${currentCategory === 'Off-Topic' ? 'bg-gray-100 text-gray-500' : 'bg-white border border-gray-200 text-gray-400'} text-[10px] px-2 py-0.5 rounded-full`}>{categoryCounts.offtopic}</span>
-              </a>
+              {FORUM_CATEGORIES.map((cat, idx) => {
+                const solidColors = ['bg-orange-400', 'bg-emerald-500', 'bg-blue-500', 'bg-indigo-500', 'bg-purple-500', 'bg-pink-500', 'bg-gray-400'];
+                const borderColors = ['border-orange-400', 'border-emerald-500', 'border-blue-500', 'border-indigo-500', 'border-purple-500', 'border-pink-500', 'border-gray-400'];
+                const sColor = solidColors[idx % solidColors.length];
+                const bColor = borderColors[idx % borderColors.length];
+                const isSelected = currentCategory === cat;
+                return (
+                  <a href={`?category=${encodeURIComponent(cat)}&sort=${currentSort}`} class={`flex items-center justify-between px-3 py-2.5 rounded-xl transition-colors text-sm ${isSelected ? 'font-bold bg-white shadow-sm border border-gray-100 text-[#05183a]' : 'font-medium text-gray-600 hover:bg-gray-100'}`}>
+                    <div class="flex items-center gap-3 w-[150px] truncate">
+                      <span class={`w-2.5 h-2.5 rounded-full shrink-0 border-2 ${isSelected ? `${bColor} ${sColor}` : `${bColor} bg-white`}`}></span>
+                      <span class="truncate">{cat}</span>
+                    </div>
+                    <span class={`${isSelected ? 'bg-gray-100 text-gray-500' : 'bg-white border border-gray-200 text-gray-400'} text-[10px] px-2 py-0.5 rounded-full shrink-0`}>{categoryCounts[cat]}</span>
+                  </a>
+                );
+              })}
             </div>
           </div>
 
@@ -425,10 +424,9 @@ if (totalPages > 1) {
         <div class="space-y-2">
           <label class="text-xs font-bold text-gray-600 uppercase tracking-widest">Kategorie</label>
           <select name="category" required class="w-full bg-gray-50 border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 px-4 py-3 rounded-xl outline-none text-sm font-medium text-[#05183a] appearance-none">
-            <option value="Finanzwesen">Finanzwesen</option>
-            <option value="Praktiker Modul">Praktiker Modul</option>
-            <option value="Steuerrecht">Steuerrecht</option>
-            <option value="Off-Topic">Off-Topic</option>
+            {FORUM_CATEGORIES.map(cat => (
+              <option value={cat}>{cat}</option>
+            ))}
           </select>
         </div>
         <div class="space-y-2">
