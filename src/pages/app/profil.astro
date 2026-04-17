@@ -116,13 +116,22 @@ if (Astro.request.method === 'POST') {
       const buffer = new Uint8Array(arrayBuffer);
       const filePath = `${user.id}/${Date.now()}_${avatarFile.name.replace(/[^a-zA-Z0-9.]/g, '')}`;
       
-      const { data: uploadData, error: uploadError } = await supabase.storage.from('avatars').upload(filePath, buffer, {
+      const supabaseAdmin = createClient(
+        import.meta.env.PUBLIC_SUPABASE_URL,
+        import.meta.env.SUPABASE_SERVICE_ROLE_KEY,
+        { auth: { autoRefreshToken: false, persistSession: false } }
+      );
+
+      const { data: uploadData, error: uploadError } = await supabaseAdmin.storage.from('avatars').upload(filePath, buffer, {
         contentType: avatarFile.type,
         upsert: true
       });
 
-      if (!uploadError && uploadData) {
-        const { data: publicUrlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
+      if (uploadError) {
+        console.error('Avatar upload error:', uploadError);
+        notification = `Fehler beim Bild-Upload: ${uploadError.message}`;
+      } else if (uploadData) {
+        const { data: publicUrlData } = supabaseAdmin.storage.from('avatars').getPublicUrl(filePath);
         updates.data.avatar_url = publicUrlData.publicUrl;
       }
     }
