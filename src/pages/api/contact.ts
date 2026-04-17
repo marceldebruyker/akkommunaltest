@@ -23,8 +23,8 @@ export const POST: APIRoute = async ({ request }) => {
 
     // 1. Send Notification to AK Kommunal Admin
     await resend.emails.send({
-      from: 'AK Kommunal System <anfragen@bw-partner.de>', // using generic bw-partner handle if no custom domain yet, otherwise a verified domain is required
-      to: 'info@ak-kommunal.de',
+      from: 'AK Kommunal System <onboarding@resend.dev>',
+      to: 'marceldebruyker@gmail.com',
       reply_to: email,
       subject: `Neue Kontaktanfrage von ${customerName}`,
       text: `Neue Anfrage über das Kontaktformular auf der Plattform:\n\nDetails:\n--------\nName: ${customerName}${orgText}\nE-Mail: ${email}\n\nNachricht:\n--------\n${message}`
@@ -32,7 +32,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     // 2. Send Confirmation to User
     await resend.emails.send({
-      from: 'AK Kommunal <anfragen@bw-partner.de>',
+      from: 'AK Kommunal <onboarding@resend.dev>',
       to: email,
       subject: 'Ihre Anfrage bei AK Kommunal',
       text: `Guten Tag ${customerName},\n\nvielen Dank für Ihre Nachricht an AK Kommunal.\nWir haben Ihre Anfrage erfolgreich erhalten und werden uns schnellstmöglich bei Ihnen zurückmelden.\n\nIhre übermittelte Nachricht:\n"${message}"\n\nMit freundlichen Grüßen\nDas Team von AK Kommunal / BW PARTNER`
