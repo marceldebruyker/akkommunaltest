@@ -74,6 +74,7 @@ const permissions = buildPermissions(profile, purchases || []);
 
 const isAdmin = permissions.hasFullAccess() || profile?.is_admin;
 const hasAccess = permissions.isMember();
+const canModerate = profile?.is_admin || profile?.is_partner;
 
 // Wenn kein Zugriff, hart zur Hauptseite werfen (wo dann die große Paywall auftaucht)
 if (!hasAccess) {
@@ -184,11 +185,17 @@ function formatDateTime(dateString: string) {
                      <span class="like-count">{topic.likes || 0}</span> Hilfreich
                   </button>
                   
-                  {isAdmin && (
-                    <button data-toggle-pin={topic.id} data-pinned={topic.is_pinned ? "true" : "false"} class={`flex items-center gap-1.5 px-4 py-2 rounded-xl border text-sm font-bold transition-all shadow-sm ${topic.is_pinned ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-[#05183a]'}`}>
-                       <span class="material-symbols-outlined text-[18px]">{topic.is_pinned ? 'do_not_disturb_on' : 'push_pin'}</span>
-                       <span class="pin-text">{topic.is_pinned ? 'Pin entfernen' : 'Anpinnen'}</span>
-                    </button>
+                  {canModerate && (
+                    <>
+                      <button data-toggle-pin={topic.id} data-pinned={topic.is_pinned ? "true" : "false"} class={`flex items-center gap-1.5 px-4 py-2 rounded-xl border text-sm font-bold transition-all shadow-sm ${topic.is_pinned ? 'bg-amber-50 border-amber-200 text-amber-700' : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50 hover:text-[#05183a]'}`}>
+                         <span class="material-symbols-outlined text-[18px]">{topic.is_pinned ? 'do_not_disturb_on' : 'push_pin'}</span>
+                         <span class="pin-text">{topic.is_pinned ? 'Pin entfernen' : 'Anpinnen'}</span>
+                      </button>
+                      <button data-delete-topic={topic.id} class="flex items-center gap-1.5 px-4 py-2 rounded-xl border text-sm font-bold transition-all shadow-sm bg-white border-red-200 text-red-500 hover:bg-red-50 hover:text-red-700 ml-2">
+                         <span class="material-symbols-outlined text-[18px]">delete</span>
+                         <span>Thema löschen</span>
+                      </button>
+                    </>
                   )}
                 </div>
                 <div class="flex items-center gap-4 text-gray-400 text-sm font-medium">
@@ -385,7 +392,45 @@ function formatDateTime(dateString: string) {
             headers: { 'Content-Type': 'application/json' }
           });
         } catch (err) {
+          // Revert on error
           console.error('Failed to toggle pin', err);
+        }
+      });
+    });
+
+    // Delete Topic Handler
+    document.querySelectorAll('[data-delete-topic]').forEach(button => {
+      button.addEventListener('click', async (e) => {
+        e.preventDefault();
+        const btn = e.currentTarget as HTMLButtonElement;
+        const topicId = btn.getAttribute('data-delete-topic');
+
+        if (!confirm('Soll dieses Thema wirklich dauerhaft gelöscht werden? Diese Aktion kann nicht rückgängig gemacht werden.')) {
+          return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="material-symbols-outlined text-[18px] animate-spin">hourglass_empty</span><span>Wird gelöscht...</span>';
+
+        try {
+          const res = await fetch('/api/forum/delete-topic', {
+            method: 'POST',
+            body: JSON.stringify({ topicId }),
+            headers: { 'Content-Type': 'application/json' }
+          });
+          
+          if (res.ok) {
+            window.location.href = '/app/forum';
+          } else {
+            alert('Fehler beim Löschen des Themas.');
+            btn.disabled = false;
+            btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">delete</span><span>Thema löschen</span>';
+          }
+        } catch (err) {
+          console.error('Failed to delete topic', err);
+          alert('Ein Netzwerkfehler ist aufgetreten.');
+          btn.disabled = false;
+          btn.innerHTML = '<span class="material-symbols-outlined text-[18px]">delete</span><span>Thema löschen</span>';
         }
       });
     });

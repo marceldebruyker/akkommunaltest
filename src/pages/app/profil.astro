@@ -16,7 +16,14 @@ if (!user) {
 let notification = '';
 
 const email = user.email || '';
-const isAdmin = email === 'marceldebruyker@gmail.com' || email === 'marcel.murschel@googlemail.com';
+const { data: profile } = await supabase
+  .from('user_profiles')
+  .select('*')
+  .eq('id', user.id)
+  .single();
+
+const isAdmin = profile?.is_admin === true;
+const isPartner = profile?.is_partner === true;
 
 if (Astro.request.method === 'POST') {
   try {
@@ -83,6 +90,8 @@ if (Astro.request.method === 'POST') {
       const anrede = formData.get('anrede')?.toString() || '';
       const password = formData.get('password')?.toString();
 
+    const jobDescription = formData.get('job_description')?.toString() || '';
+
     let salutationString = `${firstname} ${lastname}`;
     if (anrede === 'Herr' || anrede === 'Frau') {
       salutationString = `${anrede} ${lastname}`;
@@ -96,6 +105,10 @@ if (Astro.request.method === 'POST') {
         salutation_string: salutationString
       }
     };
+
+    if (isPartner) {
+      updates.data.job_description = jobDescription;
+    }
 
     const avatarFile = formData.get('avatar');
     if (avatarFile && typeof avatarFile === 'object' && avatarFile.size > 0) {
@@ -123,6 +136,41 @@ if (Astro.request.method === 'POST') {
     if (updateError) {
       notification = `Fehler: ${updateError.message}`;
     } else {
+      // Sync to Sanity if Partner
+      if (isPartner) {
+        try {
+          const { sanityAdminClient } = await import('../../lib/sanityAdmin');
+          const finalAvatarUrl = updates.data.avatar_url || user.user_metadata?.avatar_url;
+          let sanityImageId = undefined;
+          
+          if (finalAvatarUrl) {
+            const imgRes = await fetch(finalAvatarUrl);
+            if (imgRes.ok) {
+              const buffer = await imgRes.arrayBuffer();
+              const asset = await sanityAdminClient.assets.upload('image', Buffer.from(buffer), { filename: `avatar-${user.id}.jpg` });
+              sanityImageId = asset._id;
+            }
+          }
+          
+          const sanityDoc: any = {
+            _id: `team-${user.id}`,
+            _type: 'team',
+            name: `${firstname} ${lastname}`.trim(),
+            role: jobDescription,
+            sortIndex: 99
+          };
+          
+          if (sanityImageId) {
+             sanityDoc.image = { _type: 'image', asset: { _type: 'reference', _ref: sanityImageId } };
+          }
+          
+          await sanityAdminClient.createOrReplace(sanityDoc);
+          console.log('Sanity Sync Successful');
+        } catch(e) {
+          console.error('[Sanity Sync Error]', e);
+        }
+      }
+
       // Fetch latest user data
       const { data: { user: updatedUser } } = await supabase.auth.getUser();
       if (updatedUser) {
@@ -139,6 +187,8 @@ if (Astro.request.method === 'POST') {
 const firstName = user.user_metadata?.first_name || '';
 const lastName = user.user_metadata?.last_name || '';
 const anrede = user.user_metadata?.anrede || '';
+const jobDesc = user.user_metadata?.job_description || '';
+
 
 // Admin Data Fetching
 let adminSeminars: any[] = [];
@@ -288,6 +338,19 @@ if (rawStripeKey && email) {
             <label class="text-xs font-bold text-gray-600 uppercase tracking-widest">E-Mail Adresse (Login)</label>
             <input type="email" name="email" value={email} readonly disabled class="w-full bg-gray-100 border border-gray-200 px-4 py-2.5 rounded-lg outline-none text-sm font-medium text-gray-500 cursor-not-allowed" title="E-Mail kann aktuell nur über den Support geändert werden" />
           </div>
+
+          {isPartner && (
+            <div class="bg-blue-50/50 border border-blue-100 rounded-xl p-6 mt-6">
+              <h3 class="text-[14px] font-bold text-blue-900 mb-4 flex items-center gap-2">
+                <span class="material-symbols-outlined text-blue-600">stars</span> Experte & Referent (Sichtbar im Fachportal)
+              </h3>
+              <div class="space-y-2">
+                <label class="text-xs font-bold text-blue-800 uppercase tracking-widest">Rolle / Job-Beschreibung</label>
+                <input type="text" name="job_description" value={jobDesc} placeholder="z.B. Wirtschaftsprüfer, Steuerberater, Partner" class="w-full bg-white border border-blue-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 px-4 py-2.5 rounded-lg outline-none text-sm font-medium text-[#05183a] shadow-sm" />
+                <p class="text-xs text-blue-600 mt-2">Ihre Daten werden als Profil an das Sanity CMS übertragen und dort als Referenten-Daten gelistet. Änderungen sind nach dem Speichern sofort sichtbar (oder nach Refresh).</p>
+              </div>
+            </div>
+          )}
 
           <div class="space-y-2">
             <label class="text-xs font-bold text-gray-600 uppercase tracking-widest">Neues Passwort setzen</label>

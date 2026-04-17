@@ -20,7 +20,7 @@ export const POST = async ({ request, cookies }: any) => {
   }
 
   try {
-    const { topicId, isPinned } = await request.json();
+    const { topicId } = await request.json();
 
     if (!topicId) {
       return new Response(JSON.stringify({ error: 'Topic ID missing' }), { status: 400 });
@@ -28,12 +28,12 @@ export const POST = async ({ request, cookies }: any) => {
 
     const { error } = await supabase
       .from('forum_topics')
-      .update({ is_pinned: isPinned })
+      .delete()
       .eq('id', topicId);
         
     if (error) throw error;
     
-    return new Response(JSON.stringify({ success: true, isPinned }), { status: 200 });
+    return new Response(JSON.stringify({ success: true }), { status: 200 });
   } catch (err: any) {
     return new Response(JSON.stringify({ error: err.message }), { status: 500 });
   }
