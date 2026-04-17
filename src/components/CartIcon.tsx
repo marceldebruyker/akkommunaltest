@@ -12,7 +12,7 @@ export default function CartIcon() {
 
   if (!mounted) {
     return (
-      <button className="relative flex items-center justify-center w-10 h-10 bg-slate-50 rounded-full border border-slate-100/50 text-[#475569] opacity-50">
+      <button className="relative flex items-center justify-center text-[#475569] opacity-50 px-2">
         <span className="material-symbols-outlined text-[20px]">shopping_cart</span>
       </button>
     );
@@ -21,12 +21,12 @@ export default function CartIcon() {
   return (
     <button 
       onClick={() => setIsCartOpen(true)}
-      className="relative flex items-center justify-center w-10 h-10 bg-slate-50 hover:bg-slate-100 rounded-full border border-slate-100/50 text-[#475569] hover:text-[#0f172a] dark:bg-white/5 dark:hover:bg-white/10 dark:text-slate-300 dark:border-white/5 transition-all shadow-sm group"
+      className="relative flex items-center justify-center px-2 text-[#475569] hover:text-[#0f172a] dark:text-gray-400 dark:hover:text-white transition-colors group"
       aria-label="Warenkorb öffnen"
     >
-      <span className="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">shopping_cart</span>
+      <span className="material-symbols-outlined text-[22px] group-hover:scale-110 transition-transform">shopping_cart</span>
       {items.length > 0 && (
-        <span className="absolute top-0 right-0 translate-x-1/3 -translate-y-1/3 bg-[#f8981d] text-white text-[9px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center border-2 border-white dark:border-[#05183a] animate-[scaleIn_0.2s_ease-out]">
+        <span className="absolute top-0 right-0 translate-x-1 -translate-y-1 bg-primary text-white text-[9px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center animate-[scaleIn_0.2s_ease-out]">
           {items.length}
         </span>
       )}
