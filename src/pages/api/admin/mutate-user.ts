@@ -71,7 +71,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
                 const sanityDoc: any = {
                   _id: `team-${targetUserId}`,
                   _type: 'team',
-                  name: meta.salutation_string || `${meta.first_name || ''} ${meta.last_name || ''}`.trim() || targetUser.email,
+                  name: `${meta.first_name || ''} ${meta.last_name || ''}`.trim() || targetUser.email,
                   role: meta.job_description || '',
                   sortIndex: 99
                 };
