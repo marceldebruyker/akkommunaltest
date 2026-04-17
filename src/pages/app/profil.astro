@@ -5,6 +5,7 @@ import Stripe from 'stripe';
 import { sanityClient } from '../../lib/sanity';
 import { Resend } from 'resend';
 import { createClient } from '@supabase/supabase-js';
+import { Buffer } from 'node:buffer';
 
 const supabase = getSupabaseServer(Astro.request, Astro.cookies);
 const { data: { user } } = await supabase.auth.getUser();
