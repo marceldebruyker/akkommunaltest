@@ -160,9 +160,9 @@ export default function CheckoutFlow({ user = null }: { user?: any }) {
           </div>
           
           {isSubscription && (
-            <div className="flex items-start gap-3 bg-secondary-container/30 text-secondary-fixed-dim p-4 rounded-xl">
-               <span className="material-symbols-outlined text-sm mt-0.5">info</span>
-               <p className="text-xs leading-relaxed font-medium">Bequeme jährliche Abrechnung in einem gebündelten Abo. Kündigung jederzeit bis 4 Wochen vor Verlängerung möglich.</p>
+            <div className="flex items-start gap-3 bg-blue-50 text-blue-900 p-4 rounded-xl border border-blue-100 shadow-sm">
+               <span className="material-symbols-outlined text-blue-600 mt-0.5">info</span>
+               <p className="text-xs md:text-sm leading-relaxed font-semibold">Bequeme jährliche Abrechnung in einem gebündelten Abo. Kündigung jederzeit bis 4 Wochen vor Verlängerung möglich.</p>
             </div>
           )}
         </div>
