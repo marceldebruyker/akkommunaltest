@@ -32,37 +32,89 @@ import FooterSection from '../components/FooterSection.astro';
         
         <!-- Contact Form -->
         <div class="lg:col-span-7 bg-white p-8 md:p-12 rounded-3xl shadow-[0_20px_40px_-15px_rgba(5,24,58,0.08)] border border-outline-variant/20">
-          <form class="space-y-6" onsubmit="event.preventDefault(); alert('Vielen Dank für Ihre Nachricht. (Demo Formular)');">
+          <form id="contactForm" class="space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div class="space-y-2">
                 <label class="text-sm font-bold text-primary">Vorname</label>
-                <input type="text" required class="w-full bg-surface px-4 py-3 rounded-xl border border-outline-variant/40 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-on-surface-variant/40" placeholder="Max" />
+                <input type="text" id="kontakt-firstName" required class="w-full bg-surface px-4 py-3 rounded-xl border border-outline-variant/40 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-on-surface-variant/40" placeholder="Max" />
               </div>
               <div class="space-y-2">
                 <label class="text-sm font-bold text-primary">Nachname</label>
-                <input type="text" required class="w-full bg-surface px-4 py-3 rounded-xl border border-outline-variant/40 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-on-surface-variant/40" placeholder="Mustermann" />
+                <input type="text" id="kontakt-lastName" required class="w-full bg-surface px-4 py-3 rounded-xl border border-outline-variant/40 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-on-surface-variant/40" placeholder="Mustermann" />
               </div>
             </div>
             
             <div class="space-y-2">
               <label class="text-sm font-bold text-primary">Organisation / Kommune</label>
-              <input type="text" class="w-full bg-surface px-4 py-3 rounded-xl border border-outline-variant/40 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-on-surface-variant/40" placeholder="Stadtmusterhausen" />
+              <input type="text" id="kontakt-organisation" class="w-full bg-surface px-4 py-3 rounded-xl border border-outline-variant/40 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-on-surface-variant/40" placeholder="Stadtmusterhausen" />
             </div>
 
             <div class="space-y-2">
               <label class="text-sm font-bold text-primary">E-Mail</label>
-              <input type="email" required class="w-full bg-surface px-4 py-3 rounded-xl border border-outline-variant/40 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-on-surface-variant/40" placeholder="m.mustermann@stadt.de" />
+              <input type="email" id="kontakt-email" required class="w-full bg-surface px-4 py-3 rounded-xl border border-outline-variant/40 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-on-surface-variant/40" placeholder="m.mustermann@stadt.de" />
             </div>
 
             <div class="space-y-2">
               <label class="text-sm font-bold text-primary">Ihre Nachricht</label>
-              <textarea required rows="4" class="w-full bg-surface px-4 py-3 rounded-xl border border-outline-variant/40 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-on-surface-variant/40 resize-none" placeholder="Wie können wir Ihnen helfen?"></textarea>
+              <textarea id="kontakt-message" required rows="4" class="w-full bg-surface px-4 py-3 rounded-xl border border-outline-variant/40 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all placeholder:text-on-surface-variant/40 resize-none" placeholder="Wie können wir Ihnen helfen?"></textarea>
             </div>
 
-            <button type="submit" class="w-full bg-primary text-white font-bold text-lg py-4 rounded-xl hover:bg-primary-fixed-dim transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 mt-4">
+            <button id="kontakt-submitBtn" type="submit" class="w-full bg-primary text-white font-bold text-lg py-4 rounded-xl hover:bg-primary-fixed-dim transition-all shadow-lg hover:shadow-xl hover:-translate-y-1 mt-4">
               Nachricht senden
             </button>
+            <div id="kontakt-success" class="hidden w-full bg-emerald-50 text-emerald-700 p-4 rounded-xl border border-emerald-200 mt-4 text-sm font-medium animate-[fadeIn_0.5s_ease-out]">
+              <span class="material-symbols-outlined text-emerald-500 mr-2 align-middle">check_circle</span>
+              Vielen Dank! Ihre Anfrage wurde erfolgreich übermittelt.
+            </div>
+            <div id="kontakt-error" class="hidden w-full bg-red-50 text-red-700 p-4 rounded-xl border border-red-200 mt-4 text-sm font-medium animate-[fadeIn_0.5s_ease-out]">
+              Ein Fehler ist aufgetreten. Bitte versuchen Sie es später noch einmal.
+            </div>
           </form>
+
+          <script>
+            const form = document.getElementById('contactForm');
+            const submitBtn = document.getElementById('kontakt-submitBtn');
+            const successMsg = document.getElementById('kontakt-success');
+            const errorMsg = document.getElementById('kontakt-error');
+
+            if (form && submitBtn && successMsg && errorMsg) {
+              form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span class="material-symbols-outlined animate-spin align-middle mr-2 -mt-0.5" style="font-size: 1.25rem;">autorenew</span> Wird gesendet...';
+                successMsg.classList.add('hidden');
+                errorMsg.classList.add('hidden');
+
+                const data = {
+                  firstName: (document.getElementById('kontakt-firstName') as HTMLInputElement).value,
+                  lastName: (document.getElementById('kontakt-lastName') as HTMLInputElement).value,
+                  organisation: (document.getElementById('kontakt-organisation') as HTMLInputElement).value,
+                  email: (document.getElementById('kontakt-email') as HTMLInputElement).value,
+                  message: (document.getElementById('kontakt-message') as HTMLTextAreaElement).value
+                };
+
+                try {
+                  const res = await fetch('/api/contact', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                  });
+
+                  if (res.ok) {
+                    successMsg.classList.remove('hidden');
+                    (form as HTMLFormElement).reset();
+                  } else {
+                    errorMsg.classList.remove('hidden');
+                  }
+                } catch(error) {
+                  errorMsg.classList.remove('hidden');
+                } finally {
+                  submitBtn.disabled = false;
+                  submitBtn.innerHTML = 'Nachricht senden';
+                }
+              });
+            }
+          </script>
         </div>
 
         <!-- Contact Info (Freya Marx Box from Team) -->
