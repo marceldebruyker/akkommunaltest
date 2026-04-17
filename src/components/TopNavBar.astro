@@ -38,24 +38,24 @@ import CartIcon from './CartIcon.tsx';
     <div class="flex items-center gap-6 lg:gap-8">
       
       <!-- Desktop Actions -->
-      <div class="hidden lg:flex items-center gap-6">
+      <div class="hidden lg:flex items-center gap-5">
         <!-- Mitglied werden -->
-        <a href="/mitglied-werden" class="flex items-center gap-1 font-headline font-bold text-[14px] tracking-tight text-[#f8981d] hover:text-[#d58010] transition-colors group">
+        <a href="/mitglied-werden" class="font-headline font-bold text-[13px] text-white bg-primary hover:bg-primary-fixed-dim px-5 py-2 rounded-full transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5">
           Mitglied werden
-          <span class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
         </a>
         
         <!-- Divider -->
-        <div class="h-4 w-[1px] bg-slate-200 dark:bg-white/20"></div>
+        <div class="h-6 w-[1px] bg-slate-200 dark:bg-white/20"></div>
         
-        <!-- Cart Icon -->
-        <CartIcon client:load />
+        <!-- Cart & Login Group -->
+        <div class="flex items-center gap-3">
+          <CartIcon client:load />
 
-        <!-- Login -->
-        <a href="/login" class="flex items-center gap-1.5 font-headline font-bold text-[14px] tracking-tight text-[#475569] hover:text-[#0f172a] dark:text-slate-300 dark:hover:text-white transition-colors group">
-          <span class="material-symbols-outlined text-[20px] group-hover:translate-x-0.5 transition-transform">login</span>
-          <span>Login</span>
-        </a>
+          <a href="/login" class="flex items-center gap-1.5 font-headline font-bold text-[14px] tracking-tight text-[#475569] hover:text-[#0f172a] dark:text-slate-300 dark:hover:text-white transition-colors group">
+            <span class="material-symbols-outlined text-[20px] group-hover:translate-x-0.5 transition-transform">login</span>
+            <span>Login</span>
+          </a>
+        </div>
       </div>
       
       <!-- Hamburger (Mobile only) -->
