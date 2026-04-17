@@ -12,7 +12,7 @@ export default function CartIcon() {
 
   if (!mounted) {
     return (
-      <button className="relative flex items-center justify-center w-9 h-9 text-[#475569] opacity-50">
+      <button className="relative flex items-center justify-center w-10 h-10 bg-slate-50 rounded-full border border-slate-100/50 text-[#475569] opacity-50">
         <span className="material-symbols-outlined text-[20px]">shopping_cart</span>
       </button>
     );
@@ -21,7 +21,7 @@ export default function CartIcon() {
   return (
     <button 
       onClick={() => setIsCartOpen(true)}
-      className="relative flex items-center justify-center w-9 h-9 rounded-full text-[#475569] hover:bg-gray-100 dark:hover:bg-white/10 dark:text-slate-300 transition-colors group"
+      className="relative flex items-center justify-center w-10 h-10 bg-slate-50 hover:bg-slate-100 rounded-full border border-slate-100/50 text-[#475569] hover:text-[#0f172a] dark:bg-white/5 dark:hover:bg-white/10 dark:text-slate-300 dark:border-white/5 transition-all shadow-sm group"
       aria-label="Warenkorb öffnen"
     >
       <span className="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">shopping_cart</span>
