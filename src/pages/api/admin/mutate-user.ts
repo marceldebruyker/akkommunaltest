@@ -45,6 +45,46 @@ export const POST: APIRoute = async ({ request, cookies }) => {
           .eq('id', targetUserId);
           
         if (profileError) throw profileError;
+
+        // If they granted the partner role, push the current profile to Sanity
+        if (payload.is_partner === true) {
+          try {
+             // Dynamic import to avoid loading Sanity globally if not needed
+             const { sanityAdminClient } = await import('../../../lib/sanityAdmin');
+             const { data: { user: targetUser } } = await supabaseAdmin.auth.admin.getUserById(targetUserId);
+             
+             if (targetUser) {
+                const meta = targetUser.user_metadata || {};
+                
+                let sanityImageId = undefined;
+                if (meta.avatar_url) {
+                  const imgRes = await fetch(meta.avatar_url);
+                  if (imgRes.ok) {
+                    const buffer = await imgRes.arrayBuffer();
+                    // we use explicit Buffer.from inside the sanity api
+                    const asset = await sanityAdminClient.assets.upload('image', Buffer.from(buffer), { filename: `avatar-${targetUserId}.jpg` });
+                    sanityImageId = asset._id;
+                  }
+                }
+                
+                const sanityDoc: any = {
+                  _id: `team-${targetUserId}`,
+                  _type: 'team',
+                  name: meta.salutation_string || `${meta.first_name || ''} ${meta.last_name || ''}`.trim() || targetUser.email,
+                  role: meta.job_description || '',
+                  sortIndex: 99
+                };
+                
+                if (sanityImageId) {
+                  sanityDoc.image = { _type: 'image', asset: { _type: 'reference', _ref: sanityImageId } };
+                }
+                
+                await sanityAdminClient.createOrReplace(sanityDoc);
+             }
+          } catch(e) {
+             console.error('[Admin Sanity Sync Error]', e);
+          }
+        }
         break;
 
       case 'GRANT_SLUG':
