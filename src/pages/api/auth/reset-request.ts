@@ -88,7 +88,7 @@ export const POST: APIRoute = async ({ request, redirect, url }) => {
 
       // 3. Send email!
       await resend.emails.send({
-        from: 'AK Kommunal Fachportal <noreply@ak-kommunal.de>',
+        from: 'AK Kommunal Fachportal <noreply@debruyker.de>',
         to: email,
         subject: '🔐 Neues Passwort für Ihr Fachportal veregeben',
         html: htmlEmail,
