@@ -216,3 +216,21 @@ const hasAnyPurchases = permissions.isMember() || userSeminars.length > 0;
 
   </div>
 </AppLayout>
+
+<script>
+  import { clearCart } from '../../store/cartStore';
+
+  // If the user lands here directly from a successful Stripe checkout 
+  // or a successful Buy-On-Invoice, the URL will have success parameters.
+  // We can safely clear their shopping cart.
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.has('session_id') || urlParams.has('success') || urlParams.get('checkout') === 'success') {
+    clearCart();
+    
+    // Erase the query params from the address bar for a cleaner visual experience
+    if (window.history.replaceState) {
+      const cleanUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+      window.history.replaceState({path: cleanUrl}, '', cleanUrl);
+    }
+  }
+</script>
