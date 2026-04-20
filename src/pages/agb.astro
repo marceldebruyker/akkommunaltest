@@ -1,35 +1,113 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import TopNavBar from '../components/TopNavBar.astro';
-import FooterSection from '../components/FooterSection.astro';
 ---
 
-<Layout title="AGB - AK Kommunal">
-  <TopNavBar />
-  <main class="w-full bg-surface pt-32 pb-24 min-h-[60vh]">
-    <div class="max-w-4xl mx-auto px-8 text-on-surface">
-      <h1 class="text-4xl font-headline font-extrabold text-primary mb-8">Allgemeine Geschäftsbedingungen</h1>
-      <div class="prose prose-lg prose-blue max-w-none text-on-surface-variant font-light leading-relaxed">
-        <h3>§ 1 Geltungsbereich</h3>
-        <p>
-          Diese Allgemeinen Geschäftsbedingungen gelten für alle Verträge über die Teilnahme an Veranstaltungen, Seminaren und dem Online-Videoportal des "Arbeitskreis Kommunal" der BW PARTNER.
-        </p>
-        
-        <h3>§ 2 Anmeldung und Vertragsschluss</h3>
-        <p>
-          Die Anmeldung zu unseren Schulungsmodulen erfolgt elektronisch über diese Website. Ein verbindlicher Vertrag kommt durch unsere schriftliche Anmeldebestätigung zustande.
-        </p>
-        
-        <h3>§ 3 Leistungen und Inhalte</h3>
-        <p>
-          Der genaue Leistungsumfang ergibt sich aus der jeweiligen Modulbeschreibung. Modulzugänge (digital) und Video-on-Demand Abrufe sind personalisiert und dürfen nicht an Dritte weitergegeben werden.
-        </p>
+<Layout title="Allgemeine Geschäftsbedingungen - AK Kommunal">
+  <main class="pt-36 pb-24 px-6 lg:px-10 max-w-[800px] mx-auto font-body text-[#475569] leading-relaxed">
+    <h1 class="text-4xl md:text-5xl font-extrabold font-headline text-[#05183a] mb-8 tracking-tight">Allgemeine Geschäftsbedingungen (AGB)</h1>
+    <p class="text-[13px] text-gray-500 mb-16 italic">(Stand: April 2026)</p>
+    
+    <div class="space-y-12">
+      <!-- 1 -->
+      <section>
+        <h2 class="text-[18px] font-bold font-headline text-[#05183a] mb-4">§ 1 Geltungsbereich und Vertragspartner</h2>
+        <ul class="list-none space-y-4">
+          <li><strong>(1)</strong> Diese Allgemeinen Geschäftsbedingungen (AGB) gelten für alle Verträge über die Nutzung des Fachportals „AK Kommunal“, die zwischen der <strong>BW PARTNER Bauer Schätz Hasenclever Partnerschaft mbB</strong> (nachfolgend „Anbieter“ oder „BW Partner“) und dem Kunden (nachfolgend „Nutzer“ oder „Kunde“) abgeschlossen werden.</li>
+          <li><strong>(2)</strong> Das Angebot des Fachportals richtet sich ausschließlich an Kommunen, behördliche Einrichtungen, Unternehmer im Sinne von § 14 BGB sowie deren Mitarbeiter. Ein Vertragsschluss mit privaten Verbrauchern (§ 13 BGB) ist ausgeschlossen.</li>
+          <li><strong>(3)</strong> Abweichende oder ergänzende Bedingungen des Kunden werden nicht Vertragsbestandteil, es sei denn, BW Partner hat deren Geltung ausdrücklich schriftlich zugestimmt.</li>
+        </ul>
+      </section>
 
-        <p class="mt-12 text-sm italic">
-          *Dies ist ein Platzhaltertext für die AGB im Entwicklungsstand. Bitte vor Livegang mit der juristischen Fachabteilung abstimmen und ergänzen.*
-        </p>
-      </div>
+      <!-- 2 -->
+      <section>
+        <h2 class="text-[18px] font-bold font-headline text-[#05183a] mb-4">§ 2 Vertragsgegenstand und Leistungsbeschreibung</h2>
+        <ul class="list-none space-y-4">
+          <li><strong>(1)</strong> Das Fachportal „AK Kommunal“ stellt eine digitale Lern- und Informationsplattform für den kommunalen Sektor dar.</li>
+          <li><strong>(2)</strong> Zu den bereitgestellten Inhalten zählen zeitlich befristete Video-on-Demand-Kurse (Mediathek), die Einladung und Teilnahme an Live-Webinaren (via MS-Teams), das Herunterladen von Schulungsskripten sowie der Zugang zum internen Experten-Forum.</li>
+          <li><strong>(3)</strong> Der genaue Leistungsumfang ergibt sich aus dem durch den Kunden gebuchten Modul (z.B. „Praktiker“, „Spezialthemen“, „Gesamtpaket“) oder im Falle eines Einzelkaufs aus der jeweiligen Seminarbeschreibung.</li>
+          <li><strong>(4)</strong> Der Anbieter gewährleistet im Rahmen der technischen Möglichkeiten eine Erreichbarkeit der Server von 98 % im Jahresmittel. Ausfallzeiten durch notwendige Wartungsarbeiten oder aufgrund technisch unvorhersehbarer Ereignisse, die nicht im Einflussbereich des Anbieters liegen, sind hiervon ausgenommen.</li>
+        </ul>
+      </section>
+
+      <!-- 3 -->
+      <section>
+        <h2 class="text-[18px] font-bold font-headline text-[#05183a] mb-4">§ 3 Vertragsschluss und Account-Freischaltung</h2>
+        <ul class="list-none space-y-4">
+          <li><strong>(1)</strong> Die Darstellung der Module und Seminare auf der Website stellt kein rechtlich bindendes Angebot, sondern eine Aufforderung zur Bestellung dar.</li>
+          <li><strong>(2)</strong> Der Nutzer gibt durch Anklicken des Bestellbuttons (z. B. „Kostenpflichtig buchen“) ein verbindliches Vertragsangebot ab.</li>
+          <li><strong>(3) Zahlung via Kreditkarte/Stripe:</strong> Hier kommt der Vertrag mit der automatischen Bestätigung und der erfolgreichen Zahlungsabwicklung durch den Zahlungsdienstleister zustande.</li>
+          <li><strong>(4) Kauf auf Rechnung:</strong> Wählt der Kunde die Zahlungsart „Kauf auf Rechnung“, kommt der Vertrag unmittelbar mit dem Klick auf den Button zur verbindlichen kostenpflichtigen Bestellung zustande. Der Anbieter schaltet den Account sowie die gebuchten Inhalte <em>sofort</em> automatisiert zur Nutzung frei. Die Übermittlung der Rechnung erfolgt im Nachgang per E-Mail.</li>
+        </ul>
+      </section>
+
+      <!-- 4 -->
+      <section>
+        <h2 class="text-[18px] font-bold font-headline text-[#05183a] mb-4">§ 4 Preise, Zahlungsbedingungen und Zahlungsverzug</h2>
+        <ul class="list-none space-y-4">
+          <li><strong>(1)</strong> Alle angegebenen Preise verstehen sich als Netto-Preise und zzgl. der jeweils geltenden gesetzlichen Umsatzsteuer.</li>
+          <li><strong>(2)</strong> Bei der Zahlungsart „Kauf auf Rechnung“ ist der ausgewiesene Rechnungsbetrag, sofern auf der Rechnung nicht anders angegeben, innerhalb von 14 Tagen nach Rechnungsdatum ohne Abzug zur Zahlung fällig.</li>
+          <li><strong>(3)</strong> Gerät der Kunde in Zahlungsverzug, ist der Anbieter nach vorheriger Mahnung berechtigt, den Zugang zum Fachportal bis zum vollständigen Zahlungseingang vorübergehend zu sperren. Die vertraglichen Zahlungspflichten des Kunden bleiben hiervon unberührt.</li>
+        </ul>
+      </section>
+
+      <!-- 5 -->
+      <section>
+        <h2 class="text-[18px] font-bold font-headline text-[#05183a] mb-4">§ 5 Laufzeit und Kündigung (bei Abonnements)</h2>
+        <ul class="list-none space-y-4">
+          <li><strong>(1)</strong> Abonnement-Module (Jahreszugänge) haben eine initiale Laufzeit von 12 Monaten ab Vertragsschluss.</li>
+          <li><strong>(2)</strong> Das Abonnement verlängert sich automatisch um jeweils weitere 12 Monate, es sei denn, es wird von einer der beiden Vertragsparteien mit einer Frist von 4 Wochen zum Ende der jeweiligen Vertragslaufzeit gekündigt.</li>
+          <li><strong>(3)</strong> Die Kündigung bedarf der Textform (z. B. per E-Mail an <em>support@ak-kommunal.de</em> oder postalisch).</li>
+          <li><strong>(4)</strong> Das Recht zur außerordentlichen Kündigung aus wichtigem Grund bleibt hiervon unberührt.</li>
+        </ul>
+      </section>
+
+      <!-- 6 -->
+      <section>
+        <h2 class="text-[18px] font-bold font-headline text-[#05183a] mb-4">§ 6 Nutzungsrechte, Account-Sharing und Urheberrecht</h2>
+        <ul class="list-none space-y-4">
+          <li><strong>(1)</strong> Mit der vollständigen Bezahlung gewährt der Anbieter dem Kunden ein einfaches, nicht übertragbares, zeitlich auf die Vertragslaufzeit beschränktes Recht, die im Portal zur Verfügung gestellten Inhalte zu eigenen, dienstlichen Zwecken zu nutzen.</li>
+          <li><strong>(2) Die Weitergabe von Zugangsdaten (Account-Sharing):</strong> Die erworbenen Lizenzen sind strikte <em>Einzelplatzlizenzen</em>. Die Weitergabe des Passworts oder der Zugangsdaten an Dritte – auch an andere Mitarbeiter innerhalb derselben Kommune oder Behörde – ist strengstens untersagt, sofern nicht ausdrücklich eine Mehrfach- oder Behördenlizenz erworben wurde.</li>
+          <li><strong>(3)</strong> Bei Verdacht auf missbräuchliches Account-Sharing (z.B. durch parallele Logins von unterschiedlichen Standorten) behält sich der Anbieter vor, den Account nach vorheriger Anhörung zu sperren.</li>
+          <li><strong>(4)</strong> Sämtliche Inhalte (Videos, Texte, Skripte, Präsentationen) unterliegen dem Urheberrecht. Das Herunterladen (mit Ausnahme der ausdrücklich zum Download freigegebenen PDF-Skripte), das Abfilmen, die Vervielfältigung oder die Weitergabe an unberechtigte Dritte ist untersagt.</li>
+        </ul>
+      </section>
+
+      <!-- 7 -->
+      <section>
+        <h2 class="text-[18px] font-bold font-headline text-[#05183a] mb-4">§ 7 Regeln für die Nutzung des Forums (Netiquette)</h2>
+        <ul class="list-none space-y-4">
+          <li><strong>(1)</strong> Der Anbieter stellt den registrierten Nutzern ein internes Forum für den fachlichen Austausch zur Verfügung.</li>
+          <li><strong>(2)</strong> Die Nutzer verpflichten sich, im Forum einen respektvollen und professionellen Umgangston zu wahren. Die Veröffentlichung von beleidigenden, diskriminierenden, urheberrechtsverletzenden oder werblichen (Spam) Inhalten ist verboten.</li>
+          <li><strong>(3)</strong> Der Anbieter übt das digitale Hausrecht aus und behält sich das Recht vor, Beiträge, die gegen diese Regeln verstoßen, ohne Vorankündigung ganz oder teilweise zu löschen. Bei schweren oder wiederholten Verstößen kann einem Nutzer die Schreibberechtigung entzogen werden.</li>
+        </ul>
+      </section>
+
+      <!-- 8 -->
+      <section>
+        <h2 class="text-[18px] font-bold font-headline text-[#05183a] mb-4">§ 8 Haftung und Haftungsausschluss</h2>
+        <ul class="list-none space-y-4">
+          <li><strong>(1) Wichtiger Hinweis zur Rechts- und Steuerberatung:</strong> Das Fachportal AK Kommunal, deren Videos, Leitfäden sowie alle Forenbeiträge dienen ausschließlich der allgemeinen Fortbildung und Information. Die Inhalte stellen ausdrücklich <strong>keine</strong> steuerliche, juristische oder betriebswirtschaftliche Einzelfallberatung dar und können eine solche auch nicht ersetzen.</li>
+          <li><strong>(2)</strong> Der Anbieter bemüht sich um höchste fachliche Qualität und Aktualität der Inhalte (etwa zu § 2b UStG oder Ertragsteuern), übernimmt jedoch keine Gewährleistung für die Vollständigkeit, Richtigkeit oder die Eignung der bereitgestellten Informationen für die individuellen Zwecke des Kunden. Eine Haftung für finanzielle Nachteile oder rechtliche Konsequenzen, die dem Nutzer oder dessen Kommune aus der Anwendung der vermittelten Inhalte in der eigenen Praxis entstehen, wird explizit ausgeschlossen.</li>
+          <li><strong>(3)</strong> Für sonstige Schäden haftet der Anbieter nur bei Vorsatz oder grober Fahrlässigkeit. Bei der Verletzung von wesentlichen Vertragspflichten (Kardinalpflichten) haftet der Anbieter auch bei leichter Fahrlässigkeit, jedoch der Höhe nach beschränkt auf die bei Vertragsschluss vorhersehbaren und vertragstypischen Schäden.</li>
+        </ul>
+      </section>
+
+      <!-- 9 -->
+      <section>
+        <h2 class="text-[18px] font-bold font-headline text-[#05183a] mb-4">§ 9 Datenschutz</h2>
+        <p>Die Verarbeitung der personenbezogenen Daten des Nutzers (z. B. im Rahmen der Registrierung oder des Ticket-Kaufs) erfolgt unter strikter Einhaltung der gesetzlichen Bestimmungen. Die Details zur Verarbeitung, Speicherung und den Rechten des Kunden können in unserer separaten <a href="/datenschutz" class="text-blue-600 hover:text-[#05183a] transition-colors">Datenschutzerklärung</a> nachgelesen werden.</p>
+      </section>
+
+      <!-- 10 -->
+      <section>
+        <h2 class="text-[18px] font-bold font-headline text-[#05183a] mb-4">§ 10 Schlussbestimmungen</h2>
+        <ul class="list-none space-y-4">
+          <li><strong>(1)</strong> Es gilt das Recht der Bundesrepublik Deutschland unter Ausschluss des UN-Kaufrechts (CISG).</li>
+          <li><strong>(2)</strong> Ausschließlicher Gerichtsstand für alle Streitigkeiten aus oder im Zusammenhang mit diesen AGB ist der Sitz des Anbieters (Stuttgart), sofern der Kunde Kaufmann, eine juristische Person des öffentlichen Rechts oder ein öffentlich-rechtliches Sondervermögen ist.</li>
+          <li><strong>(3)</strong> Sollten einzelne Bestimmungen dieses Vertrages unwirksam sein oder werden, so wird hierdurch die Wirksamkeit der übrigen Bestimmungen nicht berührt.</li>
+        </ul>
+      </section>
+
     </div>
   </main>
-  <FooterSection />
 </Layout>
