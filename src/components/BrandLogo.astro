@@ -1,6 +1,10 @@
 ---
 // src/components/BrandLogo.astro
-const { variant = 'dark' } = Astro.props; // 'dark' (default) or 'light' (for dark backgrounds)
+// `variant`  : 'dark' (default, for light bg) or 'light' (for dark bg)
+// `subtitle` : show the "Eine Marke von BW Partner" tagline. Default true
+//              so footer/auth pages keep it; pass false in the top nav
+//              where a one-line wordmark reads cleaner.
+const { variant = 'dark', subtitle = true } = Astro.props;
 
 const textColor = variant === 'light' ? 'text-white' : 'text-[#05183a]';
 const subtitleColor = variant === 'light' ? 'text-white/50' : 'text-[#878787]';
@@ -23,9 +27,11 @@ const subtitleColor = variant === 'light' ? 'text-white/50' : 'text-[#878787]';
     <span class={`text-[21px] font-extrabold font-headline ${textColor} leading-none tracking-tight`}>
       AK Kommunal
     </span>
-    <span class={`text-[8px] font-normal ${subtitleColor} uppercase tracking-[0.18em] mt-[3px] leading-none`} style="font-stretch: condensed; letter-spacing: 0.18em;">
-      Eine Marke von BW Partner
-    </span>
+    {subtitle && (
+      <span class={`text-[8px] font-normal ${subtitleColor} uppercase tracking-[0.18em] mt-[3px] leading-none`} style="font-stretch: condensed; letter-spacing: 0.18em;">
+        Eine Marke von BW Partner
+      </span>
+    )}
   </div>
 
 </a>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useStore } from '@nanostores/react';
 import { cartItems } from '../store/cartStore';
 import { MODULES, type ModuleId } from '../lib/modules';
-import { useCheckout, type PaymentType } from '../store/useCheckout';
+import { useCheckout } from '../store/useCheckout';
 
 type CheckoutUser = {
   email?: string;
@@ -21,7 +21,7 @@ export default function CheckoutFlow({ user = null }: { user?: CheckoutUser }) {
   const [isMounted, setIsMounted] = useState(false);
   const cart = useStore(cartItems);
   const isLoggedIn = !!user;
-  const { submit, isLoading, paymentType, setPaymentType, error: checkoutError } = useCheckout();
+  const { submit, isLoading, error: checkoutError } = useCheckout();
 
   useEffect(() => {
     setIsMounted(true);
@@ -59,11 +59,14 @@ export default function CheckoutFlow({ user = null }: { user?: CheckoutUser }) {
   const tax = total * 0.19;
   const grandTotal = total + tax;
 
-  const handleCheckout = (type: PaymentType) => async (e: React.FormEvent) => {
+  const handleCheckout = async (e: React.FormEvent) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget as HTMLFormElement);
     const get = (k: string) => (formData.get(k) as string) || '';
 
+    // Only one payment path remains (Kauf auf Rechnung) — Stripe card/PayPal
+    // is intentionally disabled. The hook still accepts a payment type for
+    // future flexibility but we always pass 'invoice' here.
     await submit({
       items: isSubscription
         ? aboItems.map((item, idx) => ({ id: aboIds![idx], title: item.title, price: item.price }))
@@ -81,7 +84,7 @@ export default function CheckoutFlow({ user = null }: { user?: CheckoutUser }) {
         plz: get('plz'),
         ort: get('ort')
       }
-    }, type);
+    }, 'invoice');
   };
 
   return (
@@ -153,14 +156,7 @@ export default function CheckoutFlow({ user = null }: { user?: CheckoutUser }) {
         <h2 className="text-3xl font-extrabold font-headline text-primary tracking-tight mb-8">Ihre Daten</h2>
         
         <form
-          onSubmit={(e) => {
-            // The submitter element (the button that was clicked) carries the
-            // payment type as its `name` attribute — read it directly so we
-            // don't depend on a state update happening before submit.
-            const submitter = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null;
-            const type: PaymentType = submitter?.name === 'invoice' ? 'invoice' : 'stripe';
-            handleCheckout(type)(e);
-          }}
+          onSubmit={handleCheckout}
           className="bg-white p-8 rounded-3xl border border-outline-variant/20 shadow-xl relative z-20">
           
           {isLoggedIn ? (
@@ -263,26 +259,17 @@ export default function CheckoutFlow({ user = null }: { user?: CheckoutUser }) {
              )}
 
              <button type="submit" name="invoice" disabled={isLoading} className="w-full bg-[#05183a] hover:bg-[#0a2354] text-white text-base font-extrabold py-4 px-6 rounded-xl transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed">
-               {isLoading && paymentType === 'invoice' ? (
+               {isLoading ? (
                  <span className="animate-spin material-symbols-outlined text-[20px]">progress_activity</span>
                ) : (
                  <span className="material-symbols-outlined text-[20px] group-hover:scale-110 transition-transform">receipt_long</span>
                )}
-               Jetzt buchen (Kauf auf Rechnung)
-             </button>
-
-             <button type="submit" name="stripe" disabled={isLoading} className="w-full bg-surface hover:bg-surface-container border border-outline-variant/50 text-on-surface text-sm font-bold py-3.5 px-6 rounded-xl transition-all shadow-sm active:scale-[0.98] flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed">
-               {isLoading && paymentType === 'stripe' ? (
-                 <span className="animate-spin material-symbols-outlined text-[18px]">progress_activity</span>
-               ) : (
-                 <span className="material-symbols-outlined text-[18px]">credit_card</span>
-               )}
-               Per Kreditkarte / PayPal zahlen
+               Verbindlich bestellen (Kauf auf Rechnung)
              </button>
           </div>
-          
+
           <div className="mt-4 text-[11px] text-center text-on-surface-variant">
-            Mit Bestätigung der Zahlung akzeptieren Sie unsere <a href="/agb" className="underline hover:text-primary">AGB</a>.
+            Sie erhalten Ihre Rechnung per E-Mail mit einer Zahlungsfrist von 14 Tagen. Mit der Bestellung akzeptieren Sie unsere <a href="/agb" className="underline hover:text-primary">AGB</a>.
           </div>
         </form>
       </div>
