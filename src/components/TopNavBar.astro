@@ -1,101 +1,146 @@
 ---
 import BrandLogo from './BrandLogo.astro';
 import CartIcon from './CartIcon.tsx';
+import NavLink from './NavLink.astro';
+import { getSupabaseServer } from '../lib/supabase';
+
+// Detect logged-in users so we can swap the public "Login / Mitglied werden"
+// CTAs for a single "Zum Fachportal" action — much less awkward when a
+// returning member visits the public homepage.
+const supabase = getSupabaseServer(Astro.request, Astro.cookies);
+const { data: { user } } = await supabase.auth.getUser();
+const isLoggedIn = !!user;
+
+// Active-page detection. Exact match for the page itself, plus prefix match
+// so /mediathek/foo also highlights the "Mediathek" link. Trailing slashes
+// are normalised so /team and /team/ both match.
+const rawPath = Astro.url.pathname.replace(/\/+$/, '') || '/';
+
+function isActive(href: string): boolean {
+  if (href === rawPath) return true;
+  if (href !== '/' && rawPath.startsWith(href + '/')) return true;
+  return false;
+}
+
+const navItems = [
+  { href: '/mediathek', label: 'Mediathek' },
+  { href: '/aktuelles', label: 'Aktuelles' },
+  { href: '/termine', label: 'Termine' },
+  { href: '/team', label: 'Team' },
+  { href: '/kontakt', label: 'Kontakt' }
+];
 ---
+
 <nav class="fixed top-0 w-full z-50 bg-white/98 dark:bg-[#05183a]/95 backdrop-blur-xl border-b border-gray-100 dark:border-white/5 transition-all duration-300">
   <div class="flex items-center justify-between px-6 lg:px-10 py-3.5 max-w-6xl mx-auto">
-    
+
     <!-- Left: Brand Logo -->
     <div class="flex-shrink-0">
       <BrandLogo />
     </div>
-    
+
     <!-- Center: Navigation Links (Desktop only) -->
     <div class="hidden lg:flex items-center gap-10">
-      <a class="relative font-headline font-bold text-[15px] tracking-tight text-[#475569] hover:text-[#0f172a] dark:text-gray-400 dark:hover:text-white transition-colors group" href="/mediathek">
-        Mediathek
-        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-[#0f172a] dark:bg-white transition-all duration-300 ease-out group-hover:w-full"></span>
-      </a>
-      <a class="relative font-headline font-bold text-[15px] tracking-tight text-[#475569] hover:text-[#0f172a] dark:text-gray-400 dark:hover:text-white transition-colors group" href="/aktuelles">
-        Aktuelles
-        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-[#0f172a] dark:bg-white transition-all duration-300 ease-out group-hover:w-full"></span>
-      </a>
-      <a class="relative font-headline font-bold text-[15px] tracking-tight text-[#475569] hover:text-[#0f172a] dark:text-gray-400 dark:hover:text-white transition-colors group" href="/termine">
-        Termine
-        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-[#0f172a] dark:bg-white transition-all duration-300 ease-out group-hover:w-full"></span>
-      </a>
-      <a class="relative font-headline font-bold text-[15px] tracking-tight text-[#475569] hover:text-[#0f172a] dark:text-gray-400 dark:hover:text-white transition-colors group" href="/team">
-        Personen
-        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-[#0f172a] dark:bg-white transition-all duration-300 ease-out group-hover:w-full"></span>
-      </a>
-      <a class="relative font-headline font-bold text-[15px] tracking-tight text-[#475569] hover:text-[#0f172a] dark:text-gray-400 dark:hover:text-white transition-colors group" href="/kontakt">
-        Kontakt
-        <span class="absolute bottom-0 left-0 w-0 h-0.5 bg-[#0f172a] dark:bg-white transition-all duration-300 ease-out group-hover:w-full"></span>
-      </a>
+      {navItems.map(item => (
+        <NavLink href={item.href} label={item.label} active={isActive(item.href)} />
+      ))}
     </div>
-    
+
     <!-- Right: Actions -->
     <div class="flex items-center gap-6 lg:gap-8">
-      
+
       <!-- Desktop Actions -->
       <div class="hidden lg:flex items-center gap-5">
-        <!-- Mitglied werden -->
-        <a href="/mitglied-werden" class="font-headline font-bold text-[13px] text-white bg-primary hover:bg-primary-fixed-dim px-5 py-2 rounded-full transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5">
-          Mitglied werden
-        </a>
-        
-        <!-- Divider -->
-        <div class="h-6 w-[1px] bg-slate-200 dark:bg-white/20"></div>
-        
-        <!-- Cart & Login Group -->
-        <div class="flex items-center gap-3">
-          <CartIcon client:load />
-
-          <a href="/login" class="flex items-center gap-1.5 font-headline font-bold text-[14px] tracking-tight text-[#475569] hover:text-[#0f172a] dark:text-slate-300 dark:hover:text-white transition-colors group">
-            <span class="material-symbols-outlined text-[20px] group-hover:translate-x-0.5 transition-transform">login</span>
-            <span>Login</span>
+        {isLoggedIn ? (
+          <a
+            href="/app/dashboard"
+            class="font-headline font-bold text-[13px] text-white bg-primary hover:bg-primary-fixed-dim px-5 py-2 rounded-full transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 flex items-center gap-2"
+          >
+            <span class="material-symbols-outlined text-[16px]">dashboard</span>
+            Zum Fachportal
           </a>
-        </div>
+        ) : (
+          <>
+            <a
+              href="/mitglied-werden"
+              class="font-headline font-bold text-[13px] text-white bg-primary hover:bg-primary-fixed-dim px-5 py-2 rounded-full transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5"
+            >
+              Mitglied werden
+            </a>
+
+            <div class="h-6 w-[1px] bg-slate-200 dark:bg-white/20"></div>
+
+            <div class="flex items-center gap-3">
+              <CartIcon client:idle />
+              <a
+                href="/login"
+                class="flex items-center gap-1.5 font-headline font-bold text-[14px] tracking-tight text-[#475569] hover:text-[#0f172a] dark:text-slate-300 dark:hover:text-white transition-colors group"
+              >
+                <span class="material-symbols-outlined text-[20px] group-hover:translate-x-0.5 transition-transform">login</span>
+                <span>Login</span>
+              </a>
+            </div>
+          </>
+        )}
       </div>
-      
+
       <!-- Hamburger (Mobile only) -->
-      <button id="mobile-menu-toggle" class="lg:hidden flex items-center justify-center p-2 text-[#475569] hover:text-[#0f172a] dark:text-gray-400 dark:hover:text-white transition-colors" aria-label="Menü öffnen">
+      <button
+        id="mobile-menu-toggle"
+        class="lg:hidden flex items-center justify-center p-2 text-[#475569] hover:text-[#0f172a] dark:text-gray-400 dark:hover:text-white transition-colors"
+        aria-label="Menü öffnen"
+      >
         <span class="material-symbols-outlined text-[26px]">menu</span>
       </button>
     </div>
   </div>
 
-  <!-- Mobile Dropdown (hidden by default, only below lg) -->
+  <!-- Mobile Dropdown -->
   <div id="mobile-menu" class="hidden lg:hidden border-t border-gray-100 dark:border-white/10">
     <div class="flex flex-col px-6 py-4 gap-1 max-w-6xl mx-auto">
-      <a class="font-body font-semibold text-[15px] text-[#475569] hover:text-[#0f172a] hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl px-4 py-3 transition-all flex items-center justify-between" href="/mediathek">
-        Mediathek
-        <span class="material-symbols-outlined text-[18px] text-gray-300">chevron_right</span>
-      </a>
-      <a class="font-body font-semibold text-[15px] text-[#475569] hover:text-[#0f172a] hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl px-4 py-3 transition-all flex items-center justify-between" href="/aktuelles">
-        Aktuelles
-        <span class="material-symbols-outlined text-[18px] text-gray-300">chevron_right</span>
-      </a>
-      <a class="font-body font-semibold text-[15px] text-[#475569] hover:text-[#0f172a] hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl px-4 py-3 transition-all flex items-center justify-between" href="/termine">
-        Termine
-        <span class="material-symbols-outlined text-[18px] text-gray-300">chevron_right</span>
-      </a>
-      <a class="font-body font-semibold text-[15px] text-[#475569] hover:text-[#0f172a] hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl px-4 py-3 transition-all flex items-center justify-between" href="/team">
-        Personen
-        <span class="material-symbols-outlined text-[18px] text-gray-300">chevron_right</span>
-      </a>
-      <a class="font-body font-semibold text-[15px] text-[#475569] hover:text-[#0f172a] hover:bg-gray-50 dark:hover:bg-white/5 rounded-xl px-4 py-3 transition-all flex items-center justify-between" href="/kontakt">
-        Kontakt
-        <span class="material-symbols-outlined text-[18px] text-gray-300">chevron_right</span>
-      </a>
+      {navItems.map(item => {
+        const active = isActive(item.href);
+        return (
+          <a
+            href={item.href}
+            aria-current={active ? 'page' : undefined}
+            class:list={[
+              'font-body font-semibold text-[15px] rounded-xl px-4 py-3 transition-all',
+              active
+                ? 'text-[#0f172a] bg-gray-50 dark:bg-white/10 dark:text-white'
+                : 'text-[#475569] hover:text-[#0f172a] hover:bg-gray-50 dark:hover:bg-white/5'
+            ]}
+          >
+            {item.label}
+          </a>
+        );
+      })}
       <div class="mt-2 pt-2 border-t border-gray-100 dark:border-white/10 flex flex-col gap-2">
-        <a href="/login" class="flex items-center justify-center w-full font-body font-bold text-[15px] text-[#475569] hover:text-[#0f172a] bg-slate-50 hover:bg-slate-100 border border-slate-200 dark:bg-white/5 dark:border-white/10 dark:text-gray-300 dark:hover:text-white rounded-xl px-4 py-3 transition-all">
-          <span class="material-symbols-outlined text-[20px] mr-2">login</span>
-          Login
-        </a>
-        <a href="/mitglied-werden" class="flex items-center justify-center w-full font-body font-bold text-[15px] text-white bg-primary hover:bg-primary-fixed-dim rounded-xl px-4 py-3 transition-all shadow-sm">
-          Mitglied werden
-        </a>
+        {isLoggedIn ? (
+          <a
+            href="/app/dashboard"
+            class="flex items-center justify-center w-full font-body font-bold text-[15px] text-white bg-primary hover:bg-primary-fixed-dim rounded-xl px-4 py-3 transition-all shadow-sm gap-2"
+          >
+            <span class="material-symbols-outlined text-[20px]">dashboard</span>
+            Zum Fachportal
+          </a>
+        ) : (
+          <>
+            <a
+              href="/login"
+              class="flex items-center justify-center w-full font-body font-bold text-[15px] text-[#475569] hover:text-[#0f172a] bg-slate-50 hover:bg-slate-100 border border-slate-200 dark:bg-white/5 dark:border-white/10 dark:text-gray-300 dark:hover:text-white rounded-xl px-4 py-3 transition-all"
+            >
+              <span class="material-symbols-outlined text-[20px] mr-2">login</span>
+              Login
+            </a>
+            <a
+              href="/mitglied-werden"
+              class="flex items-center justify-center w-full font-body font-bold text-[15px] text-white bg-primary hover:bg-primary-fixed-dim rounded-xl px-4 py-3 transition-all shadow-sm"
+            >
+              Mitglied werden
+            </a>
+          </>
+        )}
       </div>
     </div>
   </div>
@@ -105,7 +150,7 @@ import CartIcon from './CartIcon.tsx';
   document.addEventListener('DOMContentLoaded', () => {
     const toggleBtn = document.getElementById('mobile-menu-toggle');
     const menu = document.getElementById('mobile-menu');
-    
+
     if (toggleBtn && menu) {
       toggleBtn.addEventListener('click', () => {
         const isHidden = menu.classList.toggle('hidden');

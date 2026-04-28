@@ -1,0 +1,31 @@
+---
+// Single source of truth for the desktop top-nav link styling.
+// `active` persists the underline so the user always knows which page
+// they are on, not just which link they're hovering.
+interface Props {
+  href: string;
+  label: string;
+  active?: boolean;
+}
+
+const { href, label, active = false } = Astro.props;
+---
+
+<a
+  href={href}
+  aria-current={active ? 'page' : undefined}
+  class:list={[
+    'relative font-headline font-bold text-[15px] tracking-tight transition-colors group',
+    active
+      ? 'text-[#0f172a] dark:text-white'
+      : 'text-[#475569] hover:text-[#0f172a] dark:text-gray-400 dark:hover:text-white'
+  ]}
+>
+  {label}
+  <span
+    class:list={[
+      'absolute bottom-0 left-0 h-0.5 bg-[#0f172a] dark:bg-white transition-all duration-300 ease-out',
+      active ? 'w-full' : 'w-0 group-hover:w-full'
+    ]}
+  ></span>
+</a>
