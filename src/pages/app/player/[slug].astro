@@ -2,6 +2,7 @@
 import AppLayout from '../../../layouts/AppLayout.astro';
 import { sanityClient } from '../../../lib/sanity';
 import { getSupabaseServer } from '../../../lib/supabase';
+import { buildPermissions } from '../../../lib/permissions';
 import SanityPortableText from '../../../components/SanityPortableText.tsx';
 
 const { slug } = Astro.params;
@@ -14,10 +15,10 @@ if (!authData?.user) {
   return Astro.redirect('/login');
 }
 
-// 2. Fetch Seminar from Sanity
+// 2. Fetch Seminar from Sanity (also pull eventDate for the 14-day validity rule)
 const video = await sanityClient.fetch(`*[_type == "seminar" && status == "aufzeichnung" && slug.current == $slug][0]{
   "slug": slug.current,
-  title, description, moduleName, duration, vimeoId, bunnyVideoId,
+  title, description, moduleName, duration, vimeoId, bunnyVideoId, eventDate,
   "materials": materials[].asset->{url, originalFilename},
   "imageUrl": image.asset->url
 }`, { slug });
@@ -26,16 +27,18 @@ if (!video) {
   return Astro.redirect('/404');
 }
 
-// 3. Verify Purchase Access
-const { data: purchaseData } = await supabase
-  .from('purchases')
-  .select('id')
-  .eq('user_id', authData.user.id)
-  .eq('video_slug', video.slug)
-  .single();
+// 3. Verify Access — use the SAME permissions logic as the fachportal so a
+// user with module-level access (e.g. "grundlagen-modul") doesn't get
+// bounced away from videos the fachportal correctly marks as FREIGESCHALTET.
+const [{ data: profile }, { data: purchases }] = await Promise.all([
+  supabase.from('user_profiles').select('*').eq('id', authData.user.id).single(),
+  supabase.from('purchases').select('video_slug, created_at').eq('user_id', authData.user.id)
+]);
 
-if (!purchaseData) {
-  // If no purchase found, redirect them to the mediathek detail page to buy it
+const permissions = buildPermissions(profile, purchases || []);
+
+if (!permissions.canAccessVideo(video.slug, video.moduleName, video.eventDate)) {
+  // No access -> mediathek detail page where they can buy it.
   return Astro.redirect(`/mediathek/${video.slug}`);
 }
 
