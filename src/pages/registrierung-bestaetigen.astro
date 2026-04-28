@@ -1,0 +1,71 @@
+---
+import Layout from '../layouts/Layout.astro';
+import TopNavBar from '../components/TopNavBar.astro';
+import FooterSection from '../components/FooterSection.astro';
+---
+
+<Layout title="Bestätigung erforderlich – AK Kommunal">
+  <TopNavBar />
+
+  <main class="w-full bg-surface min-h-screen pt-32 pb-24 relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none"></div>
+
+    <div class="max-w-2xl mx-auto px-6 lg:px-10 relative z-10">
+      <div class="bg-white rounded-3xl shadow-xl border border-outline-variant/20 p-10 md:p-14 text-center">
+        <div class="w-20 h-20 mx-auto mb-8 rounded-2xl bg-primary/10 flex items-center justify-center">
+          <span class="material-symbols-outlined text-[40px] text-primary">mark_email_read</span>
+        </div>
+
+        <h1 class="text-3xl md:text-4xl font-extrabold font-headline text-primary tracking-tight mb-4">
+          Buchung erfolgreich – jetzt E-Mail bestätigen
+        </h1>
+
+        <p class="text-on-surface-variant text-base leading-relaxed mb-8 max-w-lg mx-auto">
+          Ihre Bestellung ist bei uns angekommen und die Rechnung wird Ihnen
+          gleich von Stripe per E-Mail zugestellt. Damit Sie Ihre Inhalte im
+          Fachportal abrufen können, müssen Sie zuerst Ihre E-Mail-Adresse
+          bestätigen.
+        </p>
+
+        <div class="bg-primary/5 border border-primary/20 rounded-2xl p-6 text-left mb-8">
+          <h3 class="font-bold text-primary mb-3 flex items-center gap-2">
+            <span class="material-symbols-outlined text-[20px]">checklist</span>
+            So geht es weiter
+          </h3>
+          <ol class="space-y-3 text-sm text-on-surface-variant leading-relaxed">
+            <li class="flex gap-3">
+              <span class="flex-shrink-0 w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center font-bold text-xs">1</span>
+              <span>Öffnen Sie das Bestätigungs-Mail von <strong>noreply@debruyker.de</strong>. <em>Bitte auch den Spam-Ordner prüfen.</em></span>
+            </li>
+            <li class="flex gap-3">
+              <span class="flex-shrink-0 w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center font-bold text-xs">2</span>
+              <span>Klicken Sie auf den Bestätigungs-Link in der E-Mail.</span>
+            </li>
+            <li class="flex gap-3">
+              <span class="flex-shrink-0 w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center font-bold text-xs">3</span>
+              <span>Loggen Sie sich anschließend mit Ihrer E-Mail-Adresse und Ihrem gewählten Passwort ein. Ihre gekauften Inhalte stehen sofort bereit.</span>
+            </li>
+          </ol>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+          <a
+            href="/login"
+            class="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-primary text-white rounded-xl font-bold hover:bg-primary-fixed-dim transition-all shadow-md"
+          >
+            <span class="material-symbols-outlined text-[20px]">login</span>
+            Zum Login
+          </a>
+          <a
+            href="/"
+            class="inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-surface-container border border-outline-variant/40 text-on-surface rounded-xl font-bold hover:bg-surface-variant/50 transition-all"
+          >
+            Zur Startseite
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <FooterSection />
+</Layout>

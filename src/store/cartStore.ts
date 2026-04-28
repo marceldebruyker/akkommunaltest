@@ -40,6 +40,21 @@ export function clearCart() {
   cartItems.set([]);
 }
 
+/**
+ * Remove cart entries whose `id` matches a video_slug the user already owns.
+ * Called on every authenticated page load so logging in immediately reflects
+ * existing entitlements and prevents accidental double-purchase.
+ */
+export function pruneOwnedFromCart(ownedSlugs: string[]) {
+  if (!ownedSlugs.length) return;
+  const owned = new Set(ownedSlugs);
+  const current = cartItems.get();
+  const filtered = current.filter(item => !owned.has(item.id));
+  if (filtered.length !== current.length) {
+    cartItems.set(filtered);
+  }
+}
+
 export function setIsCartOpen(open: boolean) {
   isCartOpen.set(open);
 }

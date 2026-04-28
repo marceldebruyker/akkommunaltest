@@ -53,6 +53,13 @@ export function useCheckout() {
         return;
       }
       if (data.success && type === 'invoice') {
+        // Brand-new signup with email-confirmation enabled: there is no
+        // session yet, so /app/fachportal would bounce them to /login. Send
+        // them to a friendly confirmation page instead.
+        if (data.requiresEmailConfirmation) {
+          window.location.href = '/registrierung-bestaetigen';
+          return;
+        }
         window.location.href = '/app/fachportal?success=invoice';
         return;
       }

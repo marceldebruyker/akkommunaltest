@@ -9,12 +9,18 @@ import { logger } from '../../lib/logger';
 export const POST: APIRoute = async ({ request, cookies }) => {
   try {
     const supabase = getSupabaseServer(request, cookies);
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
 
     const body = await request.json();
     const { items, isSubscription, user: userData } = body;
 
     let authUser = user;
+    // True if we just created a brand-new account that hasn't confirmed its
+    // email yet. In that case Supabase returns a user with no session — the
+    // browser cookie isn't set, so any /app/* redirect will bounce to /login.
+    // We surface this to the client so it can show a "check your inbox" hint
+    // instead of silently dropping the user on the login page.
+    let requiresEmailConfirmation = false;
 
     if (!authUser && userData) {
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
@@ -46,6 +52,9 @@ export const POST: APIRoute = async ({ request, cookies }) => {
         return new Response(JSON.stringify({ error: signUpError.message }), { status: 400 });
       } else {
         authUser = signUpData.user;
+        // No session means email confirmation is enabled in Supabase Auth and
+        // the user hasn't clicked the link yet.
+        requiresEmailConfirmation = !signUpData.session;
       }
     }
 
@@ -197,7 +206,10 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       }
     }
 
-    return new Response(JSON.stringify({ success: true, invoiceId: invoice.id }), { status: 200 });
+    return new Response(
+      JSON.stringify({ success: true, invoiceId: invoice.id, requiresEmailConfirmation }),
+      { status: 200 }
+    );
 
   } catch (error) {
     const msg = error instanceof Error ? error.message : 'Unbekannter Fehler';
