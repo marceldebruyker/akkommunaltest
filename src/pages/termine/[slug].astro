@@ -102,11 +102,11 @@ if (user) {
 
         <div class="text-xl md:text-2xl font-light text-on-surface-variant max-w-3xl leading-relaxed">
           {typeof seminar.description === 'string' ? (
-            <p className="whitespace-pre-line">{seminar.description || 'Ein exklusives Live-Webinar der AK Kommunal.'}</p>
+            <p class="whitespace-pre-line">{seminar.description || 'Ein exklusives Live-Webinar der AK Kommunal.'}</p>
           ) : Array.isArray(seminar.description) ? (
             <SanityPortableText value={seminar.description} />
           ) : (
-            <p className="whitespace-pre-line">Ein exklusives Live-Webinar der AK Kommunal.</p>
+            <p class="whitespace-pre-line">Ein exklusives Live-Webinar der AK Kommunal.</p>
           )}
         </div>
     </div>
@@ -133,7 +133,7 @@ if (user) {
                 <div class="flex items-center gap-5 p-5 rounded-2xl bg-surface border border-outline-variant/30 hover:border-primary/20 hover:shadow-sm transition-all duration-300">
                   <div class="w-16 h-16 rounded-full overflow-hidden bg-primary/5 flex-shrink-0 border border-outline-variant/20 shadow-sm">
                     {speaker.imageUrl ? (
-                      <img src={speaker.imageUrl} alt={speaker.name} class="w-full h-full object-cover" />
+                      <img src={speaker.imageUrl} alt={speaker.name} loading="lazy" decoding="async" class="w-full h-full object-cover" />
                     ) : (
                       <div class="w-full h-full flex items-center justify-center text-primary">
                         <span class="material-symbols-outlined text-[28px]">person</span>

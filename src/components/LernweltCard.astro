@@ -58,7 +58,7 @@ const { video } = Astro.props;
            {video.referenten.map((speaker: any) => (
              <div class="relative w-12 h-12 rounded-full overflow-hidden border-2 border-white shadow-sm bg-gray-200">
                {speaker.imageUrl ? (
-                 <img src={speaker.imageUrl} alt={speaker.name} class="w-full h-full object-cover" />
+                 <img src={speaker.imageUrl} alt={speaker.name} loading="lazy" decoding="async" class="w-full h-full object-cover" />
                ) : (
                  <div class="w-full h-full flex items-center justify-center text-gray-400">
                    <span class="material-symbols-outlined text-[20px]">person</span>

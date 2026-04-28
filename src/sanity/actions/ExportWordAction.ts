@@ -14,7 +14,7 @@ export const ExportWordAction: DocumentActionComponent = (props) => {
       // We need the published ID (or draft if we want to preview it, but strictly we use published slug or raw ID)
       // Since our API queries by `slug.current`, we need to get the slug from the document.
       // `published` or `draft` hold the document fields!
-      const doc = published || draft;
+      const doc = (published || draft) as { slug?: { current?: string } } | null;
       const slug = doc?.slug?.current;
       
       if (!slug) {

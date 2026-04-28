@@ -59,7 +59,7 @@ const formattedDate = dateObj.toLocaleDateString("de-DE", { day: "2-digit", mont
 
       {post.imageUrl && (
         <div class="w-full h-64 md:h-96 lg:h-[500px] rounded-3xl overflow-hidden shadow-[0_20px_40px_-15px_rgba(5,24,58,0.1)] mb-16 animate-[fadeInUp_1s_ease-out_0.2s_both]">
-          <img src={post.imageUrl} alt={post.title} class="w-full h-full object-cover object-center" />
+          <img src={post.imageUrl} alt={post.title} fetchpriority="high" decoding="async" class="w-full h-full object-cover object-center" />
         </div>
       )}
 

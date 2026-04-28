@@ -3,9 +3,11 @@ import Layout from '../../layouts/Layout.astro';
 import TopNavBar from '../../components/TopNavBar.astro';
 import FooterSection from '../../components/FooterSection.astro';
 import AcademyFocusSection from '../../components/AcademyFocusSection.astro';
-import { sanityClient } from '../../lib/sanity';
+import { cachedSanityFetch } from '../../lib/sanity';
 
-const rawVideos = await sanityClient.fetch(`*[_type == "seminar" && status == "aufzeichnung"]{
+// Cap to 200 videos and order by latest publication so the catalogue stays
+// snappy as the library grows. Cached for 5 minutes (server-side memo).
+const rawVideos = await cachedSanityFetch<any[]>(`*[_type == "seminar" && status == "aufzeichnung"] | order(_createdAt desc) [0...200]{
   "slug": slug.current,
   title, duration, price, badges, moduleName,
   "topics": coalesce(topics, [topic]),

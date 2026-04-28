@@ -1,6 +1,6 @@
 ---
 import AppLayout from '../../layouts/AppLayout.astro';
-import { getSupabaseServer } from '../../lib/supabase';
+import { getSupabaseServer, safeAvatarUrl } from '../../lib/supabase';
 import { buildPermissions } from '../../lib/permissions';
 
 const supabase = getSupabaseServer(Astro.request, Astro.cookies);
@@ -13,7 +13,7 @@ if (!user) {
 const firstName = user.user_metadata?.first_name || '';
 const lastName = user.user_metadata?.last_name || '';
 const displayName = firstName ? `${firstName} ${lastName}` : (user.email || 'Gast');
-const avatarUrl = user.user_metadata?.avatar_url || null;
+const avatarUrl = safeAvatarUrl(user.user_metadata?.avatar_url);
 
 let notification = '';
 
@@ -90,23 +90,18 @@ let categoryCounts: Record<string, number> = { total: 0 };
 FORUM_CATEGORIES.forEach(c => categoryCounts[c] = 0);
 
 if (hasAccess) {
-  // --- 1. Zähler für die Sidebar (Parallel) ---
-  const fetchCount = async (cat: string | null) => {
-    let q = supabase.from('forum_topics').select('id', { count: 'exact', head: true });
-    if (cat) q = q.eq('category', cat);
-    const { count } = await q;
-    return count || 0;
-  };
-  
-  const results = await Promise.all([
-    fetchCount(null),
-    ...FORUM_CATEGORIES.map(cat => fetchCount(cat))
-  ]);
-  
-  categoryCounts.total = results[0];
-  FORUM_CATEGORIES.forEach((cat, idx) => {
-    categoryCounts[cat] = results[idx + 1];
-  });
+  // --- 1. Sidebar-Zähler in EINEM Query: alle Categories werden in JS aggregiert ---
+  // (statt 8 parallele Round-Trips à `select count() group by category`).
+  const { data: allCategoryRows } = await supabase
+    .from('forum_topics')
+    .select('category');
+
+  for (const row of allCategoryRows ?? []) {
+    categoryCounts.total += 1;
+    if (row.category && categoryCounts[row.category] !== undefined) {
+      categoryCounts[row.category] += 1;
+    }
+  }
 
   // --- 2. Dynamische Feed-Abfrage aufbauen ---
   let query = supabase
@@ -293,11 +288,14 @@ if (totalPages > 1) {
                   </div>
 
                   <div class="w-12 h-12 rounded-full border-2 border-white shadow-sm overflow-hidden shrink-0 mt-1 bg-[#05183a] text-white flex items-center justify-center font-bold text-lg">
-                     {topPinnedTopic.author_avatar_url ? (
-                       <img src={topPinnedTopic.author_avatar_url} class="w-full h-full object-cover" />
-                     ) : (
-                       topPinnedTopic.author_name.charAt(0).toUpperCase()
-                     )}
+                     {(() => {
+                       const safeUrl = safeAvatarUrl(topPinnedTopic.author_avatar_url);
+                       return safeUrl ? (
+                         <img src={safeUrl} alt="" class="w-full h-full object-cover" loading="lazy" referrerpolicy="no-referrer" />
+                       ) : (
+                         topPinnedTopic.author_name.charAt(0).toUpperCase()
+                       );
+                     })()}
                   </div>
                   <div class="flex-1">
                     <div class="flex items-center gap-2 mb-1.5">
@@ -345,11 +343,14 @@ if (totalPages > 1) {
                     </div>
                   )}
                   <div class="w-12 h-12 rounded-full border-2 border-gray-50 bg-[#05183a] text-white flex items-center justify-center font-bold text-lg shrink-0 mt-1 overflow-hidden">
-                     {topic.author_avatar_url ? (
-                       <img src={topic.author_avatar_url} class="w-full h-full object-cover" />
-                     ) : (
-                       topic.author_name.charAt(0).toUpperCase()
-                     )}
+                     {(() => {
+                       const safeUrl = safeAvatarUrl(topic.author_avatar_url);
+                       return safeUrl ? (
+                         <img src={safeUrl} alt="" class="w-full h-full object-cover" loading="lazy" referrerpolicy="no-referrer" />
+                       ) : (
+                         topic.author_name.charAt(0).toUpperCase()
+                       );
+                     })()}
                   </div>
                   <div class="flex-1">
                     <div class="flex items-center gap-2 mb-1.5">

@@ -1,100 +1,97 @@
 import React, { useState } from 'react';
 import { useStore } from '@nanostores/react';
 import { cartItems, clearCart } from '../store/cartStore';
+import { MODULES as MODULE_PRICES, type ModuleId } from '../lib/modules';
 
-interface Module {
-  id: string;
+// UI-side enrichment of the canonical MODULES catalogue. We keep the price
+// in lib/modules.ts so the checkout calculation cannot drift from this view.
+type DisplayModule = {
+  id: ModuleId;
   title: string;
   price: number;
   description: string;
   benefits: string[];
-}
+};
 
-const MODULES: Module[] = [
+const MODULES: DisplayModule[] = [
   {
     id: 'grundlagen',
-    title: 'Grundlagen Modul',
-    price: 500,
+    title: MODULE_PRICES.grundlagen.title,
+    price: MODULE_PRICES.grundlagen.price,
     description: 'Fokussiert auf Umsatz- und Ertragsteuern für Quereinsteiger & neue Mitarbeiter.',
     benefits: ['Materieller Zugang zum Portal', 'Arbeitshilfen Download']
   },
   {
     id: 'spezial',
-    title: 'Spezialthemen Modul',
-    price: 700,
+    title: MODULE_PRICES.spezial.title,
+    price: MODULE_PRICES.spezial.price,
     description: 'Experten-Zirkel für komplexe Themenbereiche und Aktuelles aus der Rechtsprechung.',
     benefits: ['Materieller Zugang zum Portal', 'Arbeitshilfen Download']
   },
   {
     id: 'praktiker',
-    title: 'Praktiker Modul',
-    price: 1200,
+    title: MODULE_PRICES.praktiker.title,
+    price: MODULE_PRICES.praktiker.price,
     description: 'Fokussierter Fach-Austausch und Erarbeitung von Best-Practice Ansätzen.',
     benefits: ['Materieller Zugang zum Portal', 'Arbeitshilfen Download']
   }
 ];
 
-const GESAMTPAKET: Module = {
+const GESAMTPAKET: DisplayModule = {
   id: 'gesamt',
-  title: 'Gesamtpaket',
-  price: 1600,
+  title: MODULE_PRICES.gesamt.title,
+  price: MODULE_PRICES.gesamt.price,
   description: 'Teilnahme an allen angebotenen Modulen und volldigitaler Zugang.',
   benefits: ['Alle Module inklusive', 'Portalzugang & Download Center', 'Gesetzes-Newsletter']
 };
 
+const CART_CONFLICT_MESSAGE =
+  'Hinweis: Sie haben Einzelvideos im Warenkorb. Wenn Sie Module abonnieren, wird dieser geleert, da Einmalkäufe und Abos nicht auf derselben Rechnung gemischt werden können.\n\nMöchten Sie fortfahren?';
+
 export default function MembershipConfigurator() {
-  const [selectedModules, setSelectedModules] = useState<string[]>([]);
+  const [selectedModules, setSelectedModules] = useState<ModuleId[]>([]);
   const [isGesamtpaket, setIsGesamtpaket] = useState(false);
   const cart = useStore(cartItems);
 
-  const toggleModule = (id: string) => {
+  const toggleModule = (id: ModuleId) => {
     if (isGesamtpaket) {
       setIsGesamtpaket(false);
       setSelectedModules([id]);
       return;
     }
-    
-    if (selectedModules.includes(id)) {
-      setSelectedModules(selectedModules.filter(m => m !== id));
-    } else {
-      setSelectedModules([...selectedModules, id]);
-    }
+    setSelectedModules(prev =>
+      prev.includes(id) ? prev.filter(m => m !== id) : [...prev, id]
+    );
   };
 
   const selectGesamtpaket = () => {
-    if (isGesamtpaket) {
-      setIsGesamtpaket(false);
-    } else {
-      setIsGesamtpaket(true);
-      setSelectedModules([]);
+    setIsGesamtpaket(prev => !prev);
+    setSelectedModules([]);
+  };
+
+  // Goes to checkout with the given abo plan, prompting first if the cart
+  // already holds one-off purchases (incompatible billing flow).
+  const goToCheckout = (planQuery: string) => {
+    if (cart.length > 0) {
+      if (!window.confirm(CART_CONFLICT_MESSAGE)) return;
+      clearCart();
     }
+    window.location.href = `/kasse?abo=${planQuery}`;
   };
 
   // Calculate totals
-  const totalPrice = isGesamtpaket 
-    ? GESAMTPAKET.price 
-    : selectedModules.reduce((acc, id) => {
-        const mod = MODULES.find(m => m.id === id);
-        return acc + (mod ? mod.price : 0);
-      }, 0);
+  const totalPrice = isGesamtpaket
+    ? GESAMTPAKET.price
+    : selectedModules.reduce((acc, id) => acc + (MODULE_PRICES[id]?.price ?? 0), 0);
 
-  const selectedTitles = isGesamtpaket 
-    ? [GESAMTPAKET.title] 
-    : selectedModules.map(id => MODULES.find(m => m.id === id)?.title).filter(Boolean);
+  const selectedTitles = isGesamtpaket
+    ? [GESAMTPAKET.title]
+    : selectedModules.map(id => MODULE_PRICES[id]?.title).filter(Boolean);
 
   const hasSelection = isGesamtpaket || selectedModules.length > 0;
 
   const handleSubscribe = () => {
-    if (cart.length > 0) {
-      const confirmClear = window.confirm(
-        "Hinweis: Sie haben Einzelvideos im Warenkorb. Wenn Sie Module abonnieren, wird dieser geleert, da Einmalkäufe und Abos nicht auf derselben Rechnung gemischt werden können.\n\nMöchten Sie fortfahren?"
-      );
-      if (!confirmClear) return;
-      clearCart();
-    }
-
-    const planQuery = isGesamtpaket ? 'gesamt' : selectedModules.join(',');
-    window.location.href = `/kasse?abo=${planQuery}`;
+    goToCheckout(isGesamtpaket ? 'gesamt' : selectedModules.join(','));
   };
 
   return (
@@ -136,7 +133,7 @@ export default function MembershipConfigurator() {
                 ))}
               </ul>
               <button
-                onClick={(e) => { e.stopPropagation(); setSelectedModules([mod.id]); setIsGesamtpaket(false); setTimeout(() => { const planQuery = mod.id; if (cart.length > 0) { const confirmClear = window.confirm('Hinweis: Sie haben Einzelvideos im Warenkorb. Wenn Sie Module abonnieren, wird dieser geleert.\n\nMöchten Sie fortfahren?'); if (!confirmClear) return; clearCart(); } window.location.href = `/kasse?abo=${planQuery}`; }, 50); }}
+                onClick={(e) => { e.stopPropagation(); goToCheckout(mod.id); }}
                 className={`w-full py-3 rounded-xl text-sm font-bold transition-all ${
                   isSelected
                     ? 'bg-primary text-white shadow-md hover:bg-primary/90'
@@ -183,7 +180,7 @@ export default function MembershipConfigurator() {
             ))}
           </ul>
           <button
-            onClick={(e) => { e.stopPropagation(); setIsGesamtpaket(true); setSelectedModules([]); setTimeout(() => { if (cart.length > 0) { const confirmClear = window.confirm('Hinweis: Sie haben Einzelvideos im Warenkorb. Wenn Sie Module abonnieren, wird dieser geleert.\n\nMöchten Sie fortfahren?'); if (!confirmClear) return; clearCart(); } window.location.href = '/kasse?abo=gesamt'; }, 50); }}
+            onClick={(e) => { e.stopPropagation(); goToCheckout('gesamt'); }}
             className={`w-full py-3 rounded-xl text-sm font-bold transition-all ${
               isGesamtpaket
                 ? 'bg-white text-primary shadow-md hover:bg-white/90'

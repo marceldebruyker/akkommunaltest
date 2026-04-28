@@ -1,6 +1,6 @@
 ---
 import AppLayout from '../../../layouts/AppLayout.astro';
-import { getSupabaseServer } from '../../../lib/supabase';
+import { getSupabaseServer, safeAvatarUrl } from '../../../lib/supabase';
 import { buildPermissions } from '../../../lib/permissions';
 
 const { id } = Astro.params;
@@ -14,7 +14,7 @@ if (!user) {
 const firstName = user.user_metadata?.first_name || '';
 const lastName = user.user_metadata?.last_name || '';
 const displayName = firstName ? `${firstName} ${lastName}` : (user.email || 'Gast');
-const avatarUrl = user.user_metadata?.avatar_url || null;
+const avatarUrl = safeAvatarUrl(user.user_metadata?.avatar_url);
 
 let notification = '';
 
@@ -156,11 +156,14 @@ function formatDateTime(dateString: string) {
         <div class="bg-white rounded-3xl shadow-sm border border-gray-200 overflow-hidden">
           <div class="p-6 md:p-8 flex gap-6">
             <div class="w-14 h-14 rounded-full border-2 border-gray-50 bg-[#05183a] text-white flex items-center justify-center font-bold text-xl shrink-0 overflow-hidden shadow-sm">
-               {topic.author_avatar_url ? (
-                 <img src={topic.author_avatar_url} class="w-full h-full object-cover" />
-               ) : (
-                 topic.author_name.charAt(0).toUpperCase()
-               )}
+               {(() => {
+                 const safeUrl = safeAvatarUrl(topic.author_avatar_url);
+                 return safeUrl ? (
+                   <img src={safeUrl} alt="" class="w-full h-full object-cover" loading="lazy" referrerpolicy="no-referrer" />
+                 ) : (
+                   topic.author_name.charAt(0).toUpperCase()
+                 );
+               })()}
             </div>
             
             <div class="flex-1">
@@ -219,11 +222,14 @@ function formatDateTime(dateString: string) {
 
                 <div class="p-6 flex gap-5">
                   <div class="w-10 h-10 rounded-full border-2 border-gray-50 bg-gray-200 text-gray-600 flex items-center justify-center font-bold text-sm shrink-0 overflow-hidden">
-                     {reply.author_avatar_url ? (
-                       <img src={reply.author_avatar_url} class="w-full h-full object-cover" />
-                     ) : (
-                       reply.author_name.charAt(0).toUpperCase()
-                     )}
+                     {(() => {
+                       const safeUrl = safeAvatarUrl(reply.author_avatar_url);
+                       return safeUrl ? (
+                         <img src={safeUrl} alt="" class="w-full h-full object-cover" loading="lazy" referrerpolicy="no-referrer" />
+                       ) : (
+                         reply.author_name.charAt(0).toUpperCase()
+                       );
+                     })()}
                   </div>
                   
                   <div class="flex-1">

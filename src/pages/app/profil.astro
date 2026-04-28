@@ -1,10 +1,9 @@
 ---
 import AppLayout from '../../layouts/AppLayout.astro';
-import { getSupabaseServer } from '../../lib/supabase';
+import { getSupabaseServer, getSupabaseAdmin, safeAvatarUrl } from '../../lib/supabase';
 import Stripe from 'stripe';
 import { sanityClient } from '../../lib/sanity';
 import { Resend } from 'resend';
-import { createClient } from '@supabase/supabase-js';
 import { Buffer } from 'node:buffer';
 
 const supabase = getSupabaseServer(Astro.request, Astro.cookies);
@@ -34,13 +33,8 @@ if (Astro.request.method === 'POST') {
     if (actionType === 'sendTeamsLink' && isAdmin) {
       const slug = formData.get('slug')?.toString();
       if (slug) {
-        // Fetch all users who purchased this slug
-        const supabaseAdmin = createClient(
-          import.meta.env.PUBLIC_SUPABASE_URL,
-          import.meta.env.SUPABASE_SERVICE_ROLE_KEY,
-          { auth: { autoRefreshToken: false, persistSession: false } }
-        );
-        
+        const supabaseAdmin = getSupabaseAdmin();
+
         const { data: purchases } = await supabaseAdmin.from('purchases').select('user_id').eq('video_slug', slug);
         if (purchases && purchases.length > 0 && process.env.RESEND_API_KEY) {
           const userIds = purchases.map(p => p.user_id);
@@ -113,12 +107,8 @@ if (Astro.request.method === 'POST') {
       const arrayBuffer = await avatarFile.arrayBuffer();
       const buffer = new Uint8Array(arrayBuffer);
       const filePath = `${user.id}/${Date.now()}_${avatarFile.name.replace(/[^a-zA-Z0-9.]/g, '')}`;
-      
-      const supabaseAdmin = createClient(
-        import.meta.env.PUBLIC_SUPABASE_URL,
-        import.meta.env.SUPABASE_SERVICE_ROLE_KEY,
-        { auth: { autoRefreshToken: false, persistSession: false } }
-      );
+
+      const supabaseAdmin = getSupabaseAdmin();
 
       const { data: uploadData, error: uploadError } = await supabaseAdmin.storage.from('avatars').upload(filePath, buffer, {
         contentType: avatarFile.type,
@@ -201,12 +191,8 @@ const jobDesc = user.user_metadata?.job_description || '';
 let adminSeminars: any[] = [];
 if (isAdmin) {
   const sanityProducts = await sanityClient.fetch(`*[_type == "seminar" && status == "Live Event (Anstehend)"]{ "id": slug.current, title, date, msTeamsLink }`);
-  
-  const supabaseAdmin = createClient(
-    import.meta.env.PUBLIC_SUPABASE_URL,
-    import.meta.env.SUPABASE_SERVICE_ROLE_KEY,
-    { auth: { autoRefreshToken: false, persistSession: false } }
-  );
+
+  const supabaseAdmin = getSupabaseAdmin();
   
   const { data: purchasesData } = await supabaseAdmin.from('purchases').select('video_slug');
   adminSeminars = sanityProducts.map((p: any) => {
@@ -305,11 +291,14 @@ if (rawStripeKey && email) {
           <!-- Avatar Upload -->
           <div class="flex items-center gap-6 border-b border-gray-100 pb-8 mb-6">
             <div class="relative w-20 h-20 rounded-full bg-[#05183a] text-white flex items-center justify-center font-bold text-xl shadow-[0_4px_14px_0_rgba(5,24,58,0.2)] overflow-hidden group">
-              {user.user_metadata?.avatar_url ? (
-                 <img src={user.user_metadata.avatar_url} class="w-full h-full object-cover">
-              ) : (
-                 <span>{firstName ? firstName.charAt(0) : email.charAt(0).toUpperCase()}{lastName ? lastName.charAt(0) : ''}</span>
-              )}
+              {(() => {
+                const safeUrl = safeAvatarUrl(user.user_metadata?.avatar_url);
+                return safeUrl ? (
+                   <img src={safeUrl} alt="" class="w-full h-full object-cover" loading="lazy" referrerpolicy="no-referrer">
+                ) : (
+                   <span>{firstName ? firstName.charAt(0) : email.charAt(0).toUpperCase()}{lastName ? lastName.charAt(0) : ''}</span>
+                );
+              })()}
               <div class="absolute inset-0 bg-black/50 hidden flex flex-col gap-1 items-center justify-center cursor-pointer group-hover:flex transition-opacity" onclick="document.getElementById('avatar-input').click()">
                 <span class="material-symbols-outlined text-white text-[20px]">photo_camera</span>
               </div>

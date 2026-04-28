@@ -1,10 +1,11 @@
 import type { APIRoute } from "astro";
 import { getSupabaseAdmin } from "../../../lib/supabase";
 import { Resend } from 'resend';
+import { logger } from '../../../lib/logger';
 
 const resend = new Resend(import.meta.env.RESEND_API_KEY);
 
-export const POST: APIRoute = async ({ request, redirect, url }) => {
+export const POST: APIRoute = async ({ request, redirect }) => {
   const formData = await request.formData();
   const email = formData.get("email")?.toString();
 
@@ -26,7 +27,7 @@ export const POST: APIRoute = async ({ request, redirect, url }) => {
     });
 
     if (linkError) {
-      console.error("Supabase Generate Link Error:", linkError);
+      logger.error('Supabase Generate Link Error', { error: linkError.message, email });
       return redirect("/passwort-vergessen?success=true"); // Fail silently for enumerations
     }
 
@@ -97,7 +98,7 @@ export const POST: APIRoute = async ({ request, redirect, url }) => {
     }
 
   } catch (err) {
-    console.error("Recovery Email Dispatch Error:", err);
+    logger.error('Recovery Email Dispatch Error', { error: err instanceof Error ? err.message : String(err) });
   }
 
   // Always return success to prevent email enumeration attacks

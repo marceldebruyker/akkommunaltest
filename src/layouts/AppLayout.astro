@@ -1,7 +1,7 @@
 ---
 import '../styles/global.css';
 import BrandLogo from '../components/BrandLogo.astro';
-import { getSupabaseServer } from '../lib/supabase';
+import { getSupabaseServer, safeAvatarUrl } from '../lib/supabase';
 
 const { title, currentPath } = Astro.props;
 
@@ -31,7 +31,9 @@ try {
   const hour = parseInt(hourString, 10);
   if (hour >= 5 && hour < 11) timeGreeting = "Guten Morgen";
   else if (hour >= 18 || hour < 5) timeGreeting = "Guten Abend";
-} catch(e) {}
+} catch {
+  // Intl unavailable in this runtime; fall back to "Guten Tag".
+}
 
 // We can pass user info to slots if needed via locals, or components just use their own fetches.
 ---
@@ -98,13 +100,18 @@ try {
         </div>
         <div class="flex items-center gap-4">
 
-          <a href="/app/profil" title="Mein Profil & Rechnungen" class="w-10 h-10 rounded-full bg-[#05183a] text-white flex items-center justify-center font-bold text-sm shadow-md overflow-hidden border-2 border-white hover:ring-4 hover:ring-[#05183a]/10 hover:scale-105 transition-all cursor-pointer block">
-            {user?.user_metadata?.avatar_url ? (
-              <img src={user.user_metadata.avatar_url} class="w-full h-full object-cover">
-            ) : (
-              initials
-            )}
-          </a>
+          {(() => {
+            const safeUrl = safeAvatarUrl(user?.user_metadata?.avatar_url);
+            return (
+              <a href="/app/profil" title="Mein Profil & Rechnungen" class="w-10 h-10 rounded-full bg-[#05183a] text-white flex items-center justify-center font-bold text-sm shadow-md overflow-hidden border-2 border-white hover:ring-4 hover:ring-[#05183a]/10 hover:scale-105 transition-all cursor-pointer block">
+                {safeUrl ? (
+                  <img src={safeUrl} alt="" class="w-full h-full object-cover" loading="lazy" referrerpolicy="no-referrer">
+                ) : (
+                  initials
+                )}
+              </a>
+            );
+          })()}
         </div>
       </header>
       

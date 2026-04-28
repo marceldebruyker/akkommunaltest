@@ -1,0 +1,8 @@
+dist/
+.astro/
+.vercel/
+node_modules/
+public/
+package-lock.json
+*.log
+db/migrations/

@@ -1,5 +1,7 @@
 import type { APIRoute } from 'astro';
-import { getSupabaseServer, getSupabaseAdmin } from '../../../lib/supabase';
+import { getSupabaseAdmin } from '../../../lib/supabase';
+import { requireAdmin } from '../../../lib/apiAuth';
+import { logger } from '../../../lib/logger';
 
 // Helper interface for return type
 export interface AdminUserRecord {
@@ -17,49 +19,37 @@ export interface AdminUserRecord {
 
 export const GET: APIRoute = async ({ request, cookies }) => {
   try {
-    // 1. Authenticate Request
-    const supabaseSession = getSupabaseServer(request, cookies);
-    const { data: { user }, error: authError } = await supabaseSession.auth.getUser();
+    const auth = await requireAdmin({ request, cookies });
+    if (!auth.ok) return auth.response;
 
-    if (authError || !user) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
-    }
-
-    // 2. Authorize Admin Access
-    const { data: adminProfile } = await supabaseSession
-      .from('user_profiles')
-      .select('is_admin')
-      .eq('id', user.id)
-      .single();
-
-    if (adminProfile?.is_admin !== true) {
-      return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403 });
-    }
-
-    // 3. Fetch comprehensive user payload via Admin API
+    // Fetch comprehensive user payload via Admin API.
+    // auth.users lives in a separate Postgres schema served by GoTrue's admin API,
+    // so we cannot do a single SQL join with user_profiles/purchases. We do three
+    // round-trips in parallel, then join in-memory via Maps (O(N) instead of O(N*M)).
     const supabaseAdmin = getSupabaseAdmin();
 
-    // 3a. Auth Users
-    const { data: { users }, error: usersError } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1000 });
-    if (usersError) throw usersError;
+    const [usersRes, profilesRes, purchasesRes] = await Promise.all([
+      supabaseAdmin.auth.admin.listUsers({ perPage: 1000 }),
+      supabaseAdmin.from('user_profiles').select('id, is_admin, is_partner, has_membership'),
+      supabaseAdmin.from('purchases').select('user_id, video_slug')
+    ]);
 
-    // 3b. Profiles
-    const { data: profiles, error: profilesError } = await supabaseAdmin
-      .from('user_profiles')
-      .select('*');
-    if (profilesError) throw profilesError;
+    if (usersRes.error) throw usersRes.error;
+    if (profilesRes.error) throw profilesRes.error;
+    if (purchasesRes.error) throw purchasesRes.error;
 
-    // 3c. Purchases
-    const { data: purchases, error: purchasesError } = await supabaseAdmin
-      .from('purchases')
-      .select('*');
-    if (purchasesError) throw purchasesError;
+    const profileById = new Map(
+      (profilesRes.data ?? []).map(p => [p.id, p])
+    );
+    const purchasesByUser = new Map<string, string[]>();
+    for (const row of purchasesRes.data ?? []) {
+      const list = purchasesByUser.get(row.user_id) ?? [];
+      list.push(row.video_slug);
+      purchasesByUser.set(row.user_id, list);
+    }
 
-    // 4. Map everything together
-    const finalUsers: AdminUserRecord[] = users.map(u => {
-      const p = profiles.find(profile => profile.id === u.id);
-      const uPurchases = purchases.filter(purchase => purchase.user_id === u.id).map(p => p.video_slug);
-
+    const finalUsers: AdminUserRecord[] = usersRes.data.users.map(u => {
+      const p = profileById.get(u.id);
       return {
         id: u.id,
         email: u.email || '',
@@ -70,7 +60,7 @@ export const GET: APIRoute = async ({ request, cookies }) => {
         is_admin: p?.is_admin || false,
         is_partner: p?.is_partner || false,
         has_membership: p?.has_membership || false,
-        purchases: uPurchases
+        purchases: purchasesByUser.get(u.id) ?? []
       };
     });
 
@@ -81,8 +71,9 @@ export const GET: APIRoute = async ({ request, cookies }) => {
       }
     });
 
-  } catch (err: any) {
-    console.error('Error fetching admin users:', err);
-    return new Response(JSON.stringify({ error: err.message }), { status: 500 });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Unknown error';
+    logger.error('Error fetching admin users', { error: msg });
+    return new Response(JSON.stringify({ error: msg }), { status: 500 });
   }
 };

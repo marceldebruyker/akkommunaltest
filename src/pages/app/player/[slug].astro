@@ -45,7 +45,7 @@ if (video.bunnyVideoId) {
   videoInfo = { type: 'bunny', id: video.bunnyVideoId.trim() };
 } else if (video.vimeoId) {
   const input = video.vimeoId.trim();
-  const ytMatch = input.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+  const ytMatch = input.match(/(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/);
   const vimeoMatch = input.match(/(?:vimeo\.com\/|player\.vimeo\.com\/video\/)([0-9]+)/);
   
   if (ytMatch) {
@@ -77,7 +77,6 @@ if (video.bunnyVideoId) {
        <iframe 
          src={`https://www.youtube.com/embed/${videoInfo.id}?autoplay=1&rel=0`} 
          class="absolute inset-0 w-full h-full" 
-         frameborder="0" 
          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
          allowfullscreen>
        </iframe>
@@ -85,7 +84,6 @@ if (video.bunnyVideoId) {
        <iframe 
          src={`https://player.vimeo.com/video/${videoInfo.id}?autoplay=1&title=0&byline=0&portrait=0`} 
          class="absolute inset-0 w-full h-full" 
-         frameborder="0" 
          allow="autoplay; fullscreen; picture-in-picture" 
          allowfullscreen>
        </iframe>
@@ -134,7 +132,7 @@ if (video.bunnyVideoId) {
 
     <div class="prose prose-lg max-w-none text-gray-600 font-light leading-relaxed">
       {typeof video.description === 'string' ? (
-        <p className="whitespace-pre-line">{video.description || 'Keine weitere Beschreibung hinterlegt.'}</p>
+        <p class="whitespace-pre-line">{video.description || 'Keine weitere Beschreibung hinterlegt.'}</p>
       ) : Array.isArray(video.description) ? (
         <SanityPortableText value={video.description} />
       ) : (

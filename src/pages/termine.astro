@@ -2,12 +2,13 @@
 import Layout from '../layouts/Layout.astro';
 import TopNavBar from '../components/TopNavBar.astro';
 import FooterSection from '../components/FooterSection.astro';
-import { sanityClient, extractPlainTextFromPortableText } from '../lib/sanity';
+import { cachedSanityFetch } from '../lib/sanity';
 
 export const prerender = false;
 
-// Fetch Live-Events from Sanity
-const rawSeminars = await sanityClient.fetch(`*[_type == "seminar" && status == "live"] | order(eventDate asc) {
+// Cap to the next 100 live events; cached server-side for 5 min so
+// repeated page loads from different visitors don't all hit Sanity.
+const rawSeminars = await cachedSanityFetch<any[]>(`*[_type == "seminar" && status == "live"] | order(eventDate asc) [0...100] {
   "slug": slug.current,
   title, description, moduleName, duration, price, eventDate, badges,
   "topics": coalesce(topics, [topic]),

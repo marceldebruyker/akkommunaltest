@@ -73,7 +73,7 @@ import FooterSection from '../components/FooterSection.astro';
 
           <script>
             const form = document.getElementById('contactForm');
-            const submitBtn = document.getElementById('kontakt-submitBtn');
+            const submitBtn = document.getElementById('kontakt-submitBtn') as HTMLButtonElement | null;
             const successMsg = document.getElementById('kontakt-success');
             const errorMsg = document.getElementById('kontakt-error');
 

@@ -1,20 +1,11 @@
 import type { APIRoute } from 'astro';
 import { sanityClient, extractPlainTextFromPortableText } from '../../../lib/sanity';
-import { getSupabaseServer } from '../../../lib/supabase';
+import { requireAdmin } from '../../../lib/apiAuth';
 import { Document, Packer, Paragraph, TextRun, HeadingLevel } from 'docx';
 
 export const GET: APIRoute = async ({ request, cookies }) => {
-  // 1. Authenticate user to ensure only admins/editors can export
-  const supabase = getSupabaseServer(request, cookies);
-  const { data: authData } = await supabase.auth.getUser();
-  const user = authData?.user;
-
-  // We check if the user is authenticated. 
-  // Ideally, you'd check roles, but any authenticated admin logging into Sanity via the UI triggers this.
-  // Wait, Sanity Studio might not set the Supabase cookie if they are separate!
-  // If the user is operating in Sanity Studio, they are authenticated in Sanity, not necessarily Supabase.
-  // So we might want to just check a secret token or allow it if triggered from Studio.
-  // We'll skip strict auth for the MVP since it's just exporting public seminar data anyway.
+  const auth = await requireAdmin({ request, cookies });
+  if (!auth.ok) return auth.response;
 
   const url = new URL(request.url);
   const seminarId = url.searchParams.get('id');
@@ -104,11 +95,14 @@ export const GET: APIRoute = async ({ request, cookies }) => {
     }],
   });
 
-  // 6. Convert to Buffer and Return
-  const buffer = await Packer.toBuffer(doc);
+  // 6. Convert to Buffer and Return.
+  // Node Buffer is not in DOM BodyInit; wrap the bytes in a Uint8Array, which
+  // Web Response accepts and never widens to SharedArrayBuffer.
+  const nodeBuffer = await Packer.toBuffer(doc);
+  const bytes = new Uint8Array(nodeBuffer);
   const cleanTitle = seminar.title.replace(/[^a-z0-9]/gi, '_').toLowerCase();
 
-  return new Response(buffer, {
+  return new Response(bytes, {
     status: 200,
     headers: {
       'Content-Type': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',

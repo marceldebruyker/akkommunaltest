@@ -1,22 +1,27 @@
 import React, { useState, useEffect } from 'react';
 import { useStore } from '@nanostores/react';
 import { cartItems } from '../store/cartStore';
+import { MODULES, type ModuleId } from '../lib/modules';
+import { useCheckout, type PaymentType } from '../store/useCheckout';
 
-const MODULES = {
-  grundlagen: { title: 'Grundlagen Modul', price: 500 },
-  spezial: { title: 'Spezialthemen Modul', price: 700 },
-  praktiker: { title: 'Praktiker Modul', price: 1200 },
-  gesamt: { title: 'Gesamtpaket', price: 1600 }
-};
+type CheckoutUser = {
+  email?: string;
+  user_metadata?: {
+    behorde?: string;
+    strasse?: string;
+    plz?: string;
+    ort?: string;
+    leitwegId?: string;
+    leitweg_id?: string;
+  };
+} | null;
 
-export default function CheckoutFlow({ user = null }: { user?: any }) {
+export default function CheckoutFlow({ user = null }: { user?: CheckoutUser }) {
   const [aboIds, setAboIds] = useState<string[] | null>(null);
   const [isMounted, setIsMounted] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [paymentType, setPaymentType] = useState<'stripe' | 'invoice'>('stripe');
   const cart = useStore(cartItems);
   const isLoggedIn = !!user;
-  const [checkoutError, setCheckoutError] = useState<string | null>(null);
+  const { submit, isLoading, paymentType, setPaymentType, error: checkoutError } = useCheckout();
 
   useEffect(() => {
     setIsMounted(true);
@@ -46,7 +51,7 @@ export default function CheckoutFlow({ user = null }: { user?: any }) {
   }
 
   // Calculate Totals
-  const aboItems = (aboIds || []).map(id => MODULES[id as keyof typeof MODULES]).filter(Boolean);
+  const aboItems = (aboIds || []).map(id => MODULES[id as ModuleId]).filter(Boolean);
   const aboTotal = aboItems.reduce((acc, item) => acc + item.price, 0);
   const cartTotal = cart.reduce((acc, item) => acc + item.price, 0);
 
@@ -54,54 +59,29 @@ export default function CheckoutFlow({ user = null }: { user?: any }) {
   const tax = total * 0.19;
   const grandTotal = total + tax;
 
-  const handleCheckout = async (e: React.FormEvent) => {
+  const handleCheckout = (type: PaymentType) => async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    setCheckoutError(null);
+    const formData = new FormData(e.currentTarget as HTMLFormElement);
+    const get = (k: string) => (formData.get(k) as string) || '';
 
-    try {
-      const formData = new FormData(e.currentTarget as HTMLFormElement);
-      const anrede = formData.get('anrede') as string || '';
-      const email = isLoggedIn ? user.email : formData.get('email') as string;
-      const password = formData.get('password') as string || '';
-      const vorname = formData.get('vorname') as string || '';
-      const nachname = formData.get('nachname') as string || '';
-      const leitwegId = formData.get('leitwegId') as string || '';
-      const behorde = formData.get('behorde') as string || '';
-      const strasse = formData.get('strasse') as string || '';
-      const plz = formData.get('plz') as string || '';
-      const ort = formData.get('ort') as string || '';
-
-      const payload = {
-        items: isSubscription
-          ? aboItems.map((item, idx) => ({ id: aboIds![idx], title: item.title, price: item.price }))
-          : cart.map(item => ({ id: item.id, title: item.title, price: item.price })),
-        isSubscription,
-        user: { email, password, anrede, vorname, nachname, leitwegId, behorde, strasse, plz, ort }
-      };
-
-      const endpoint = paymentType === 'invoice' ? '/api/buy-on-invoice' : '/api/create-checkout-session';
-
-      const res = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await res.json();
-
-      if (data.url) {
-        window.location.href = data.url; // Redirect to Stripe hosted Checkout
-      } else if (data.success && paymentType === 'invoice') {
-        window.location.href = '/app/fachportal?success=invoice'; // Redirect immediately to Fachportal
-      } else {
-        setCheckoutError(data.error || 'Es ist ein unbekannter Fehler aufgetreten.');
-        setIsLoading(false);
+    await submit({
+      items: isSubscription
+        ? aboItems.map((item, idx) => ({ id: aboIds![idx], title: item.title, price: item.price }))
+        : cart.map(item => ({ id: item.id, title: item.title, price: item.price })),
+      isSubscription,
+      user: {
+        email: isLoggedIn ? (user!.email ?? '') : get('email'),
+        password: get('password'),
+        anrede: get('anrede'),
+        vorname: get('vorname'),
+        nachname: get('nachname'),
+        leitwegId: get('leitwegId'),
+        behorde: get('behorde'),
+        strasse: get('strasse'),
+        plz: get('plz'),
+        ort: get('ort')
       }
-    } catch (err) {
-      setCheckoutError('Fehler bei der Verbindung zum Server. Bitte versuchen Sie es erneut.');
-      setIsLoading(false);
-    }
+    }, type);
   };
 
   return (
@@ -172,17 +152,26 @@ export default function CheckoutFlow({ user = null }: { user?: any }) {
       <div className="flex flex-col">
         <h2 className="text-3xl font-extrabold font-headline text-primary tracking-tight mb-8">Ihre Daten</h2>
         
-        <form onSubmit={handleCheckout} className="bg-white p-8 rounded-3xl border border-outline-variant/20 shadow-xl relative z-20">
+        <form
+          onSubmit={(e) => {
+            // The submitter element (the button that was clicked) carries the
+            // payment type as its `name` attribute — read it directly so we
+            // don't depend on a state update happening before submit.
+            const submitter = (e.nativeEvent as SubmitEvent).submitter as HTMLButtonElement | null;
+            const type: PaymentType = submitter?.name === 'invoice' ? 'invoice' : 'stripe';
+            handleCheckout(type)(e);
+          }}
+          className="bg-white p-8 rounded-3xl border border-outline-variant/20 shadow-xl relative z-20">
           
           {isLoggedIn ? (
             <div className="mb-8">
               <div className="flex items-center gap-4 bg-primary/5 p-4 rounded-2xl border border-primary/20">
                 <div className="w-12 h-12 bg-primary text-white rounded-full flex items-center justify-center pt-1 font-bold text-xl uppercase shadow-md">
-                  {user.email.charAt(0)}
+                  {(user!.email ?? '?').charAt(0)}
                 </div>
                 <div>
                   <div className="text-xs font-bold text-primary tracking-widest uppercase mb-0.5">Angemeldet als</div>
-                  <div className="font-semibold text-on-surface text-base">{user.email}</div>
+                  <div className="font-semibold text-on-surface text-base">{user!.email}</div>
                   <a href="/api/auth/signout" className="text-[10px] text-red-500 hover:text-red-700 font-bold uppercase mt-1 inline-block transition-colors">Anderes Konto / Abmelden</a>
                 </div>
               </div>
@@ -273,7 +262,7 @@ export default function CheckoutFlow({ user = null }: { user?: any }) {
                </div>
              )}
 
-             <button type="submit" onClick={() => setPaymentType('invoice')} disabled={isLoading} className="w-full bg-[#05183a] hover:bg-[#0a2354] text-white text-base font-extrabold py-4 px-6 rounded-xl transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed">
+             <button type="submit" name="invoice" disabled={isLoading} className="w-full bg-[#05183a] hover:bg-[#0a2354] text-white text-base font-extrabold py-4 px-6 rounded-xl transition-all shadow-md active:scale-[0.98] flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed">
                {isLoading && paymentType === 'invoice' ? (
                  <span className="animate-spin material-symbols-outlined text-[20px]">progress_activity</span>
                ) : (
@@ -281,8 +270,8 @@ export default function CheckoutFlow({ user = null }: { user?: any }) {
                )}
                Jetzt buchen (Kauf auf Rechnung)
              </button>
-             
-             <button type="submit" onClick={() => setPaymentType('stripe')} disabled={isLoading} className="w-full bg-surface hover:bg-surface-container border border-outline-variant/50 text-on-surface text-sm font-bold py-3.5 px-6 rounded-xl transition-all shadow-sm active:scale-[0.98] flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed">
+
+             <button type="submit" name="stripe" disabled={isLoading} className="w-full bg-surface hover:bg-surface-container border border-outline-variant/50 text-on-surface text-sm font-bold py-3.5 px-6 rounded-xl transition-all shadow-sm active:scale-[0.98] flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed">
                {isLoading && paymentType === 'stripe' ? (
                  <span className="animate-spin material-symbols-outlined text-[18px]">progress_activity</span>
                ) : (

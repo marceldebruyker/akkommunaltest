@@ -1,5 +1,6 @@
 import type { APIRoute } from 'astro';
 import { Resend } from 'resend';
+import { logger } from '../../lib/logger';
 
 const resend = new Resend(import.meta.env.RESEND_API_KEY);
 
@@ -25,7 +26,7 @@ export const POST: APIRoute = async ({ request }) => {
     await resend.emails.send({
       from: 'AK Kommunal System <onboarding@resend.dev>',
       to: 'marceldebruyker@gmail.com',
-      reply_to: email,
+      replyTo: email,
       subject: `Neue Kontaktanfrage von ${customerName}`,
       text: `Neue Anfrage über das Kontaktformular auf der Plattform:\n\nDetails:\n--------\nName: ${customerName}${orgText}\nE-Mail: ${email}\n\nNachricht:\n--------\n${message}`
     });
@@ -44,9 +45,10 @@ export const POST: APIRoute = async ({ request }) => {
         'Content-Type': 'application/json'
       }
     });
-  } catch (error: any) {
-    console.error('Contact Form Error:', error);
-    return new Response(JSON.stringify({ error: error.message || 'Internal Server Error' }), {
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : 'Internal Server Error';
+    logger.error('Contact Form Error', { error: msg });
+    return new Response(JSON.stringify({ error: msg }), {
       status: 500,
       headers: {
         'Content-Type': 'application/json'

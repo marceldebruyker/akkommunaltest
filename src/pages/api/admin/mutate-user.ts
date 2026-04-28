@@ -1,29 +1,14 @@
 import type { APIRoute } from 'astro';
-import { getSupabaseServer, getSupabaseAdmin } from '../../../lib/supabase';
+import { getSupabaseAdmin } from '../../../lib/supabase';
+import { requireAdmin } from '../../../lib/apiAuth';
+import { logger } from '../../../lib/logger';
 import { Buffer } from 'node:buffer';
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   try {
-    // 1. Authenticate Request
-    const supabaseSession = getSupabaseServer(request, cookies);
-    const { data: { user }, error: authError } = await supabaseSession.auth.getUser();
+    const auth = await requireAdmin({ request, cookies });
+    if (!auth.ok) return auth.response;
 
-    if (authError || !user) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
-    }
-
-    // 2. Authorize Admin Access
-    const { data: adminProfile } = await supabaseSession
-      .from('user_profiles')
-      .select('is_admin')
-      .eq('id', user.id)
-      .single();
-
-    if (adminProfile?.is_admin !== true) {
-      return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403 });
-    }
-
-    // 3. Process the mutation
     const body = await request.json();
     const { targetUserId, action, payload } = body;
 
@@ -34,7 +19,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
     const supabaseAdmin = getSupabaseAdmin();
 
     switch (action) {
-      case 'UPDATE_ROLE':
+      case 'UPDATE_ROLE': {
         // Update user_profiles (is_admin, is_partner, has_membership)
         const { error: profileError } = await supabaseAdmin
           .from('user_profiles')
@@ -44,7 +29,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
             ...(payload.has_membership !== undefined && { has_membership: payload.has_membership })
           })
           .eq('id', targetUserId);
-          
+
         if (profileError) throw profileError;
 
         // If they granted the partner role, push the current profile to Sanity
@@ -82,22 +67,22 @@ export const POST: APIRoute = async ({ request, cookies }) => {
                 
                 await sanityAdminClient.createOrReplace(sanityDoc);
              }
-          } catch(e) {
-             console.error('[Admin Sanity Sync Error]', e);
+          } catch (e) {
+             logger.error('[Admin Sanity Sync Error]', { error: e instanceof Error ? e.message : String(e) });
           }
         }
         break;
+      }
 
-      case 'GRANT_SLUG':
+      case 'GRANT_SLUG': {
         if (!payload.slug) throw new Error('Missing slug in payload');
-        // Check if exists
         const { data: existing } = await supabaseAdmin
           .from('purchases')
           .select('id')
           .eq('user_id', targetUserId)
           .eq('video_slug', payload.slug)
           .single();
-        
+
         if (!existing) {
           const { error: grantErr } = await supabaseAdmin
             .from('purchases')
@@ -105,8 +90,9 @@ export const POST: APIRoute = async ({ request, cookies }) => {
           if (grantErr) throw grantErr;
         }
         break;
+      }
 
-      case 'REVOKE_SLUG':
+      case 'REVOKE_SLUG': {
         if (!payload.slug) throw new Error('Missing slug in payload');
         const { error: revokeErr } = await supabaseAdmin
           .from('purchases')
@@ -115,19 +101,17 @@ export const POST: APIRoute = async ({ request, cookies }) => {
           .eq('video_slug', payload.slug);
         if (revokeErr) throw revokeErr;
         break;
+      }
 
-      case 'RESEND_RESET_PASSWORD':
-        // Generate recovery link and conceptually we could send an email here using standard Supabase mail 
-        // or just return the magic link
-        const { data: linkData, error: linkErr } = await supabaseAdmin.auth.admin.generateLink({
+      case 'RESEND_RESET_PASSWORD': {
+        // Supabase can email the recovery link itself; we just need to mint it.
+        const { error: linkErr } = await supabaseAdmin.auth.admin.generateLink({
           type: 'recovery',
           email: payload.email
         });
         if (linkErr) throw linkErr;
-        // In reality, one would call the custom email endpoint or let Supabase do it.
-        // For now, let's trigger our custom reset endpoint conceptually if we want, or just return success 
-        // since Supabase can handle the email out-of-the-box if configured.
         break;
+      }
 
       default:
         return new Response(JSON.stringify({ error: 'Unknown action' }), { status: 400 });
@@ -140,8 +124,9 @@ export const POST: APIRoute = async ({ request, cookies }) => {
       }
     });
 
-  } catch (err: any) {
-    console.error('Error mutating user:', err);
-    return new Response(JSON.stringify({ error: err.message }), { status: 500 });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Unknown error';
+    logger.error('Error mutating user', { error: msg });
+    return new Response(JSON.stringify({ error: msg }), { status: 500 });
   }
 };

@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import Stripe from 'stripe';
 import { getSupabaseServer, getSupabaseAdmin } from '../../lib/supabase';
 import { sanityClient } from '../../lib/sanity';
+import { logger } from '../../lib/logger';
 
 export const POST: APIRoute = async ({ request, cookies }) => {
   try {
@@ -88,7 +89,7 @@ export const POST: APIRoute = async ({ request, cookies }) => {
         }
       });
     } catch (updateErr) {
-      console.warn("Could not save billing profile data, continuing checkout.", updateErr);
+      logger.warn('Could not save billing profile data, continuing checkout.', { error: updateErr instanceof Error ? updateErr.message : String(updateErr) });
     }
 
     // 5. Checkout Session generieren
@@ -143,8 +144,9 @@ export const POST: APIRoute = async ({ request, cookies }) => {
 
     return new Response(JSON.stringify({ url: session.url, success: true }), { status: 200 });
 
-  } catch (error: any) {
-    console.error("Stripe Checkout Error:", error);
-    return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : 'Unbekannter Fehler';
+    logger.error('Stripe Checkout Error', { error: msg });
+    return new Response(JSON.stringify({ error: msg }), { status: 500 });
   }
 };
